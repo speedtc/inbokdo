@@ -1,0 +1,17 @@
+{
+  "name": "inbokdo",
+  "version": "1.0.0",
+  "description": "인복도 人福圖 — 사주 명리로 그리는 사람 별자리 지도",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "dev": "wrangler dev --local",
+    "deploy": "wrangler deploy",
+    "test": "node test/astro.test.mjs && node test/saju.test.mjs",
+    "og": "python3 tools/mkog.py"
+  },
+  "devDependencies": {
+    "wrangler": "^4.124.0",
+    "lunar-javascript": "^1.7.4"
+  }
+}

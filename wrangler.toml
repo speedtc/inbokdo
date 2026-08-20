@@ -1,0 +1,19 @@
+name = "inbokdo"
+main = "index.js"
+compatibility_date = "2025-08-01"
+
+[[rules]]
+type = "Text"
+globs = ["**/*.html"]
+
+[[rules]]
+type = "Data"
+globs = ["**/*.png"]
+
+[observability]
+enabled = true
+
+[[d1_databases]]
+binding = "DB"
+database_name = "inbokdo"
+database_id = "3dc59d14-568e-4a4d-aaeb-d3bb18bb6df4"

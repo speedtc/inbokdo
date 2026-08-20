@@ -1,0 +1,1474 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#080b14">
+<!--HEAD-->
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>&#9733;</text></svg>">
+<style>
+*,*::before,*::after{box-sizing:border-box}
+[hidden]{display:none!important}
+:root{
+  --ink:#080b14; --ink2:#0e1422; --ink3:#151d31;
+  --gold:#d9b45b; --gold2:#f2dfa5; --gold-dim:#8a7534;
+  --txt:#e9e5db; --dim:#8a92a6; --dim2:#5d6579;
+  --line:rgba(255,255,255,.09); --line2:rgba(255,255,255,.16);
+  --card:rgba(255,255,255,.035);
+  --e0:#4ea87a; --e1:#e2734a; --e2:#d0a94f; --e3:#9fb0c4; --e4:#4f86c6;
+  --r:22px;
+  --safe-b:env(safe-area-inset-bottom,0px);
+  --safe-t:env(safe-area-inset-top,0px);
+  --ease:cubic-bezier(.22,1,.36,1);
+  --spring:cubic-bezier(.34,1.56,.64,1);
+}
+html,body{margin:0;padding:0}
+body{
+  background:var(--ink); color:var(--txt);
+  font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Text','Pretendard Variable',Pretendard,system-ui,'Malgun Gothic',sans-serif;
+  font-size:17px; line-height:1.6; -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+  letter-spacing:-.022em; overflow-x:hidden;
+  text-rendering:optimizeLegibility;
+  -webkit-tap-highlight-color:transparent;
+}
+@supports (font:-apple-system-body){ body{font-family:-apple-system,'Pretendard Variable',Pretendard,sans-serif} }
+body::before{
+  content:''; position:fixed; inset:0; z-index:-2; pointer-events:none;
+  background:
+    radial-gradient(900px 520px at 50% -10%, rgba(217,180,91,.13), transparent 62%),
+    radial-gradient(700px 480px at 12% 22%, rgba(79,134,198,.10), transparent 60%),
+    radial-gradient(700px 520px at 88% 78%, rgba(120,80,160,.09), transparent 60%),
+    linear-gradient(180deg,#080b14 0%,#0a0f1c 40%,#080b14 100%);
+}
+#stars{position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.55}
+.wrap{max-width:540px;margin:0 auto;padding:0 22px calc(120px + var(--safe-b))}
+a{color:inherit;text-decoration:none;-webkit-touch-callout:none}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
+input,select{font:inherit;color:inherit}
+
+/* ---------- 헤더 ---------- */
+header{position:sticky;top:0;z-index:40;
+  -webkit-backdrop-filter:saturate(180%) blur(20px);backdrop-filter:saturate(180%) blur(20px);
+  background:rgba(8,11,20,.72);
+  border-bottom:.5px solid rgba(255,255,255,.10);
+  padding-top:var(--safe-t)}
+.hdr{max-width:540px;margin:0 auto;padding:11px 22px;display:flex;align-items:center;gap:10px}
+.logo{display:flex;align-items:center;gap:9px;font-weight:800;letter-spacing:-.02em}
+.logo .mk{width:26px;height:26px;flex:0 0 26px}
+.logo b{font-size:17px}
+.logo span{font-size:11px;color:var(--gold-dim);font-weight:600;letter-spacing:.14em;margin-left:1px}
+.hdr .sp{flex:1}
+.ghost{border:1px solid var(--line2);border-radius:999px;padding:7px 14px;font-size:13px;font-weight:600;color:var(--dim);transition:.15s}
+.ghost:hover{color:var(--txt);border-color:var(--gold-dim)}
+
+/* ---------- 공통 ---------- */
+.eyebrow{font-size:12.5px;font-weight:600;letter-spacing:.14em;color:var(--gold-dim);text-transform:uppercase}
+h1{font-size:clamp(33px,9vw,46px);line-height:1.14;font-weight:700;letter-spacing:-.042em;margin:16px 0 0}
+h2{font-size:24px;font-weight:700;letter-spacing:-.032em;margin:0 0 14px}
+.lead{color:var(--dim);font-size:16px;margin:18px 0 0;line-height:1.66;letter-spacing:-.018em}
+.card{background:var(--card);border:.5px solid var(--line);border-radius:var(--r);padding:20px;
+  -webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);
+  box-shadow:inset 0 .5px 0 rgba(255,255,255,.07)}
+.sec{margin-top:52px}
+.muted{color:var(--dim)}
+.tiny{font-size:12.5px;line-height:1.6;color:var(--dim2)}
+.center{text-align:center}
+.gold{color:var(--gold2)}
+hr.d{border:0;border-top:1px solid var(--line);margin:20px 0}
+
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:54px;
+  padding:16px 22px;border-radius:16px;font-weight:600;font-size:17px;letter-spacing:-.022em;
+  background:linear-gradient(180deg,#f0d590,#cda549);color:#1d1607;
+  box-shadow:0 6px 22px rgba(217,180,91,.26),inset 0 1px 0 rgba(255,255,255,.35);
+  transition:transform .32s var(--spring),box-shadow .3s var(--ease),opacity .2s}
+.btn:active{transform:scale(.965)}
+.btn:disabled{opacity:.4;pointer-events:none;box-shadow:none}
+.btn.sec2{background:rgba(255,255,255,.07);border:.5px solid var(--line2);color:var(--txt);
+  box-shadow:inset 0 .5px 0 rgba(255,255,255,.09);font-weight:600;
+  -webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px)}
+.btn.sec2:active{background:rgba(255,255,255,.11)}
+
+/* ---------- 폼 ---------- */
+.field{margin-top:22px}
+.field>label{display:block;font-size:13px;font-weight:600;color:var(--dim);margin-bottom:9px;letter-spacing:-.01em}
+.inp{width:100%;min-height:52px;padding:15px 16px;background:rgba(255,255,255,.055);border:.5px solid var(--line2);
+  border-radius:14px;outline:none;transition:.2s var(--ease);font-size:17px;letter-spacing:-.02em}
+.inp:focus{border-color:rgba(217,180,91,.55);background:rgba(217,180,91,.07);box-shadow:0 0 0 4px rgba(217,180,91,.10)}
+.inp::placeholder{color:var(--dim2)}
+select.inp{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='7' viewBox='0 0 11 7'%3E%3Cpath d='M1 1l4.5 4.5L10 1' stroke='%238a92a6' stroke-width='1.6' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 14px center;padding-right:36px}
+select.inp option{background:#151d31;color:#e9e5db}
+.row{display:flex;gap:8px}
+.row>*{flex:1;min-width:0}
+.seg{display:flex;background:rgba(255,255,255,.07);border-radius:14px;padding:3px;gap:3px;position:relative}
+.seg button{flex:1;min-height:44px;padding:10px 8px;border-radius:11px;font-size:15px;font-weight:600;color:var(--dim);
+  transition:color .2s,background .28s var(--ease),transform .3s var(--spring)}
+.seg button[aria-pressed=true]{background:linear-gradient(180deg,#f0d590,#cda549);color:#1d1607;
+  box-shadow:0 2px 8px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.35)}
+.seg button:active{transform:scale(.96)}
+.chk{display:flex;align-items:center;gap:9px;font-size:14px;color:var(--dim);cursor:pointer;user-select:none;padding:4px 0}
+.chk{min-height:44px}
+.chk input{appearance:none;width:22px;height:22px;flex:0 0 22px;border:1.2px solid var(--line2);border-radius:7px;background:rgba(255,255,255,.06);position:relative;transition:.24s var(--spring)}
+.chk input:checked{background:linear-gradient(135deg,#e8c876,#c99f42);border-color:transparent}
+.chk input:checked::after{content:'';position:absolute;left:7.5px;top:3px;width:5px;height:11px;border:solid #1d1607;border-width:0 2.4px 2.4px 0;transform:rotate(42deg)}
+.err{color:#ff9b8a;font-size:13.5px;margin-top:12px;min-height:1px}
+.hint{font-size:12.5px;color:var(--dim2);margin-top:7px;line-height:1.55}
+details.adv{margin-top:16px;border-top:1px solid var(--line);padding-top:14px}
+details.adv summary{font-size:13.5px;color:var(--dim);cursor:pointer;list-style:none;font-weight:600}
+details.adv summary::-webkit-details-marker{display:none}
+details.adv summary::before{content:'＋ ';color:var(--gold-dim)}
+details.adv[open] summary::before{content:'－ '}
+
+/* ---------- 별지도 ---------- */
+.mapbox{position:relative;margin:0 -4px}
+.mapbox svg{display:block;width:100%;height:auto;overflow:visible}
+.star{cursor:pointer}
+.star circle.hit{fill:transparent}
+.dirlabel{font-size:9.5px;font-weight:700;letter-spacing:.1em}
+.namelabel{font-size:8.6px;font-weight:600;fill:rgba(233,229,219,.62)}
+.namelabel.on{fill:#f2dfa5}
+
+/* ---------- 리스트 ---------- */
+.plist{display:flex;flex-direction:column;gap:8px;margin-top:14px}
+.prow{display:flex;align-items:center;gap:13px;padding:13px 14px;background:var(--card);min-height:62px;
+  border:.5px solid var(--line);border-radius:17px;cursor:pointer;text-align:left;width:100%;
+  transition:transform .3s var(--spring),background .2s;
+  -webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px)}
+.prow:active{transform:scale(.985);background:rgba(255,255,255,.07)}
+.prow .rk{width:22px;text-align:center;font-size:13px;font-weight:800;color:var(--dim2);flex:0 0 22px}
+.prow .rk.top{color:var(--gold2)}
+.av{width:40px;height:40px;flex:0 0 40px;border-radius:13px;display:grid;place-items:center;
+  font-size:17px;font-weight:600;border:.5px solid rgba(255,255,255,.14)}
+.prow .nm{flex:1;min-width:0}
+.prow .nm b{display:block;font-size:16px;font-weight:600;letter-spacing:-.022em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.prow .nm i{display:block;font-style:normal;font-size:12px;color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sc{font-size:19px;font-weight:700;letter-spacing:-.035em;flex:0 0 auto;font-variant-numeric:tabular-nums}
+
+/* ---------- 결과 ---------- */
+.scorebig{font-size:88px;font-weight:700;letter-spacing:-.055em;line-height:1;margin:6px 0 0;
+  font-variant-numeric:tabular-nums}
+.scorebig small{font-size:24px;font-weight:600;opacity:.42;margin-left:3px;letter-spacing:-.03em}
+.band{display:inline-block;padding:5px 13px;border-radius:999px;font-size:12.5px;font-weight:800;letter-spacing:-.01em;border:1px solid}
+.tone-gold{color:#f2dfa5;border-color:rgba(217,180,91,.45);background:rgba(217,180,91,.1)}
+.tone-green{color:#8fd6ac;border-color:rgba(78,168,122,.4);background:rgba(78,168,122,.1)}
+.tone-blue{color:#93bdea;border-color:rgba(79,134,198,.4);background:rgba(79,134,198,.1)}
+.tone-gray{color:#b3bccd;border-color:var(--line2);background:rgba(255,255,255,.05)}
+.tone-amber{color:#e8c07a;border-color:rgba(210,160,70,.4);background:rgba(210,160,70,.1)}
+.tone-red{color:#f0998c;border-color:rgba(200,90,80,.4);background:rgba(200,90,80,.1)}
+.typecard{border-radius:var(--r);padding:22px;border:.5px solid var(--line);position:relative;overflow:hidden;
+  -webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);box-shadow:inset 0 .5px 0 rgba(255,255,255,.07)}
+.typecard::before{content:'';position:absolute;inset:0;opacity:.13;background:radial-gradient(120% 90% at 0% 0%,var(--c),transparent 65%)}
+.typecard>*{position:relative}
+.typecard .lbl{font-size:11.5px;font-weight:800;letter-spacing:.13em;color:var(--dim)}
+.typecard h3{margin:7px 0 0;font-size:26px;font-weight:700;letter-spacing:-.04em}
+.typecard p{margin:11px 0 0;font-size:15.5px;line-height:1.66;color:#cdd3e0;letter-spacing:-.018em}
+.chip{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:8px;font-size:12px;font-weight:700;
+  background:rgba(255,255,255,.06);border:1px solid var(--line);color:var(--dim)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+.note{display:flex;gap:10px;padding:11px 0;border-bottom:1px solid var(--line)}
+.note:last-child{border-bottom:0}
+.note .ic{flex:0 0 22px;color:var(--gold-dim);font-size:13px;text-align:center;line-height:1.7}
+.note b{display:block;font-size:13.5px;font-weight:700}
+.note span{font-size:13px;color:var(--dim);line-height:1.6}
+.pillars{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-top:12px}
+.pil{background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:11px;padding:9px 4px;text-align:center}
+.pil i{display:block;font-style:normal;font-size:10.5px;color:var(--dim2);font-weight:700;letter-spacing:.06em}
+.pil b{display:block;font-size:19px;font-weight:700;letter-spacing:.02em;margin-top:3px}
+.pil s{display:block;text-decoration:none;font-size:11px;color:var(--dim);margin-top:1px}
+.bars{margin-top:12px;display:flex;flex-direction:column;gap:7px}
+.bar{display:flex;align-items:center;gap:9px;font-size:12.5px}
+.bar .bn{flex:0 0 40px;color:var(--dim);font-weight:600}
+.bar .bt{flex:1;height:7px;border-radius:99px;background:rgba(255,255,255,.07);overflow:hidden}
+.bar .bt i{display:block;height:100%;border-radius:99px}
+.bar .bv{flex:0 0 38px;text-align:right;color:var(--dim2);font-variant-numeric:tabular-nums}
+
+/* ---------- 공유 ---------- */
+.sharebox{background:linear-gradient(155deg,rgba(217,180,91,.14),rgba(217,180,91,.03));
+  border:.5px solid rgba(217,180,91,.26);border-radius:var(--r);padding:22px;
+  -webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px)}
+.linkrow{display:flex;gap:8px;margin-top:12px}
+.linkrow input{flex:1;min-width:0;padding:12px 13px;font-size:13.5px;background:rgba(0,0,0,.3);
+  border:1px solid var(--line2);border-radius:11px;outline:none;color:var(--dim)}
+.linkrow button{flex:0 0 auto;padding:12px 17px;border-radius:11px;font-weight:800;font-size:14px;
+  background:linear-gradient(135deg,#e8c876,#c99f42);color:#20180a}
+.dock{position:fixed;left:0;right:0;bottom:0;z-index:45;padding:12px 22px calc(14px + var(--safe-b));
+  -webkit-backdrop-filter:saturate(180%) blur(24px);backdrop-filter:saturate(180%) blur(24px);
+  background:linear-gradient(180deg,rgba(8,11,20,0),rgba(8,11,20,.86) 32%);
+  transform:translateY(115%);transition:transform .42s var(--ease);pointer-events:none}
+.dock.on{transform:none;pointer-events:auto}
+.dock .in{max-width:540px;margin:0 auto}
+.toast{position:fixed;left:50%;bottom:calc(26px + var(--safe-b));transform:translateX(-50%) translateY(20px);
+  background:#1c2437;border:1px solid var(--line2);border-radius:12px;padding:12px 20px;font-size:14px;font-weight:600;
+  opacity:0;pointer-events:none;transition:.22s;z-index:100;box-shadow:0 10px 40px rgba(0,0,0,.5)}
+.toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+
+.cap{display:flex;align-items:center;gap:11px;margin-top:18px}
+.cap .bt{flex:1;height:6px;border-radius:99px;background:rgba(255,255,255,.09);overflow:hidden}
+.cap .bt i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#cda549,#f0d590);transition:width .8s var(--ease)}
+.cap .bt.full i{background:linear-gradient(90deg,#c05353,#e08a6a)}
+.cap b{font-size:13px;font-weight:600;color:var(--dim);font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+.upsell{background:linear-gradient(155deg,rgba(217,180,91,.16),rgba(217,180,91,.04));
+  border:.5px solid rgba(217,180,91,.3);border-radius:var(--r);padding:22px;
+  -webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px)}
+.upsell .px{display:flex;align-items:baseline;gap:6px;margin-top:12px}
+.upsell .px b{font-size:30px;font-weight:700;letter-spacing:-.04em;color:#f2dfa5}
+.upsell ul{margin:14px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:8px}
+.upsell li{font-size:14.5px;color:#cdd3e0;display:flex;gap:9px;letter-spacing:-.018em}
+.upsell li::before{content:'✓';color:#f2dfa5;font-weight:700;flex:0 0 14px}
+.sso{display:flex;flex-direction:column;gap:9px;margin-top:16px}
+.sso button{display:flex;align-items:center;justify-content:center;gap:9px;width:100%;min-height:54px;
+  border-radius:16px;font-weight:600;font-size:16.5px;letter-spacing:-.022em;
+  transition:transform .3s var(--spring),filter .2s}
+.sso button:active{transform:scale(.965);filter:brightness(.94)}
+.sso svg{width:19px;height:19px;flex:0 0 19px}
+.me{display:flex;align-items:center;gap:8px}
+.me img{width:26px;height:26px;border-radius:50%;object-fit:cover;border:.5px solid var(--line2)}
+.skel{background:linear-gradient(90deg,rgba(255,255,255,.04),rgba(255,255,255,.09),rgba(255,255,255,.04));
+  background-size:200% 100%;animation:sh 1.3s infinite;border-radius:10px}
+@keyframes sh{0%{background-position:200% 0}100%{background-position:-200% 0}}
+.fade{animation:fade .62s var(--ease) both}
+@keyframes fade{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+.rv.armed{opacity:0;transform:translateY(24px);transition:opacity .75s var(--ease),transform .75s var(--ease)}
+.rv.armed.in{opacity:1;transform:none}
+@media(prefers-reduced-motion:reduce){.fade,.rv{animation:none!important;opacity:1!important;transform:none!important;transition:none!important}}
+@media print{.rv{opacity:1!important;transform:none!important}.dock{display:none}}
+.spin{width:17px;height:17px;border:2px solid rgba(32,24,10,.28);border-top-color:#20180a;border-radius:50%;animation:sp .7s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+footer{margin-top:56px;padding-top:22px;border-top:1px solid var(--line);color:var(--dim2);font-size:12.5px;line-height:1.75}
+@media(min-width:600px){ .wrap{padding-bottom:90px} }
+</style>
+</head>
+<body>
+<canvas id="stars"></canvas>
+<header>
+  <div class="hdr">
+    <a class="logo" href="/" aria-label="인복도 홈">
+      <svg class="mk" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+        <circle cx="16" cy="16" r="14" stroke="#8a7534" stroke-width="1"/>
+        <circle cx="16" cy="16" r="9" stroke="#8a7534" stroke-width=".6" opacity=".55"/>
+        <path d="M16 5.4l1.9 5.9h6.2l-5 3.6 1.9 5.9-5-3.6-5 3.6 1.9-5.9-5-3.6h6.2z" fill="#e8c876"/>
+        <circle cx="24.5" cy="21.5" r="1.5" fill="#d9b45b" opacity=".9"/>
+        <circle cx="7.5" cy="20" r="1.1" fill="#d9b45b" opacity=".7"/>
+        <circle cx="9" cy="9" r="1" fill="#d9b45b" opacity=".6"/>
+      </svg>
+      <b>인복도</b><span>人福圖</span>
+    </a>
+    <div class="sp"></div>
+    <button class="ghost" id="navBtn" hidden>내 지도</button>
+  </div>
+</header>
+
+<main class="wrap" id="app"></main>
+<div class="dock" id="dock"><div class="in"></div></div>
+<div class="toast" id="toast"></div>
+<!--BOOT-->
+<script>
+(function(){
+'use strict';
+var BOOT = window.__BOOT__ || {view:'home'};
+var app = document.getElementById('app');
+var toastEl = document.getElementById('toast');
+var toastT;
+
+/* ===== 데이터 ===== */
+var STEM=['갑','을','병','정','무','기','경','신','임','계'];
+var STEM_H=['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
+var BR=['자','축','인','묘','진','사','오','미','신','유','술','해'];
+var BR_H=['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+var ELEM=['목','화','토','금','수'], ELEM_H=['木','火','土','金','水'];
+var ECOL=['#4ea87a','#e2734a','#d0a94f','#9fb0c4','#4f86c6'];
+var HOURS=[
+ ['모름','태어난 시간을 몰라요'],
+ [23,'자시 子 · 23:00~00:59'],[1,'축시 丑 · 01:00~02:59'],[3,'인시 寅 · 03:00~04:59'],
+ [5,'묘시 卯 · 05:00~06:59'],[7,'진시 辰 · 07:00~08:59'],[9,'사시 巳 · 09:00~10:59'],
+ [11,'오시 午 · 11:00~12:59'],[13,'미시 未 · 13:00~14:59'],[15,'신시 申 · 15:00~16:59'],
+ [17,'유시 酉 · 17:00~18:59'],[19,'술시 戌 · 19:00~20:59'],[21,'해시 亥 · 21:00~22:59']
+];
+var TYPES=null, CHARS=null, ME=null;
+var PROVIDERS=(window.__BOOT__||{}).providers||[];
+var KAKAO_KEY=(window.__BOOT__||{}).kakaoKey||'';
+var REF=(function(){
+  try{
+    var q=new URLSearchParams(location.search).get('ref');
+    if(q&&/^[0-9a-z]{4,12}$/.test(q)){sessionStorage.setItem('inbokdo_ref',q);return q;}
+    return sessionStorage.getItem('inbokdo_ref')||'';
+  }catch(e){return ''}
+})();
+function goCreate(fromCode){
+  try{ if(fromCode) sessionStorage.setItem('inbokdo_ref',fromCode); }catch(e){}
+  location.href='/'+(fromCode?('?ref='+encodeURIComponent(fromCode)):'');
+}
+if(KAKAO_KEY){
+  var ks=document.createElement('script');
+  ks.src='https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js';
+  ks.integrity='sha384-TiCUE00h649CAMonG018J2ujOgDKW/kVWlChEuu4jK2vxfAAD0eZxzCKakxg55G4';
+  ks.crossOrigin='anonymous';
+  ks.onload=function(){try{window.Kakao.init(KAKAO_KEY)}catch(e){}};
+  document.head.appendChild(ks);
+}
+
+/* ===== 유틸 ===== */
+function h(html){var t=document.createElement('template');t.innerHTML=html.trim();return t.content;}
+function el(id){return document.getElementById(id);}
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){
+  return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+function tap(){try{navigator.vibrate&&navigator.vibrate(8)}catch(e){}}
+var RV=null;
+function reveal(root){
+  if(!('IntersectionObserver' in window))return;
+  if(!RV)RV=new IntersectionObserver(function(es){
+    es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');RV.unobserve(e.target);}});
+  },{rootMargin:'0px 0px -6% 0px',threshold:.04});
+  var vh=window.innerHeight||800;
+  (root||document).querySelectorAll('.rv').forEach(function(n){
+    if(n.getBoundingClientRect().top > vh*0.92){ n.classList.add('armed'); RV.observe(n); }
+  });
+}
+function countUp(node,to,ms){
+  var t0=null,from=0;
+  function step(t){
+    if(!t0)t0=t;
+    var k=Math.min(1,(t-t0)/(ms||900));
+    var e=1-Math.pow(1-k,3);
+    node.firstChild.nodeValue=String(Math.round(from+(to-from)*e));
+    if(k<1)requestAnimationFrame(step);
+  }
+  node.firstChild.nodeValue='0';requestAnimationFrame(step);
+}
+var dockEl=document.getElementById('dock');
+var dockIO=null;
+function setDock(html,onClick,anchorSel){
+  var inner=dockEl.firstElementChild;
+  if(dockIO){dockIO.disconnect();dockIO=null;}
+  if(!html){dockEl.classList.remove('on');inner.innerHTML='';return;}
+  inner.innerHTML=html;
+  if(onClick)inner.firstElementChild.onclick=function(){tap();onClick();};
+  var nodes=anchorSel?[].slice.call(document.querySelectorAll(anchorSel)):[];
+  if(!nodes.length||!('IntersectionObserver' in window)){dockEl.classList.add('on');return;}
+  var vis=0;
+  dockIO=new IntersectionObserver(function(es){
+    es.forEach(function(e){ vis += e.isIntersecting?1:-1; });
+    if(vis<0)vis=0;
+    dockEl.classList.toggle('on',vis===0);
+  },{threshold:0});
+  nodes.forEach(function(n){dockIO.observe(n)});
+}
+function toast(m){toastEl.textContent=m;toastEl.classList.add('on');
+  clearTimeout(toastT);toastT=setTimeout(function(){toastEl.classList.remove('on')},2100);}
+function store(k,v){try{if(v===undefined)return JSON.parse(localStorage.getItem(k));
+  localStorage.setItem(k,JSON.stringify(v));}catch(e){return null}}
+function api(path,opt){
+  return fetch(path,Object.assign({headers:{'content-type':'application/json'}},opt||{}))
+    .then(function(r){return r.json().then(function(j){
+      if(!r.ok) throw new Error(j.error||'요청에 실패했습니다.'); return j;});});
+}
+function band(n){
+  if(n>=86)return{label:'인생급 인복',tone:'gold'};
+  if(n>=78)return{label:'확실한 내 편',tone:'green'};
+  if(n>=70)return{label:'있으면 좋은 사이',tone:'blue'};
+  if(n>=61)return{label:'무난한 사이',tone:'gray'};
+  if(n>=52)return{label:'거리 조절이 필요',tone:'amber'};
+  return{label:'조심스러운 사이',tone:'red'};
+}
+function constellation(j){
+  var n=j.count||0;
+  var tier = n>=20?{name:'은하급',desc:'이 정도면 하나의 은하입니다'}
+    : n>=10?{name:'환한 별자리',desc:'멀리서도 보이는 밝기입니다'}
+    : n>=6?{name:'제법 큰 별자리',desc:'모양이 잡히기 시작했습니다'}
+    : n>=3?{name:'작은 별자리',desc:'이제 선이 이어집니다'}
+    : n>=1?{name:'씨앗 별자리',desc:'첫 별이 떴습니다'}
+    : {name:'아직 빈 하늘',desc:'첫 별을 기다리는 중'};
+  var elems={};(j.entries||[]).forEach(function(e){elems[e.elem]=1});
+  var have=Object.keys(elems).length;
+  var missing=[];
+  for(var i=0;i<5;i++) if(!elems[i]) missing.push(ELEM_H[i]+' '+ELEM[i]);
+  return {
+    name: j.ownerName+'자리',
+    tier: tier.name, desc: tier.desc,
+    complete: have===5, have:have, missing:missing,
+    gwiin: (j.entries||[]).filter(function(e){return e.cheoneul}).length
+  };
+}
+function charBy(k){for(var i=0;i<CHARS.length;i++)if(CHARS[i].key===k)return CHARS[i];return CHARS[0];}
+function gz(p){return p?STEM_H[p[0]]+BR_H[p[1]]:'—';}
+function gzk(p){return p?STEM[p[0]]+BR[p[1]]:'시간 모름';}
+
+/* ===== 배경 별 ===== */
+(function(){
+  var c=document.getElementById('stars'),x=c.getContext('2d'),pts=[],raf;
+  function init(){
+    c.width=innerWidth*devicePixelRatio;c.height=innerHeight*devicePixelRatio;
+    c.style.width=innerWidth+'px';c.style.height=innerHeight+'px';
+    pts=[];var n=Math.min(120,Math.round(innerWidth*innerHeight/12000));
+    for(var i=0;i<n;i++)pts.push({x:Math.random()*c.width,y:Math.random()*c.height,
+      r:(Math.random()*1.1+.3)*devicePixelRatio,p:Math.random()*6.28,s:Math.random()*.9+.3});
+  }
+  function draw(t){
+    x.clearRect(0,0,c.width,c.height);
+    for(var i=0;i<pts.length;i++){var p=pts[i];
+      var a=.28+.42*Math.abs(Math.sin(t/2600*p.s+p.p));
+      x.globalAlpha=a;x.fillStyle=i%7===0?'#f2dfa5':'#cfe0ff';
+      x.beginPath();x.arc(p.x,p.y,p.r,0,6.284);x.fill();}
+    raf=requestAnimationFrame(draw);
+  }
+  init();raf=requestAnimationFrame(draw);
+  var to;addEventListener('resize',function(){clearTimeout(to);to=setTimeout(init,220)});
+})();
+
+/* ===== 폼 ===== */
+function formHTML(o){
+  o=o||{};
+  var years='';for(var y=2035;y>=1900;y--)years+='<option value="'+y+'"'+(y===(o.y||1995)?' selected':'')+'>'+y+'</option>';
+  var months='';for(var m=1;m<=12;m++)months+='<option value="'+m+'"'+(m===(o.m||1)?' selected':'')+'>'+m+'월</option>';
+  var days='';for(var d=1;d<=31;d++)days+='<option value="'+d+'"'+(d===(o.d||1)?' selected':'')+'>'+d+'일</option>';
+  var hrs='';for(var i=0;i<HOURS.length;i++)hrs+='<option value="'+HOURS[i][0]+'">'+HOURS[i][1]+'</option>';
+  return ''+
+  '<div class="field"><label for="fName">'+esc(o.nameLabel||'이름 또는 닉네임')+'</label>'+
+    '<input class="inp" id="fName" maxlength="12" autocomplete="off" placeholder="'+esc(o.namePh||'예: 김도현, 도현이')+'"></div>'+
+  '<div class="field"><label>달력</label><div class="seg" id="fCal">'+
+    '<button type="button" data-v="solar" aria-pressed="true">양력</button>'+
+    '<button type="button" data-v="lunar" aria-pressed="false">음력</button></div></div>'+
+  '<div class="field"><label>생년월일</label><div class="row">'+
+    '<select class="inp" id="fY" style="flex:1.35">'+years+'</select>'+
+    '<select class="inp" id="fM">'+months+'</select>'+
+    '<select class="inp" id="fD">'+days+'</select></div>'+
+    '<label class="chk" id="fLeapWrap" hidden style="margin-top:10px"><input type="checkbox" id="fLeap"><span>윤달이에요</span></label>'+
+    '<div class="hint" id="fLunarHint" hidden></div></div>'+
+  '<div class="field"><label>태어난 시간</label>'+
+    '<select class="inp" id="fH">'+hrs+'</select>'+
+    '<div class="hint">시간을 모르면 그대로 두세요. 시주(時柱)만 빼고 계산합니다.</div></div>'+
+  '<details class="adv"><summary>고급 설정</summary>'+
+    '<label class="chk" style="margin-top:10px"><input type="checkbox" id="fTrue"><span>진태양시로 보정 (서울 기준 −32분)</span></label>'+
+    '<div class="hint">한국 표준시는 동경 135도 기준이라 실제 태양시와 약 32분 차이가 납니다. 시간 경계에 태어났다면 켜보세요.</div>'+
+  '</details>'+
+  '<div class="err" id="fErr"></div>'+
+  '<button class="btn" id="fGo" style="margin-top:18px">'+esc(o.cta||'다음')+'</button>';
+}
+
+function bindForm(root,onSubmit){
+  var cal='solar';
+  var seg=root.querySelector('#fCal');
+  var leapWrap=root.querySelector('#fLeapWrap');
+  var hint=root.querySelector('#fLunarHint');
+  var fy=root.querySelector('#fY'),fm=root.querySelector('#fM');
+  seg.addEventListener('click',function(e){
+    var b=e.target.closest('button[data-v]');if(!b)return;
+    cal=b.dataset.v;
+    seg.querySelectorAll('button').forEach(function(x){x.setAttribute('aria-pressed',String(x===b));});
+    refreshLeap();
+  });
+  function refreshLeap(){
+    if(cal!=='lunar'){leapWrap.hidden=true;hint.hidden=true;root.querySelector('#fLeap').checked=false;return;}
+    hint.hidden=false;hint.textContent='음력 날짜는 한국천문연구원 기준으로 양력으로 변환한 뒤 계산합니다.';
+    api('/api/lunar?y='+fy.value).then(function(j){
+      var lm=j.leapMonth;
+      if(lm && Number(fm.value)===lm){leapWrap.hidden=false;
+        leapWrap.querySelector('span').textContent=lm+'월 윤달이에요';}
+      else{leapWrap.hidden=true;root.querySelector('#fLeap').checked=false;}
+    }).catch(function(){});
+  }
+  fy.addEventListener('change',refreshLeap);
+  fm.addEventListener('change',refreshLeap);
+
+  var btn=root.querySelector('#fGo'),err=root.querySelector('#fErr'),busy=false;
+  function submit(){
+    if(busy)return;
+    var name=root.querySelector('#fName').value.trim();
+    if(!name){err.textContent='이름 또는 닉네임을 입력해 주세요.';root.querySelector('#fName').focus();return;}
+    var hv=root.querySelector('#fH').value;
+    var unknown=(hv==='모름');
+    var birth={
+      y:Number(fy.value),m:Number(fm.value),d:Number(root.querySelector('#fD').value),
+      hour:unknown?null:Number(hv),minute:unknown?null:30,
+      unknownTime:unknown,lunar:cal==='lunar',
+      leap:!!root.querySelector('#fLeap').checked,
+      trueSolar:!!root.querySelector('#fTrue').checked
+    };
+    err.textContent='';busy=true;
+    btn.innerHTML='<span class="spin"></span>';
+    onSubmit({name:name,birth:birth},function(msg){
+      busy=false;btn.textContent=btn.dataset.label||'다시 시도';
+      if(msg)err.textContent=msg;
+    });
+  }
+  btn.dataset.label=btn.textContent;
+  btn.addEventListener('click',submit);
+  root.addEventListener('keydown',function(e){if(e.key==='Enter'&&e.target.id==='fName')submit();});
+}
+
+/* ===== 별지도 ===== */
+var EANG=[90,180,null,270,0]; // 목 화 토 금 수 (화면 각도, 0=위, 시계방향)
+function layout(entries){
+  var by={};entries.forEach(function(e){(by[e.elem]=by[e.elem]||[]).push(e);});
+  var out=[];
+  Object.keys(by).forEach(function(k){
+    var e=Number(k),list=by[k],n=list.length;
+    list.forEach(function(it,i){
+      var ang;
+      if(e===2){
+        var g=Math.floor(i/4);
+        ang=45+(i%4)*90+(g%2?1:-1)*Math.ceil(g/2)*13;
+      }else{
+        var span=Math.min(72,Math.max(18,n*15));
+        ang=EANG[e]+(n===1?0:(i/(n-1)-.5)*span);
+      }
+      var r=158-((it.score-8)/91)*94;   // 62 ~ 158
+      out.push(Object.assign({},it,{ang:ang,r:r}));
+    });
+  });
+  // 겹침 완화: 가까운 별끼리 접선 방향으로 밀어낸다
+  for(var pass=0;pass<26;pass++){
+    var moved=false;
+    for(var a=0;a<out.length;a++)for(var b=a+1;b<out.length;b++){
+      var A=out[a],B=out[b];
+      var pa=pos(A),pb=pos(B);
+      var dx=pb.x-pa.x,dy=pb.y-pa.y,d=Math.sqrt(dx*dx+dy*dy);
+      if(d>=21)continue;
+      var push=(21-d)/2;
+      var da=push/Math.max(A.r,26)*57.3, db=push/Math.max(B.r,26)*57.3;
+      var dir=((B.ang-A.ang+540)%360-180)>=0?1:-1;
+      A.ang-=da*dir; B.ang+=db*dir;
+      if(d<3){A.r=Math.max(58,A.r-3);B.r=Math.min(160,B.r+3);}
+      moved=true;
+    }
+    if(!moved)break;
+  }
+  out.forEach(function(o){var q=pos(o);o.x=q.x;o.y=q.y;});
+  return out;
+}
+function pos(o){
+  var rad=(o.ang-90)*Math.PI/180;
+  return {x:180+Math.cos(rad)*o.r, y:180+Math.sin(rad)*o.r};
+}
+// 이름표 자리 잡기 (겹치면 반대편, 그래도 겹치면 생략)
+function placeLabels(pts,limit){
+  var boxes=[{x:180,y:198,w:70,h:16}]; // 중심 라벨 영역
+  var sorted=pts.slice().sort(function(a,b){return b.score-a.score});
+  var out={};
+  sorted.forEach(function(p,idx){
+    if(limit && idx>=limit) return;
+    var w=Math.max(18,p.name.length*8.4+3),h=12;
+    var rr=p.score>=82?7:4.4;
+    var cands=[{x:p.x,y:p.y+rr+10},{x:p.x,y:p.y-rr-4},
+               {x:p.x+w/2+rr+4,y:p.y+4},{x:p.x-w/2-rr-4,y:p.y+4}];
+    for(var i=0;i<cands.length;i++){
+      var c=cands[i];
+      if(c.x-w/2<-6||c.x+w/2>366||c.y<12||c.y>354)continue;
+      var hit=boxes.some(function(bx){
+        return Math.abs(bx.x-c.x)<(bx.w+w)/2+2 && Math.abs(bx.y-c.y)<(bx.h+h)/2+1;
+      });
+      if(!hit){boxes.push({x:c.x,y:c.y,w:w,h:h});out[p.id]=c;return;}
+    }
+  });
+  return out;
+}
+function starMap(entries,owner,opt){
+  opt=opt||{};
+  var pts=layout(entries);
+  var labels=placeLabels(pts, pts.length>34?14:0);
+  if(opt.sel!=null&&!labels[opt.sel]){
+    var sp=pts.filter(function(x){return x.id===opt.sel})[0];
+    if(sp)labels[opt.sel]={x:sp.x,y:sp.y-11};
+  }
+  var s='<svg viewBox="-20 -10 400 400" role="img" aria-label="인복 별자리 지도">';
+  s+='<defs>'+
+     '<radialGradient id="og"><stop offset="0%" stop-color="#fff8e0"/><stop offset="45%" stop-color="#f2dfa5"/><stop offset="100%" stop-color="#d9b45b" stop-opacity="0"/></radialGradient>'+
+     '<filter id="gl" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="2.6" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>'+
+     '</defs>';
+  // 동심원
+  [158,118,80,44].forEach(function(r,i){
+    s+='<circle cx="180" cy="180" r="'+r+'" fill="none" stroke="rgba(255,255,255,'+(0.09-i*0.012)+')" stroke-width="1"'+(i===0?' stroke-dasharray="2 4"':'')+'/>';
+  });
+  // 방위선
+  [0,90,180,270].forEach(function(a){
+    var rad=(a-90)*Math.PI/180;
+    s+='<line x1="180" y1="180" x2="'+(180+Math.cos(rad)*158)+'" y2="'+(180+Math.sin(rad)*158)+'" stroke="rgba(255,255,255,.055)" stroke-width="1"/>';
+  });
+  // 오행 방위 라벨
+  [[0,'水 북',4],[90,'木 동',0],[180,'火 남',1],[270,'金 서',3]].forEach(function(d){
+    var rad=(d[0]-90)*Math.PI/180,R=174;
+    s+='<text class="dirlabel" x="'+(180+Math.cos(rad)*R)+'" y="'+(180+Math.sin(rad)*R+3)+'" text-anchor="middle" fill="'+ECOL[d[2]]+'" opacity=".7">'+d[1]+'</text>';
+  });
+  [45,135,225,315].forEach(function(a){
+    var rad=(a-90)*Math.PI/180,R=170;
+    s+='<text class="dirlabel" x="'+(180+Math.cos(rad)*R)+'" y="'+(180+Math.sin(rad)*R+3)+'" text-anchor="middle" fill="'+ECOL[2]+'" opacity=".38">土</text>';
+  });
+  // 연결선
+  pts.forEach(function(p){
+    s+='<line x1="180" y1="180" x2="'+p.x.toFixed(1)+'" y2="'+p.y.toFixed(1)+'" stroke="'+ECOL[p.elem]+'" stroke-opacity="'+(0.10+p.score/420).toFixed(3)+'" stroke-width="'+(p.score>=80?1.4:1)+'"/>';
+  });
+  // 중심(주인)
+  s+='<circle cx="180" cy="180" r="26" fill="url(#og)" opacity=".5"/>';
+  s+='<circle cx="180" cy="180" r="9.5" fill="#f7ecc8" filter="url(#gl)"/>';
+  s+='<text x="180" y="184" text-anchor="middle" font-size="9" font-weight="800" fill="#20180a">'+esc(owner.han)+'</text>';
+  s+='<text x="180" y="201" text-anchor="middle" font-size="10" font-weight="600" fill="#f2dfa5" letter-spacing="-.02em">'+esc(owner.name)+'</text>';
+  // 참여자 별
+  pts.forEach(function(p,i){
+    var big=p.score>=82,rr=big?5.2:(p.score>=68?4.2:3.4);
+    s+='<g class="star" data-id="'+p.id+'">';
+    if(big){
+      s+='<path d="M'+p.x.toFixed(1)+' '+(p.y-9).toFixed(1)+'l2.1 6.9 6.9 2.1-6.9 2.1-2.1 6.9-2.1-6.9-6.9-2.1 6.9-2.1z" fill="'+ECOL[p.elem]+'" opacity=".95" filter="url(#gl)"/>';
+    }else{
+      s+='<circle cx="'+p.x.toFixed(1)+'" cy="'+p.y.toFixed(1)+'" r="'+rr+'" fill="'+ECOL[p.elem]+'" filter="url(#gl)"/>';
+    }
+    if(p.cheoneul)s+='<circle cx="'+p.x.toFixed(1)+'" cy="'+p.y.toFixed(1)+'" r="'+(rr+4)+'" fill="none" stroke="#f2dfa5" stroke-width="1" opacity=".75"/>';
+    var L=labels[p.id];
+    if(L) s+='<text class="namelabel'+(opt.sel===p.id?' on':'')+'" x="'+L.x.toFixed(1)+'" y="'+L.y.toFixed(1)+'" text-anchor="middle">'+esc(p.name)+'</text>';
+    s+='<circle class="hit" cx="'+p.x.toFixed(1)+'" cy="'+p.y.toFixed(1)+'" r="15"/></g>';
+  });
+  if(!pts.length){
+    s+='<text x="180" y="252" text-anchor="middle" font-size="11.5" fill="#5d6579">아직 아무도 없어요. 링크를 보내보세요.</text>';
+  }
+  s+='</svg>';
+  return s;
+}
+
+/* ===== 화면: 홈 ===== */
+function viewHome(){
+  app.innerHTML='';
+  app.appendChild(h(
+  '<section class="fade" style="padding-top:36px">'+
+    '<div class="eyebrow">사주로 그리는 사람 지도</div>'+
+    '<h1>내 곁의 사람들은<br>나에게 <span class="gold">어떤 기운</span>일까</h1>'+
+    '<p class="lead">생년월일만 있으면 됩니다. 링크를 보내고 친구가 자기 생일을 넣으면, '+
+      '두 사람 사이에 오가는 기운을 사주 명리로 풀어 <b class="gold">별자리처럼</b> 그려드립니다.</p>'+
+    '<button class="btn" id="go" style="margin-top:26px">내 인복도 만들기</button>'+
+    '<p class="tiny center" style="margin-top:11px">30초면 끝나요 · 가입 없음</p>'+
+  '</section>'+
+
+  '<section class="sec rv">'+
+    '<div class="mapbox" id="demo"></div>'+
+    '<p class="tiny center" style="margin-top:-4px">참여자는 자기 일간(日干)의 오행 방위에 자리를 잡고, 기운이 잘 맞을수록 나에게 가까이 옵니다.</p>'+
+  '</section>'+
+
+  '<section class="sec rv">'+
+    '<h2>이렇게 씁니다</h2>'+
+    '<div class="card" style="display:flex;flex-direction:column;gap:16px">'+
+      step(1,'내 생년월일을 넣습니다','양력·음력 모두 됩니다. 태어난 시간은 몰라도 괜찮아요.')+
+      step(2,'만들어진 링크를 보냅니다','카톡·인스타 어디든. 친구는 자기 생일만 넣으면 됩니다.')+
+      step(3,'별이 하나씩 찍힙니다','누가 나에게 힘이 되는 사람인지 한눈에 보입니다.')+
+    '</div>'+
+  '</section>'+
+
+  '<section class="sec rv">'+
+    '<h2>어떻게 계산하나요</h2>'+
+    '<div class="card">'+
+      '<p style="margin:0;font-size:14.5px;line-height:1.8;color:#cdd3e0">'+
+      '재미로 뽑는 랜덤 점수가 아닙니다. 생년월일시를 <b class="gold">사주 여덟 글자</b>로 세운 뒤, '+
+      '두 사람의 일간(日干) 사이 십신 관계, 지지의 합·충·형·해, 천을귀인 같은 신살, '+
+      '그리고 서로 부족한 오행을 얼마나 채워주는지를 따져 점수를 냅니다.</p>'+
+      '<div class="chips">'+
+        '<span class="chip">절기 기준 월주</span><span class="chip">한국 표준시 변천 반영</span>'+
+        '<span class="chip">음양력 변환</span><span class="chip">십신 · 합충 · 신살</span>'+
+      '</div>'+
+      '<p class="tiny" style="margin:14px 0 0">절기와 삭 시각은 천문 계산(VSOP87)으로 직접 구합니다. '+
+      '1954~1961년 표준시 변경과 서머타임 시행 기간도 반영합니다.</p>'+
+    '</div>'+
+  '</section>'+
+
+  '<section class="sec rv">'+
+    '<h2>열 가지 사람</h2>'+
+    '<p class="tiny" style="margin:-6px 0 0">태어난 날의 천간에 따라 나는 이런 사람입니다.</p>'+
+    '<div class="plist" id="charList"></div>'+
+  '</section>'+
+
+  '<section class="sec rv">'+
+    '<button class="btn" id="go2">내 인복도 만들기</button>'+
+  '</section>'+
+
+  '<footer>'+
+    '<b style="color:#8a92a6">인복도 人福圖</b><br>'+
+    '사주 명리는 사람을 이해하는 오래된 언어이지 정답지가 아닙니다. 여기 나온 결과로 사람을 재단하지 마세요. '+
+    '실제 관계는 결국 주고받은 말과 시간으로 만들어집니다.<br><br>'+
+    '입력한 생년월일은 궁합 계산에만 쓰이며, 다른 참여자에게는 절대 보이지 않습니다.<br><br>'+
+    '<a href="/terms" style="color:#8a92a6;text-decoration:underline">이용약관</a> · '+
+    '<a href="/privacy" style="color:#8a92a6;text-decoration:underline">개인정보처리방침</a>'+
+  '</footer>'));
+
+  el('go').onclick=el('go2').onclick=function(){tap();location.hash='';viewCreate();};
+  setDock('<button class="btn">내 인복도 만들기</button>',function(){viewCreate();},'#go');
+  reveal(app);
+
+  // 데모 지도
+  var demo=[
+    {id:1,name:'현우',score:91,elem:0,cheoneul:true},{id:2,name:'지민',score:74,elem:1,cheoneul:false},
+    {id:3,name:'수아',score:62,elem:4,cheoneul:false},{id:4,name:'태호',score:83,elem:3,cheoneul:false},
+    {id:5,name:'은지',score:55,elem:2,cheoneul:false},{id:6,name:'준서',score:69,elem:0,cheoneul:false},
+    {id:7,name:'서연',score:47,elem:1,cheoneul:false},{id:8,name:'민재',score:78,elem:4,cheoneul:false}
+  ];
+  el('demo').innerHTML=starMap(demo,{han:'丙',name:'나'},{});
+
+  loadMeta().then(function(){
+    var list=el('charList');if(!list)return;
+    list.innerHTML=CHARS.map(function(c){
+      return '<div class="prow" style="cursor:default">'+
+        '<div class="av" style="background:'+c.color+'22;color:'+c.color+'">'+esc(c.han)+'</div>'+
+        '<div class="nm"><b>'+esc(c.name)+'</b><i>'+esc(c.tag)+'</i></div>'+
+        '<span class="chip" style="flex:0 0 auto">'+esc(ELEM_H[c.elem])+'</span></div>';
+    }).join('');
+  });
+  window.scrollTo(0,0);
+}
+function step(n,t,d){
+  return '<div style="display:flex;gap:13px;align-items:flex-start">'+
+    '<div style="flex:0 0 26px;height:26px;border-radius:9px;background:rgba(217,180,91,.15);color:#f2dfa5;'+
+    'display:grid;place-items:center;font-size:13px;font-weight:800">'+n+'</div>'+
+    '<div><b style="font-size:15px">'+esc(t)+'</b>'+
+    '<div style="font-size:13.5px;color:var(--dim);margin-top:2px;line-height:1.6">'+esc(d)+'</div></div></div>';
+}
+
+/* ===== 화면: 내 지도 만들기 ===== */
+function viewCreate(){
+  setDock(null);
+  app.innerHTML='';
+  app.appendChild(h(
+  '<section class="fade" style="padding-top:30px">'+
+    '<div class="eyebrow">STEP 1</div>'+
+    '<h1 style="font-size:30px">내 정보를<br>먼저 넣어주세요</h1>'+
+    '<p class="lead" style="font-size:14.5px">이 정보로 지도의 중심을 세웁니다. 친구에게는 이름만 보이고 생년월일은 보이지 않습니다.</p>'+
+    (!ME&&PROVIDERS.length
+      ? '<div class="card" style="margin-top:22px;border-color:rgba(217,180,91,.26);background:linear-gradient(155deg,rgba(217,180,91,.1),rgba(255,255,255,.03))">'+
+        '<b style="font-size:16px;letter-spacing:-.03em">먼저 로그인하면 지도가 계정에 저장됩니다</b>'+
+        '<div class="tiny" style="margin-top:6px">로그인 없이 만들어도 되지만, 이 브라우저에서만 찾을 수 있어요.</div>'+
+        ssoBtns('/')+'</div>'
+      : '')+
+    '<div class="card" style="margin-top:22px" id="fw">'+formHTML({cta:'내 인복도 만들기'})+'</div>'+
+  '</section>'));
+  bindSso(app);
+  bindForm(el('fw'),function(data,done){
+    if(REF)data.ref=REF;
+    api('/api/maps',{method:'POST',body:JSON.stringify(data)}).then(function(j){
+      try{sessionStorage.removeItem('inbokdo_ref')}catch(e){}
+      var mine=store('inbokdo_mine')||{};
+      mine[j.code]={token:j.token,name:data.name,at:Date.now()};
+      store('inbokdo_mine',mine);
+      location.href='/m/'+j.code;
+    }).catch(function(e){done(e.message);});
+  });
+  window.scrollTo(0,0);
+}
+
+/* ===== 화면: 지도 ===== */
+var MAP=null,SEL=null;
+function viewMap(code){
+  app.innerHTML='<div class="skel" style="height:34px;width:60%;margin-top:34px"></div>'+
+    '<div class="skel" style="height:300px;margin-top:22px"></div>';
+  var mine=store('inbokdo_mine')||{};
+  var tk=mine[code]&&mine[code].token;
+  loadMeta().then(function(){
+    return api('/api/maps/'+code+(tk?'?token='+encodeURIComponent(tk):''));
+  }).then(function(j){
+    MAP=j;MAP.code=code;
+    var joined=(store('inbokdo_joined')||{})[code];
+    if(j.isOwner) renderOwner(j);
+    else if(joined) showResultFor(code,joined.id,joined.token);
+    else renderVisitor(j);
+  }).catch(function(e){
+    app.innerHTML='<section class="fade" style="padding-top:60px" class="center">'+
+      '<h1 style="font-size:26px">'+esc(e.message)+'</h1>'+
+      '<p class="lead">링크가 잘못되었거나 삭제된 지도일 수 있어요.</p>'+
+      '<button class="btn" style="margin-top:20px" onclick="location.href=\'/\'">내 인복도 만들기</button></section>';
+  });
+}
+
+function constBox(j){
+  var k=constellation(j);
+  var top=(j.entries||[])[0];
+  var h2='';
+  if(top){
+    var tc=charBy(top.charKey),tt=TYPES[top.typeIn];
+    h2='<div class="card" style="margin-top:10px;background:linear-gradient(155deg,rgba(217,180,91,.13),rgba(255,255,255,.03));border-color:rgba(217,180,91,.24)">'+
+      '<div class="eyebrow" style="color:#c9a227">내 1번 인복</div>'+
+      '<div style="display:flex;align-items:center;gap:13px;margin-top:11px">'+
+        '<div class="av" style="width:48px;height:48px;flex:0 0 48px;background:'+tc.color+'22;color:'+tc.color+';font-size:21px">'+esc(tc.han)+'</div>'+
+        '<div style="flex:1;min-width:0"><b style="font-size:19px;letter-spacing:-.03em">'+esc(top.name)+'</b>'+
+        '<div class="tiny" style="color:var(--dim)">'+esc(tt.name)+' · '+esc(tc.name)+'</div></div>'+
+        '<div class="sc" style="font-size:24px;color:#f2dfa5">'+top.score+'</div>'+
+      '</div>'+
+      '<button class="btn sec2" id="brag" style="margin-top:14px">'+esc(top.name)+'님에게 알려주기</button>'+
+    '</div>';
+  }
+  return '<div class="card">'+
+    '<div style="display:flex;align-items:baseline;gap:9px">'+
+      '<b style="font-size:22px;font-weight:700;letter-spacing:-.035em">'+esc(k.name)+'</b>'+
+      '<span class="chip" style="flex:0 0 auto">'+esc(k.tier)+'</span></div>'+
+    '<p style="margin:8px 0 0;font-size:14.5px;color:#cdd3e0;line-height:1.66">'+esc(k.desc)+'.'+
+      (k.gwiin?' 그중 <b class="gold">천을귀인이 '+k.gwiin+'명</b> 있습니다.':'')+'</p>'+
+    '<div class="chips">'+
+      (k.complete
+        ? '<span class="chip" style="color:#f2dfa5;border-color:rgba(217,180,91,.45)">★ 오행 완성</span>'
+        : '<span class="chip">오행 '+k.have+'/5</span>'+
+          (k.missing.length&&k.missing.length<=3?'<span class="chip">아직 없는 기운 · '+esc(k.missing.join(', '))+'</span>':''))+
+    '</div>'+
+    (k.complete?'':'<div class="tiny" style="margin-top:11px">다섯 방위가 다 차면 별자리가 완성됩니다.</div>')+
+  '</div>'+h2;
+}
+function capBar(j){
+  var lim=j.limit||10,n=Math.min(j.count,lim),pct=Math.round(n/lim*100);
+  return '<div class="cap"><span class="bt'+(j.full?' full':'')+'"><i style="width:'+pct+'%"></i></span>'+
+    '<b>'+j.count+' / '+lim+'명</b></div>'+
+    (j.full
+      ? '<div class="tiny" style="margin-top:7px;color:#e8c07a">자리가 다 찼어요. 아래에서 자리를 늘려보세요.</div>'
+      : '<div class="tiny" style="margin-top:7px">'+(lim-j.count)+'자리 남았어요.</div>');
+}
+function growBox(j){
+  var lim=j.limit||10, maxed=lim>=30;
+  var done=!!j.checkedInToday;
+  return '<div class="upsell" id="growBox">'+
+    '<div class="eyebrow" style="color:#c9a227">자리 늘리기</div>'+
+    '<b style="display:block;font-size:21px;font-weight:700;letter-spacing:-.035em;margin-top:8px">'+
+      (maxed?'출석으로는 다 채웠어요':'하루 한 번 들르면 자리가 하나 늘어요')+'</b>'+
+    '<p style="margin:9px 0 0;font-size:14.5px;color:#cdd3e0;line-height:1.66">'+
+      (maxed
+        ? '출석으로 늘릴 수 있는 30명을 다 채웠습니다. 이제 친구를 초대해서 늘려보세요.'
+        : '지금 정원은 <b class="gold">'+lim+'명</b>. 출석으로 최대 30명까지 늘릴 수 있어요.')+'</p>'+
+    (j.streak>1?'<div class="chips" style="margin-top:11px"><span class="chip" style="color:#f2dfa5;border-color:rgba(217,180,91,.4)">🔥 '+j.streak+'일 연속</span>'+
+      (j.invites?'<span class="chip">초대 '+j.invites+'명 · +'+(j.invites*2)+'자리</span>':'')+'</div>':
+     (j.invites?'<div class="chips" style="margin-top:11px"><span class="chip">초대 '+j.invites+'명 · +'+(j.invites*2)+'자리</span></div>':''))+
+    (maxed?'':'<button class="btn'+(done?' sec2':'')+'" id="chk" style="margin-top:16px"'+(done?' disabled':'')+'>'+
+      (done?'오늘 출석 완료 · 내일 또 오세요':'출석하고 자리 1개 늘리기')+'</button>')+
+    '<div class="tiny" style="margin-top:12px;padding-top:11px;border-top:1px solid rgba(255,255,255,.09);line-height:1.65">'+
+      '친구가 내 링크로 들어와 <b style="color:#cdd3e0">자기 인복도를 만들면</b> 자리가 2개씩 더 늘어납니다.</div>'+
+  '</div>';
+}
+// 로그인한 상태에서 브라우저에만 있던 지도를 자동으로 계정에 붙인다
+function claimIfNeeded(j){
+  if(!ME||j.saved!==false)return;
+  var mine=store('inbokdo_mine')||{};
+  var tk=mine[j.code]&&mine[j.code].token;
+  if(!tk)return;
+  api('/api/maps/'+j.code+'/claim',{method:'POST',body:JSON.stringify({token:tk})})
+    .then(function(){toast('내 계정에 저장했어요');setTimeout(function(){viewMap(j.code)},800);})
+    .catch(function(){});
+}
+function bindCheckin(code){
+  var b=el('chk');if(!b)return;
+  b.onclick=function(){
+    tap();
+    var mine=store('inbokdo_mine')||{};
+    var tk=mine[code]&&mine[code].token;
+    if(!tk){toast('이 지도의 주인만 출석할 수 있어요');return;}
+    b.innerHTML='<span class="spin"></span>';b.disabled=true;
+    api('/api/maps/'+code+'/checkin',{method:'POST',body:JSON.stringify({token:tk})})
+      .then(function(r){
+        toast(r.message||'출석했어요');
+        setTimeout(function(){viewMap(code)},700);
+      })
+      .catch(function(e){b.disabled=false;b.textContent='출석하고 자리 1개 늘리기';toast(e.message);});
+  };
+}
+function upsellBox(j){
+  return '<div class="upsell">'+
+    '<div class="eyebrow" style="color:#c9a227">자리가 다 찼어요</div>'+
+    '<b style="display:block;font-size:21px;font-weight:700;letter-spacing:-.035em;margin-top:8px">'+
+      '별을 더 받고 싶다면</b>'+
+    '<p style="margin:9px 0 0;font-size:14.5px;color:#cdd3e0;line-height:1.66">'+
+      '무료로 '+(j.limit||10)+'명까지 받았습니다. 한 번 후원하면 이 지도는 계속 열려 있습니다.</p>'+
+    '<ul><li>참여 인원 300명까지</li><li>지도 영구 보관</li><li>새 참여자 알림</li></ul>'+
+    '<button class="btn" id="unlock" style="margin-top:16px">후원하고 계속 받기</button>'+
+    '<div class="tiny center" style="margin-top:10px">준비 중입니다. 조금만 기다려 주세요.</div>'+
+  '</div>';
+}
+function bindUnlock(code){
+  var b=el('unlock');if(!b)return;
+  b.onclick=function(){
+    tap();
+    var mine=store('inbokdo_mine')||{};
+    var tk=mine[code]&&mine[code].token;
+    b.innerHTML='<span class="spin"></span>';
+    api('/api/maps/'+code+'/unlock',{method:'POST',body:JSON.stringify({token:tk})})
+      .then(function(){toast('열렸습니다');location.reload();})
+      .catch(function(e){b.textContent='후원하고 계속 받기';toast(e.message);});
+  };
+}
+function shareBox(code,ownerName){
+  var url=location.origin+'/m/'+code;
+  return '<div class="sharebox">'+
+    '<b style="font-size:15.5px">링크를 보내면 별이 늘어납니다</b>'+
+    '<div class="tiny" style="margin-top:5px;color:var(--dim)">받는 사람은 생년월일만 넣으면 됩니다. 가입 필요 없어요.</div>'+
+    '<div class="linkrow"><input id="lnk" readonly value="'+esc(url)+'"><button id="cpy">복사</button></div>'+
+    '<button class="btn sec2" id="shr" style="margin-top:9px">공유하기</button>'+
+    '<button class="btn sec2" id="grp" style="margin-top:9px">단톡방에 통째로 보내기</button>'+
+    '<div class="tiny" style="margin-top:11px;line-height:1.65">단톡방에 보내면 문구까지 같이 나갑니다. '+
+      '한 명씩 설득하는 것보다 방에 한 번 던지는 쪽이 훨씬 빨리 찹니다.</div>'+
+  '</div>';
+}
+function copyLink(code){
+  var url=location.origin+'/m/'+code;
+  var i=el('lnk');if(i){i.select();i.setSelectionRange(0,99999);}
+  function ok(){toast('링크를 복사했어요')}
+  if(navigator.clipboard&&window.isSecureContext){
+    navigator.clipboard.writeText(url).then(ok).catch(function(){try{document.execCommand('copy');ok()}catch(e){}});
+  }else{try{document.execCommand('copy');ok()}catch(e){toast('링크를 길게 눌러 복사해 주세요')}}
+}
+function doShare(code,ownerName,group){
+  var url=location.origin+'/m/'+code;
+  var title=(ownerName?ownerName+'님의 인복도':'인복도');
+  var txt=group
+    ? '우리 방 사람들 다 해보자. 생일만 넣으면 나랑 얼마나 맞는지 사주로 나와요. 30초 걸림'
+    : '생년월일만 넣으면 우리 둘 사이에 오가는 기운이 사주로 나와요.';
+  if(window.Kakao&&window.Kakao.isInitialized&&window.Kakao.isInitialized()){
+    try{
+      window.Kakao.Share.sendDefault({
+        objectType:'feed',
+        content:{title:title,description:txt,imageUrl:location.origin+'/og.png',
+          imageWidth:1200,imageHeight:630,link:{mobileWebUrl:url,webUrl:url}},
+        buttons:[{title:group?'나도 해보기':'내 별 남기기',link:{mobileWebUrl:url,webUrl:url}}]
+      });
+      return;
+    }catch(e){}
+  }
+  if(navigator.share){navigator.share({title:title,text:txt,url:url}).catch(function(){});return;}
+  copyLink(code);
+}
+function bindShare(code,ownerName){
+  var c=el('cpy');if(c)c.onclick=function(){tap();copyLink(code);};
+  var s=el('shr');if(s)s.onclick=function(){tap();doShare(code,ownerName);};
+  var g=el('grp');if(g)g.onclick=function(){tap();doShare(code,ownerName,true);};
+}
+
+function renderOwner(j){
+  var pts=j.entries;
+  app.innerHTML='';
+  app.appendChild(h(
+  '<section class="fade" style="padding-top:28px">'+
+    '<div class="eyebrow">MY MAP</div>'+
+    '<h1 style="font-size:29px">'+esc(j.ownerName)+'님의 인복도</h1>'+
+    '<p class="lead" style="font-size:14.5px">'+
+      (pts.length? '지금까지 <b class="gold">'+pts.length+'명</b>이 별을 남겼습니다. 안쪽에 있을수록 나와 기운이 잘 맞는 사람입니다.'
+                 : '아직 아무도 없습니다. 아래 링크를 친구에게 보내보세요.')+'</p>'+
+    capBar(j)+
+  '</section>'+
+  '<section class="sec rv" style="margin-top:30px">'+constBox(j)+'</section>'+
+  '<section class="sec fade" style="margin-top:20px"><div class="mapbox" id="map"></div>'+
+    '<div id="selBox"></div></section>'+
+  '<section class="sec rv">'+shareBox(j.code,j.ownerName)+'</section>'+
+  '<section class="sec rv">'+growBox(j)+'</section>'+
+  (j.saved===false&&PROVIDERS.length
+    ? '<section class="sec rv"><div class="card" style="border-color:rgba(217,180,91,.28);background:linear-gradient(155deg,rgba(217,180,91,.12),rgba(255,255,255,.03))">'+
+      '<div class="eyebrow" style="color:#c9a227">아직 저장 안 됨</div>'+
+      '<b style="display:block;font-size:19px;font-weight:700;letter-spacing:-.035em;margin-top:8px">이 지도는 이 브라우저에만 있어요</b>'+
+      '<p style="margin:8px 0 0;font-size:14.5px;color:#cdd3e0;line-height:1.66">'+
+      '기록을 지우거나 폰을 바꾸면 다시 찾을 수 없습니다. 로그인해두면 안전하게 남습니다.</p>'+
+      ssoBtns('/m/'+j.code)+'</div></section>'
+    : '')+
+  '<section class="sec rv" id="listSec"></section>'+
+  '<section class="sec rv" id="meSec"></section>'+
+  '<footer>결과는 재미로 보는 것이지 사람을 판단하는 기준이 아닙니다. 참여자의 생년월일은 저장되지만 누구에게도 표시되지 않습니다.</footer>'));
+
+  el('map').innerHTML=starMap(pts,j.ownerChar,{sel:SEL});
+  bindStars(pts);
+  bindShare(j.code,j.ownerName);
+  bindCheckin(j.code);
+  bindSso(app);
+  claimIfNeeded(j);
+  var bg=el('brag');
+  if(bg)bg.onclick=function(){
+    tap();
+    var t=(j.entries[0]||{}).name;
+    var url=location.origin+'/m/'+j.code;
+    var msg=t+'님이 제 1번 인복이래요. 인복도에서 나온 결과예요.';
+    if(navigator.share)navigator.share({title:'인복도',text:msg,url:url}).catch(function(){});
+    else copyLink(j.code);
+  };
+  setDock('<button class="btn">'+(j.full?'자리 늘리기':'링크 공유하기')+'</button>',function(){
+    if(j.full){var g=el('growBox');if(g)g.scrollIntoView({behavior:'smooth',block:'center'});}
+    else doShare(j.code,j.ownerName);
+  },'.sharebox, #growBox');
+  reveal(app);
+
+  if(pts.length){
+    el('listSec').innerHTML='<h2>내 사람들</h2><div class="plist">'+pts.map(function(p,i){
+      var c=charBy(p.charKey),t=TYPES[p.typeIn],b=band(p.score);
+      return '<button class="prow" data-id="'+p.id+'">'+
+        '<span class="rk'+(i<3?' top':'')+'">'+(i+1)+'</span>'+
+        '<span class="av" style="background:'+c.color+'22;color:'+c.color+'">'+esc(c.han)+'</span>'+
+        '<span class="nm"><b>'+esc(p.name)+(p.cheoneul?' <span style="color:#f2dfa5">★</span>':'')+'</b>'+
+        '<i>'+esc(t.name)+' · '+esc(c.name)+'</i></span>'+
+        '<span class="sc" style="color:'+scColor(b.tone)+'">'+p.score+'</span></button>';
+    }).join('')+'</div>';
+    el('listSec').addEventListener('click',function(e){
+      var b=e.target.closest('[data-id]');if(!b)return;selectStar(Number(b.dataset.id));
+    });
+  }
+  var me=j.ownerSaju&&j.ownerSaju.pillars;
+  if(me){
+    el('meSec').innerHTML='<h2>내 사주</h2>'+sajuCard(j.ownerSaju,j.ownerChar);
+  }
+  window.scrollTo(0,0);
+}
+function scColor(tone){
+  return {gold:'#f2dfa5',green:'#8fd6ac',blue:'#93bdea',gray:'#b3bccd',amber:'#e8c07a',red:'#f0998c'}[tone];
+}
+function bindStars(pts){
+  var box=el('map');if(!box)return;
+  box.addEventListener('click',function(e){
+    var g=e.target.closest('.star');if(!g)return;selectStar(Number(g.dataset.id));
+  });
+}
+function selectStar(id){
+  SEL=(SEL===id?null:id);
+  var pts=MAP.entries;
+  el('map').innerHTML=starMap(pts,MAP.ownerChar,{sel:SEL});
+  var box=el('selBox');
+  if(SEL==null){box.innerHTML='';return;}
+  var p=pts.filter(function(x){return x.id===SEL})[0];if(!p){box.innerHTML='';return;}
+  var c=charBy(p.charKey),ti=TYPES[p.typeIn],to=TYPES[p.typeOut],b=band(p.score);
+  box.innerHTML='<div class="card fade" style="margin-top:12px">'+
+    '<div style="display:flex;align-items:center;gap:12px">'+
+      '<div class="av" style="width:44px;height:44px;flex:0 0 44px;background:'+c.color+'22;color:'+c.color+';font-size:19px">'+esc(c.han)+'</div>'+
+      '<div style="flex:1;min-width:0"><b style="font-size:17px">'+esc(p.name)+'</b>'+
+      '<div class="tiny" style="color:var(--dim)">'+esc(c.name)+' · '+esc(c.tag)+'</div></div>'+
+      '<div style="text-align:right"><div class="sc" style="font-size:24px;color:'+scColor(b.tone)+'">'+p.score+'</div>'+
+      '<div class="tiny">'+p.rank+'위</div></div>'+
+    '</div>'+
+    '<hr class="d">'+
+    '<div class="lbl tiny" style="letter-spacing:.13em;font-weight:800">이 사람은 나에게</div>'+
+    '<b style="font-size:16px;color:'+ti.color+'">'+esc(ti.name)+'</b>'+
+    '<p style="margin:5px 0 0;font-size:13.5px;color:#cdd3e0;line-height:1.7">'+esc(ti.in)+'</p>'+
+    '<div class="lbl tiny" style="letter-spacing:.13em;font-weight:800;margin-top:14px">나는 이 사람에게</div>'+
+    '<b style="font-size:16px;color:'+to.color+'">'+esc(to.name)+'</b>'+
+    '<p style="margin:5px 0 0;font-size:13.5px;color:#cdd3e0;line-height:1.7">'+esc(to.out)+'</p>'+
+    '<div class="tiny" style="margin-top:13px;padding-top:11px;border-top:1px solid var(--line)">💡 '+esc(ti.how)+'</div>'+
+  '</div>';
+  box.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+function sajuCard(s,ch){
+  var P=s.pillars,names=['년주','월주','일주','시주'],keys=['year','month','day','hour'];
+  var g='<div class="card">'+
+    '<div style="display:flex;align-items:center;gap:12px">'+
+    '<div class="av" style="width:44px;height:44px;flex:0 0 44px;background:'+ch.color+'22;color:'+ch.color+';font-size:19px">'+esc(ch.han)+'</div>'+
+    '<div><b style="font-size:16px">'+esc(ch.name)+'</b><div class="tiny" style="color:var(--dim)">'+esc(ch.tag)+'</div></div></div>'+
+    '<p style="margin:12px 0 0;font-size:13.5px;color:#cdd3e0;line-height:1.7">'+esc(ch.desc)+'</p>'+
+    '<div class="pillars">';
+  keys.forEach(function(k,i){
+    var p=P[k];
+    g+='<div class="pil"><i>'+names[i]+'</i><b>'+(p?esc(gz(p)):'—')+'</b><s>'+(p?esc(gzk(p)):'모름')+'</s></div>';
+  });
+  g+='</div><div class="bars">';
+  s.dist.forEach(function(v,i){
+    g+='<div class="bar"><span class="bn">'+ELEM_H[i]+' '+ELEM[i]+'</span>'+
+      '<span class="bt"><i style="width:'+Math.min(100,v*2.4)+'%;background:'+ECOL[i]+'"></i></span>'+
+      '<span class="bv">'+v.toFixed(1)+'%</span></div>';
+  });
+  g+='</div>';
+  if(s.lunar)g+='<div class="tiny" style="margin-top:12px">양력 '+s.solar.y+'.'+s.solar.m+'.'+s.solar.d+
+    ' · 음력 '+s.lunar.y+'.'+s.lunar.m+'.'+s.lunar.d+(s.lunar.leap?' (윤달)':'')+
+    (s.unknownTime?' · 시간 모름':'')+'</div>';
+  g+='</div>';
+  return g;
+}
+
+/* ===== 결과 카드 이미지 ===== */
+function drawCard(r){
+  var W=1080,H=1350,c=document.createElement('canvas');
+  c.width=W;c.height=H;var x=c.getContext('2d');
+  var res=r.result,b=band(res.score);
+  var ti=TYPES[res.typeIn],to=TYPES[res.typeOut];
+  var cme=charBy(res.charB),cow=charBy(res.charA);
+  var SC={gold:'#f2dfa5',green:'#8fd6ac',blue:'#93bdea',gray:'#c3ccdd',amber:'#e8c07a',red:'#f0998c'}[b.tone];
+  var F="-apple-system,BlinkMacSystemFont,'Pretendard Variable',Pretendard,'Apple SD Gothic Neo','Malgun Gothic',sans-serif";
+
+  var g=x.createLinearGradient(0,0,0,H);
+  g.addColorStop(0,'#0b1020');g.addColorStop(.5,'#0a0f1c');g.addColorStop(1,'#080b14');
+  x.fillStyle=g;x.fillRect(0,0,W,H);
+  var rg=x.createRadialGradient(W/2,240,0,W/2,240,760);
+  rg.addColorStop(0,'rgba(217,180,91,.16)');rg.addColorStop(1,'rgba(217,180,91,0)');
+  x.fillStyle=rg;x.fillRect(0,0,W,H);
+
+  var sd=res.score*7919+1;
+  function rnd(){sd=(sd*1103515245+12345)%2147483648;return sd/2147483648;}
+  for(var i=0;i<260;i++){
+    var px=rnd()*W,py=rnd()*H,pr=rnd()*2.4+.6;
+    x.globalAlpha=.18+rnd()*.55;
+    x.fillStyle=rnd()<.2?'#f2dfa5':'#cfe0ff';
+    x.beginPath();x.arc(px,py,pr,0,6.284);x.fill();
+  }
+  x.globalAlpha=1;
+
+  x.textAlign='center';
+  x.fillStyle='#b0913f';x.font='600 30px '+F;
+  x.fillText('人 福 圖   인 복 도',W/2,120);
+
+  x.fillStyle='#8a92a6';x.font='500 34px '+F;
+  x.fillText(r.me.name+'  ×  '+r.ownerName,W/2,214);
+
+  x.fillStyle=SC;x.font='700 210px '+F;
+  x.shadowColor='rgba(242,223,165,.28)';x.shadowBlur=48;
+  x.fillText(String(res.score),W/2,400);
+  x.shadowBlur=0;
+  x.fillStyle='#8a92a6';x.font='600 38px '+F;
+  x.fillText(b.label,W/2,468);
+
+  // 두 캐릭터
+  function orb(cx,cy,ch,label,sub){
+    x.beginPath();x.arc(cx,cy,62,0,6.284);
+    x.fillStyle=ch.color+'2e';x.fill();
+    x.lineWidth=2;x.strokeStyle=ch.color+'88';x.stroke();
+    x.fillStyle=ch.color;x.font='600 52px '+F;x.fillText(ch.han,cx,cy+19);
+    x.fillStyle='#8a92a6';x.font='500 25px '+F;x.fillText(label,cx,cy+108);
+    x.fillStyle='#e9e5db';x.font='600 32px '+F;x.fillText(sub,cx,cy+150);
+  }
+  orb(W/2-215,640,cme,'나',cme.name);
+  orb(W/2+215,640,cow,r.ownerName+'님',cow.name);
+  x.strokeStyle='rgba(217,180,91,.45)';x.lineWidth=2;
+  x.beginPath();x.moveTo(W/2-128,640);x.lineTo(W/2+128,640);x.stroke();
+  x.fillStyle='#d9b45b';x.font='600 34px '+F;
+  x.fillText('↔',W/2,652);
+
+  // 유형 카드
+  function card(y,label,name,color,text){
+    var pad=88,w=W-pad*2,hh=196;
+    x.beginPath();
+    if(x.roundRect)x.roundRect(pad,y,w,hh,34);else x.rect(pad,y,w,hh);
+    x.fillStyle='rgba(255,255,255,.045)';x.fill();
+    x.lineWidth=1.5;x.strokeStyle='rgba(255,255,255,.10)';x.stroke();
+    x.textAlign='left';
+    x.fillStyle='#8a92a6';x.font='600 24px '+F;x.fillText(label,pad+40,y+56);
+    x.fillStyle=color;x.font='700 46px '+F;x.fillText(name,pad+40,y+116);
+    x.fillStyle='#a8b0c2';x.font='500 26px '+F;
+    x.fillText(text.length>30?text.slice(0,29)+'…':text,pad+40,y+162);
+    x.textAlign='center';
+  }
+  card(880,'나는 '+r.ownerName+'님에게',to.name,to.color,to.out.split('.')[0]+'.');
+  card(1096,r.ownerName+'님은 나에게',ti.name,ti.color,ti.in.split('.')[0]+'.');
+
+  x.fillStyle='#5d6579';x.font='500 25px '+F;
+  x.fillText(location.host,W/2,1315);
+  return c;
+}
+function saveCard(r){
+  var c;
+  try{c=drawCard(r);}catch(e){toast('이미지를 만들지 못했어요');return;}
+  var name='인복도_'+r.me.name+'_'+r.result.score+'점.png';
+  c.toBlob(function(blob){
+    if(!blob){toast('이미지를 만들지 못했어요');return;}
+    var file=null;
+    try{file=new File([blob],name,{type:'image/png'});}catch(e){}
+    if(file&&navigator.canShare&&navigator.canShare({files:[file]})){
+      navigator.share({files:[file],title:'인복도'}).catch(function(){});
+      return;
+    }
+    var url=URL.createObjectURL(blob);
+    var a=document.createElement('a');a.href=url;a.download=name;
+    document.body.appendChild(a);a.click();a.remove();
+    setTimeout(function(){URL.revokeObjectURL(url)},4000);
+    toast('이미지를 저장했어요');
+  },'image/png');
+}
+
+/* ===== 화면: 방문자 ===== */
+function renderVisitorFull(j){
+  setDock(null);
+  var c=j.ownerChar;
+  app.innerHTML='';
+  app.appendChild(h(
+  '<section class="fade" style="padding-top:34px">'+
+    '<div class="eyebrow">자리가 다 찼어요</div>'+
+    '<h1 style="font-size:30px">'+esc(j.ownerName)+'님의 인복도는<br>지금 <span class="gold">'+j.count+'명</span>이 꽉 채웠어요</h1>'+
+    '<p class="lead">조금 늦었네요. 대신 <b>내 인복도</b>를 만들어서 '+esc(j.ownerName)+'님을 초대해보는 건 어때요?</p>'+
+    '<button class="btn" id="mk" style="margin-top:26px">내 인복도 만들기</button>'+
+  '</section>'+
+  '<section class="sec rv"><div class="mapbox" id="map"></div>'+
+    '<p class="tiny center" style="margin-top:-2px">이미 자리를 잡은 사람들입니다.</p></section>'));
+  el('map').innerHTML=starMap(j.entries,j.ownerChar,{});
+  el('mk').onclick=function(){tap();goCreate(j.code);};
+  setDock('<button class="btn">내 인복도 만들기</button>',function(){goCreate(j.code);},'#mk');
+  reveal(app);window.scrollTo(0,0);
+}
+function renderVisitor(j){
+  if(j.full)return renderVisitorFull(j);
+  app.innerHTML='';
+  var c=j.ownerChar;
+  app.appendChild(h(
+  '<section class="fade" style="padding-top:30px">'+
+    '<div class="eyebrow">초대장</div>'+
+    '<h1 style="font-size:29px">'+esc(j.ownerName)+'님의 인복도에<br>당신의 <span class="gold">별</span>을 남겨주세요</h1>'+
+    '<p class="lead" style="font-size:14.5px">생년월일만 넣으면 두 사람 사이에 오가는 기운을 사주로 풀어드립니다. '+
+      '<b>내가 이 사람에게 어떤 사람인지</b>도 함께 나옵니다.</p>'+
+  '</section>'+
+  '<section class="sec fade" style="margin-top:22px">'+
+    '<div class="card" style="display:flex;align-items:center;gap:13px">'+
+      '<div class="av" style="width:46px;height:46px;flex:0 0 46px;background:'+c.color+'22;color:'+c.color+';font-size:20px">'+esc(c.han)+'</div>'+
+      '<div style="flex:1;min-width:0"><b style="font-size:16px">'+esc(j.ownerName)+'님은 '+esc(c.name)+'</b>'+
+      '<div class="tiny" style="color:var(--dim)">'+esc(c.tag)+'</div></div>'+
+      '<div style="text-align:right"><div style="font-size:19px;font-weight:800;color:#f2dfa5">'+j.count+'</div><div class="tiny">명 참여</div></div>'+
+    '</div>'+
+  '</section>'+
+  '<section class="sec fade"><div class="mapbox" id="map"></div>'+
+    '<p class="tiny center" style="margin-top:-2px">이미 자리를 잡은 사람들입니다. 이름만 보이고 생년월일은 아무에게도 보이지 않아요.</p></section>'+
+  '<section class="sec fade"><div class="card" id="fw">'+
+    formHTML({cta:'내 별 남기기',nameLabel:'뭐라고 부를까요',namePh:'예: 지민, 동아리 지민'})+'</div></section>'+
+  '<section class="sec fade"><button class="btn sec2" id="own">나도 내 인복도 만들기</button></section>'+
+  '<footer>입력한 생년월일은 궁합 계산에만 쓰이고 지도 주인에게도 보이지 않습니다. 결과는 재미로만 봐주세요.</footer>'));
+
+  el('map').innerHTML=starMap(j.entries,j.ownerChar,{});
+  el('own').onclick=function(){tap();goCreate(j.code);};
+  setDock('<button class="btn">내 별 남기기</button>',function(){
+    var n=document.querySelector('#fw');
+    n.scrollIntoView({behavior:'smooth',block:'center'});
+    setTimeout(function(){var f=n.querySelector('#fName');if(f)f.focus();},420);
+  },'#fw');
+  reveal(app);
+  bindForm(el('fw'),function(data,done){
+    api('/api/maps/'+j.code+'/join',{method:'POST',body:JSON.stringify(data)}).then(function(r){
+      var jd=store('inbokdo_joined')||{};
+      jd[j.code]={id:r.entryId,token:r.token,name:data.name};
+      store('inbokdo_joined',jd);
+      renderResult(r,j.code);
+    }).catch(function(e){
+      done(e.message);
+      if(/자리가 다 찼/.test(e.message)) setTimeout(function(){
+        api('/api/maps/'+j.code).then(function(n){MAP=n;MAP.code=j.code;renderVisitorFull(n);});
+      },900);
+    });
+  });
+  window.scrollTo(0,0);
+}
+
+function showResultFor(code,id,token){
+  api('/api/maps/'+code+'/entries/'+id+'?token='+encodeURIComponent(token))
+    .then(function(r){renderResult(r,code);})
+    .catch(function(){
+      var jd=store('inbokdo_joined')||{};delete jd[code];store('inbokdo_joined',jd);
+      renderVisitor(MAP);
+    });
+}
+
+function renderResult(r,code){
+  var res=r.result,b=band(res.score);
+  var ti=TYPES[res.typeIn],to=TYPES[res.typeOut];
+  var cme=charBy(res.charB),cow=charBy(res.charA);
+  var pct=r.total>1?Math.round((1-(r.rank-1)/r.total)*100):100;
+
+  app.innerHTML='';
+  app.appendChild(h(
+  '<section class="fade center" style="padding-top:34px">'+
+    '<div class="eyebrow">'+esc(r.ownerName)+'님과 '+esc(r.me.name)+'님</div>'+
+    '<div class="scorebig" style="color:'+scColor(b.tone)+'">'+res.score+'<small>점</small></div>'+
+    '<div style="margin-top:12px"><span class="band tone-'+b.tone+'">'+esc(b.label)+'</span></div>'+
+    '<p class="tiny" style="margin-top:12px">참여자 '+r.total+'명 중 <b class="gold">'+r.rank+'위</b>'+
+      (r.total>2?' · 상위 '+pct+'%':'')+'</p>'+
+    (r.rank===1&&r.total>=3
+      ? '<div class="card" style="margin-top:18px;background:linear-gradient(155deg,rgba(217,180,91,.16),rgba(255,255,255,.03));border-color:rgba(217,180,91,.3)">'+
+        '<b style="font-size:17px;letter-spacing:-.03em">지금 '+esc(r.ownerName)+'님의 <span class="gold">1번 인복</span>입니다</b>'+
+        '<div class="tiny" style="margin-top:6px;color:var(--dim)">'+r.total+'명 중에서 가장 기운이 잘 맞는 사람이에요.</div></div>'
+      : '')+
+  '</section>'+
+
+  '<section class="sec fade" style="margin-top:26px">'+
+    '<div class="typecard" style="--c:'+to.color+';background:rgba(255,255,255,.035)">'+
+      '<div class="lbl">나는 '+esc(r.ownerName)+'님에게</div>'+
+      '<h3 style="color:'+to.color+'">'+esc(to.name)+'</h3>'+
+      '<p>'+esc(to.out)+'</p>'+
+    '</div>'+
+    '<div class="typecard" style="--c:'+ti.color+';background:rgba(255,255,255,.035);margin-top:10px">'+
+      '<div class="lbl">'+esc(r.ownerName)+'님은 나에게</div>'+
+      '<h3 style="color:'+ti.color+'">'+esc(ti.name)+'</h3>'+
+      '<p>'+esc(ti.in)+'</p>'+
+    '</div>'+
+    '<div class="card" style="margin-top:10px"><div class="tiny" style="color:#cdd3e0;font-size:13.5px">💡 '+esc(ti.how)+'</div></div>'+
+  '</section>'+
+
+  '<section class="sec rv">'+
+    '<h2>두 사람의 캐릭터</h2>'+
+    '<div class="card" style="display:flex;gap:10px;align-items:stretch">'+
+      charMini(cme,'나')+
+      '<div style="flex:0 0 22px;display:grid;place-items:center;color:var(--gold-dim);font-size:17px">↔</div>'+
+      charMini(cow,esc(r.ownerName)+'님')+
+    '</div>'+
+    '<div class="chips" style="margin-top:10px">'+
+      '<span class="chip">일간 관계 '+esc(res.sipsinOut)+'</span>'+
+      (res.cheoneul?'<span class="chip" style="color:#f2dfa5;border-color:rgba(217,180,91,.4)">★ 천을귀인</span>':'')+
+      (res.ganHap?'<span class="chip">천간합</span>':'')+
+      (res.ganChung?'<span class="chip">천간충</span>':'')+
+      res.branchRels.map(function(x){return '<span class="chip">지지 '+esc(x.label)+' '+esc(x.pairs.join(' '))+'</span>';}).join('')+
+    '</div>'+
+  '</section>'+
+
+  (res.notes.length?'<section class="sec rv"><h2>왜 이런 결과가 나왔나</h2><div class="card">'+
+    res.notes.map(function(n){return '<div class="note"><div class="ic">◈</div><div><b>'+esc(n.t)+'</b>'+
+      '<span>'+esc(n.d)+'</span></div></div>';}).join('')+'</div></section>':'')+
+
+  '<section class="sec fade"><h2>내 사주</h2>'+sajuCard(r.me.saju,cme)+'</section>'+
+
+  '<section class="sec rv">'+
+    '<div class="sharebox">'+
+      '<b style="font-size:15.5px">나도 내 인복도를 만들어볼까요</b>'+
+      '<div class="tiny" style="margin-top:5px;color:var(--dim)">내 링크를 만들어 친구들을 모으면, 누가 나에게 힘이 되는 사람인지 한눈에 보입니다.</div>'+
+      '<button class="btn" id="mk" style="margin-top:13px">내 인복도 만들기</button>'+
+      '<button class="btn sec2" id="card" style="margin-top:9px">결과 이미지 저장하기</button>'+
+      '<button class="btn sec2" id="see" style="margin-top:9px">'+esc(r.ownerName)+'님의 지도 보기</button>'+
+    '</div>'+
+  '</section>'+
+  '<footer>사주는 사람을 이해하는 언어이지 정답지가 아닙니다. 낮은 점수가 나빠도 실제 관계는 얼마든지 달라집니다.</footer>'));
+
+  el('mk').onclick=function(){tap();goCreate(code);};
+  el('card').onclick=function(){tap();saveCard(r);};
+  el('see').onclick=function(){tap();renderVisitorMapOnly(code);};
+  var sb=document.querySelector('.scorebig');
+  if(sb)countUp(sb,res.score,1000);
+  setDock('<button class="btn">나도 내 인복도 만들기</button>',function(){goCreate(code);},'#mk, #card');
+  reveal(app);
+  window.scrollTo(0,0);
+}
+function charMini(c,label){
+  return '<div style="flex:1;min-width:0;text-align:center">'+
+    '<div class="av" style="width:46px;height:46px;margin:0 auto;background:'+c.color+'22;color:'+c.color+';font-size:20px">'+esc(c.han)+'</div>'+
+    '<div class="tiny" style="margin-top:7px;color:var(--dim2)">'+label+'</div>'+
+    '<b style="display:block;font-size:14.5px;margin-top:1px">'+esc(c.name)+'</b>'+
+    '<div class="tiny" style="line-height:1.5;margin-top:3px">'+esc(c.tag)+'</div>'+
+    '<div class="tiny" style="margin-top:6px;color:var(--gold-dim)">주는 것 · '+esc(c.give)+'</div></div>';
+}
+function renderVisitorMapOnly(code){
+  api('/api/maps/'+code).then(function(j){
+    MAP=j;MAP.code=code;
+    app.innerHTML='';
+    app.appendChild(h(
+    '<section class="fade" style="padding-top:30px">'+
+      '<div class="eyebrow">'+esc(j.ownerName)+'님의 인복도</div>'+
+      '<h1 style="font-size:27px">지금까지 '+j.count+'명이<br>별을 남겼습니다</h1>'+
+    '</section>'+
+    '<section class="sec fade"><div class="mapbox" id="map"></div><div id="selBox"></div></section>'+
+    '<section class="sec rv">'+shareBox(code,j.ownerName)+'</section>'+
+    '<section class="sec fade"><button class="btn" id="mk">나도 내 인복도 만들기</button></section>'));
+    el('map').innerHTML=starMap(j.entries,j.ownerChar,{});
+    bindStars(j.entries);
+    bindShare(code,j.ownerName);
+    el('mk').onclick=function(){tap();goCreate(code);};
+    window.scrollTo(0,0);
+  });
+}
+
+/* ===== 부트 ===== */
+function loadMeta(){
+  if(TYPES)return Promise.resolve();
+  return api('/api/meta').then(function(j){TYPES=j.types;CHARS=j.characters;});
+}
+function loadMe(){
+  return api('/api/me').then(function(j){
+    ME=j.user||null;
+    if(j.providers&&j.providers.length)PROVIDERS=j.providers;
+    return j;
+  }).catch(function(){ME=null;return {user:null}});
+}
+function ssoBtns(next){
+  if(!PROVIDERS.length)return '';
+  var n=encodeURIComponent(next||location.pathname+location.search);
+  var icons={
+    kakao:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3C6.9 3 2.8 6.2 2.8 10.2c0 2.5 1.7 4.8 4.2 6.1l-1 3.6c-.1.3.3.6.6.4l4.3-2.8c.4 0 .7.1 1.1.1 5.1 0 9.2-3.2 9.2-7.2S17.1 3 12 3z"/></svg>',
+    naver:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 4h5.3l5.1 7.4V4H20v16h-5.3L9.6 12.6V20H4z"/></svg>'
+  };
+  return '<div class="sso">'+PROVIDERS.map(function(p){
+    return '<button type="button" data-sso="'+p.key+'" data-next="'+esc(n)+'" '+
+      'style="background:'+p.color+';color:'+p.fg+'">'+(icons[p.key]||'')+
+      esc(p.label)+'로 계속하기</button>';
+  }).join('')+'</div>';
+}
+function bindSso(root){
+  (root||document).addEventListener('click',function(e){
+    var b=e.target.closest('[data-sso]');if(!b)return;
+    tap();location.href='/auth/'+b.dataset.sso+'?next='+b.dataset.next;
+  });
+}
+function logout(){
+  fetch('/auth/logout',{method:'POST'}).then(function(){location.href='/'});
+}
+function updateNav(){
+  var b=el('navBtn');
+  if(ME){
+    b.hidden=false;
+    b.innerHTML='<span class="me">'+(ME.avatar?'<img src="'+esc(ME.avatar)+'" alt="">':'')+
+      esc(ME.nickname||'내 지도')+'</span>';
+    b.onclick=function(){tap();viewMine();};
+    return;
+  }
+  var mine=store('inbokdo_mine')||{};
+  var codes=Object.keys(mine);
+  if(codes.length && BOOT.view!=='map'){
+    b.hidden=false;b.textContent='내 지도';
+    b.onclick=function(){
+      codes.sort(function(a,c){return mine[c].at-mine[a].at});
+      location.href='/m/'+codes[0];
+    };
+  }else if(PROVIDERS.length){
+    b.hidden=false;b.textContent='로그인';
+    b.onclick=function(){tap();viewLogin();};
+  }else b.hidden=true;
+}
+
+/* ===== 화면: 로그인 ===== */
+function viewLogin(next){
+  setDock(null);
+  app.innerHTML='';
+  app.appendChild(h(
+  '<section class="fade" style="padding-top:44px">'+
+    '<div class="eyebrow">LOGIN</div>'+
+    '<h1 style="font-size:31px">내 인복도를<br>계속 <span class="gold">간직하려면</span></h1>'+
+    '<p class="lead">로그인해두면 폰을 바꿔도, 기록을 지워도 내 지도가 그대로 남습니다. '+
+      '출석으로 모은 자리도 함께 따라옵니다.</p>'+
+    '<div class="card" style="margin-top:26px">'+ssoBtns(next)+
+      '<div class="tiny" style="margin-top:14px;line-height:1.65">'+
+      '로그인하면 <a href="/terms" style="color:#8a92a6;text-decoration:underline">이용약관</a>과 '+
+      '<a href="/privacy" style="color:#8a92a6;text-decoration:underline">개인정보처리방침</a>에 동의하는 것으로 봅니다. '+
+      '닉네임과 프로필 사진만 받아오고, 그 외 정보는 가져오지 않습니다.</div>'+
+    '</div>'+
+    '<button class="btn sec2" id="skip" style="margin-top:14px">로그인 없이 둘러보기</button>'+
+  '</section>'));
+  bindSso(app);
+  el('skip').onclick=function(){tap();location.href='/'};
+  window.scrollTo(0,0);
+}
+
+/* ===== 화면: 내 지도 목록 ===== */
+function viewMine(){
+  setDock(null);
+  app.innerHTML='<div class="skel" style="height:40px;width:55%;margin-top:36px"></div>';
+  loadMe().then(function(j){
+    if(!j.user)return viewLogin('/');
+    var maps=j.maps||[];
+    app.innerHTML='';
+    app.appendChild(h(
+    '<section class="fade" style="padding-top:34px">'+
+      '<div class="eyebrow">MY MAPS</div>'+
+      '<h1 style="font-size:30px">'+esc(j.user.nickname||'내')+'님의 지도</h1>'+
+      (maps.length?'':'<p class="lead">아직 만든 지도가 없어요.</p>')+
+      '<div class="plist" style="margin-top:22px">'+maps.map(function(m){
+        return '<button class="prow" data-code="'+esc(m.code)+'">'+
+          '<span class="av" style="background:'+m.char.color+'22;color:'+m.char.color+'">'+esc(m.char.han)+'</span>'+
+          '<span class="nm"><b>'+esc(m.name)+'님의 인복도</b><i>별 '+m.count+' / '+m.limit+'명</i></span>'+
+          '<span class="tiny">열기 ›</span></button>';
+      }).join('')+'</div>'+
+      '<button class="btn" id="new" style="margin-top:22px">새 인복도 만들기</button>'+
+      '<button class="btn sec2" id="out" style="margin-top:9px">로그아웃</button>'+
+    '</section>'));
+    app.addEventListener('click',function(e){
+      var b=e.target.closest('[data-code]');if(b)location.href='/m/'+b.dataset.code;
+    });
+    el('new').onclick=function(){tap();viewCreate()};
+    el('out').onclick=function(){tap();logout()};
+    window.scrollTo(0,0);
+  });
+}
+Promise.all([loadMeta(),loadMe()]).then(function(){
+  if(BOOT.view==='login')viewLogin();
+  else if(BOOT.view==='mine')viewMine();
+  else if(BOOT.view==='map')viewMap(BOOT.code);
+  else if(BOOT.view==='notfound'){
+    app.innerHTML='<section class="fade center" style="padding-top:70px">'+
+      '<h1 style="font-size:26px">페이지를 찾을 수 없어요</h1>'+
+      '<button class="btn" style="margin-top:22px" onclick="location.href=\'/\'">인복도 홈으로</button></section>';
+  }
+  else viewHome();
+  updateNav();
+}).catch(function(){
+  app.innerHTML='<section class="center" style="padding-top:70px"><h1 style="font-size:24px">잠시 후 다시 시도해 주세요</h1></section>';
+});
+})();
+</script>
+</body>
+</html>
