@@ -1,4 +1,4 @@
-name = "inbokdo"
+name = "inbokdo-app"
 main = "index.js"
 compatibility_date = "2025-08-01"
 
