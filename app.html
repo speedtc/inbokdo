@@ -598,7 +598,8 @@ function starMap(entries,owner,opt){
   });
   // 연결선
   pts.forEach(function(p){
-    s+='<line x1="180" y1="180" x2="'+p.x.toFixed(1)+'" y2="'+p.y.toFixed(1)+'" stroke="'+ECOL[p.elem]+'" stroke-opacity="'+(0.10+p.score/420).toFixed(3)+'" stroke-width="'+(p.score>=80?1.4:1)+'"/>';
+    var isMe=(opt.me===p.id);
+    s+='<line x1="180" y1="180" x2="'+p.x.toFixed(1)+'" y2="'+p.y.toFixed(1)+'" stroke="'+(isMe?'#f2dfa5':ECOL[p.elem])+'" stroke-opacity="'+(isMe?0.95:(0.10+p.score/420)).toFixed(3)+'" stroke-width="'+(isMe?2.2:(p.score>=80?1.4:1))+'"'+(isMe?' stroke-dasharray="3 2.5"':'')+'/>';
   });
   // 중심(주인)
   s+='<circle cx="180" cy="180" r="26" fill="url(#og)" opacity=".5"/>';
@@ -615,8 +616,12 @@ function starMap(entries,owner,opt){
       s+='<circle cx="'+p.x.toFixed(1)+'" cy="'+p.y.toFixed(1)+'" r="'+rr+'" fill="'+ECOL[p.elem]+'" filter="url(#gl)"/>';
     }
     if(p.cheoneul)s+='<circle cx="'+p.x.toFixed(1)+'" cy="'+p.y.toFixed(1)+'" r="'+(rr+4)+'" fill="none" stroke="#f2dfa5" stroke-width="1" opacity=".75"/>';
+    if(opt.me===p.id){
+      s+='<circle cx="'+p.x.toFixed(1)+'" cy="'+p.y.toFixed(1)+'" r="'+(rr+7)+'" fill="none" stroke="#f2dfa5" stroke-width="1.6" opacity=".9"/>';
+      s+='<circle cx="'+p.x.toFixed(1)+'" cy="'+p.y.toFixed(1)+'" r="'+(rr+12)+'" fill="none" stroke="#f2dfa5" stroke-width="1" opacity=".35"/>';
+    }
     var L=labels[p.id];
-    if(L) s+='<text class="namelabel'+(opt.sel===p.id?' on':'')+'" x="'+L.x.toFixed(1)+'" y="'+L.y.toFixed(1)+'" text-anchor="middle">'+esc(p.name)+'</text>';
+    if(L) s+='<text class="namelabel'+(opt.sel===p.id||opt.me===p.id?' on':'')+'" x="'+L.x.toFixed(1)+'" y="'+L.y.toFixed(1)+'" text-anchor="middle">'+(opt.me===p.id?'나 · ':'')+esc(p.name)+'</text>';
     s+='<circle class="hit" cx="'+p.x.toFixed(1)+'" cy="'+p.y.toFixed(1)+'" r="15"/></g>';
   });
   if(!pts.length){
@@ -1275,6 +1280,12 @@ function renderResult(r,code){
   '</section>'+
 
   '<section class="sec rv">'+
+    '<h2>'+esc(r.ownerName)+'님과 이어진 자리</h2>'+
+    '<p class="tiny" style="margin:-8px 0 12px">가운데가 '+esc(r.ownerName)+'님, 금색 원이 나입니다. 기운이 잘 맞을수록 안쪽에 자리를 잡습니다.</p>'+
+    '<div class="mapbox" id="rmap"><div class="skel" style="height:300px"></div></div>'+
+  '</section>'+
+
+  '<section class="sec rv">'+
     '<h2>두 사람의 캐릭터</h2>'+
     '<div class="card" style="display:flex;gap:10px;align-items:stretch">'+
       charMini(cme,'나')+
@@ -1312,6 +1323,12 @@ function renderResult(r,code){
   el('see').onclick=function(){tap();renderVisitorMapOnly(code);};
   var sb=document.querySelector('.scorebig');
   if(sb)countUp(sb,res.score,1000);
+  api('/api/maps/'+code).then(function(m){
+    var box=el('rmap');if(!box)return;
+    box.innerHTML=starMap(m.entries,m.ownerChar,{me:r.entryId});
+  }).catch(function(){
+    var box=el('rmap');if(box)box.innerHTML='';
+  });
   setDock('<button class="btn">나도 내 인복도 만들기</button>',function(){goCreate(code);},'#mk, #card');
   reveal(app);
   window.scrollTo(0,0);

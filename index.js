@@ -459,7 +459,9 @@ function renderPage(meta) {
   const u = esc(meta.url);
   const head = `<title>${t}</title>
 <meta name="description" content="${d}">
+<meta name="robots" content="${meta.noindex ? 'noindex,nofollow' : 'index,follow'}">
 <meta property="og:type" content="website">
+<meta property="og:locale" content="ko_KR">
 <meta property="og:site_name" content="인복도">
 <meta property="og:title" content="${t}">
 <meta property="og:description" content="${d}">
@@ -467,6 +469,11 @@ function renderPage(meta) {
 <meta property="og:image" content="${esc(meta.origin)}/og.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:alt" content="인복도 - 사주로 그리는 사람 별자리 지도">
+<meta name="twitter:title" content="${t}">
+<meta name="twitter:description" content="${d}">
+<meta name="twitter:image" content="${esc(meta.origin)}/og.png">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="canonical" href="${u}">`;
   return APP_HTML.replace('<!--HEAD-->', head)
@@ -522,9 +529,16 @@ export default {
     }
 
     if (url.pathname === '/robots.txt') {
-      return new Response(
-        `User-agent: *\nAllow: /$\nAllow: /privacy\nAllow: /terms\nDisallow: /m/\nDisallow: /me\nDisallow: /auth/\nDisallow: /api/\n`,
-        { headers: { 'content-type': 'text/plain; charset=utf-8' } });
+      // 링크 미리보기 봇은 전부 통과시킨다. 검색 노출은 /m/ 페이지의 noindex 메타로 막는다.
+      const previewBots = [
+        'kakaotalk-scrap', 'Kakaotalk-scrap', 'Daumoa', 'Yeti', 'NaverBot',
+        'facebookexternalhit', 'Facebot', 'Twitterbot', 'LinkedInBot',
+        'Slackbot', 'Slackbot-LinkExpanding', 'Discordbot', 'TelegramBot',
+        'WhatsApp', 'SkypeUriPreview', 'Line', 'Applebot',
+      ];
+      const body = previewBots.map((b) => `User-agent: ${b}\nAllow: /\n`).join('\n')
+        + `\nUser-agent: *\nDisallow: /me\nDisallow: /auth/\nDisallow: /api/\n`;
+      return new Response(body, { headers: { 'content-type': 'text/plain; charset=utf-8' } });
     }
 
     const mPage = url.pathname.match(/^\/m\/([0-9a-z]{4,12})\/?$/);
@@ -543,7 +557,7 @@ export default {
       const desc = ownerName
         ? `생년월일만 넣으면 ${ownerName}님과 나 사이에 오가는 기운을 사주로 풀어드립니다. 30초면 끝납니다.`
         : '내 사람 별자리를 그려보세요.';
-      return new Response(renderPage({ title, desc, url: `${origin}/m/${code}`, origin, boot: { view: 'map', code, ownerName, kakaoKey: env.KAKAO_JS_KEY || '', providers } }), {
+      return new Response(renderPage({ title, desc, url: `${origin}/m/${code}`, origin, boot: { view: 'map', code, ownerName, kakaoKey: env.KAKAO_JS_KEY || '', providers }, noindex: true }), {
         headers: { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'no-store' },
       });
     }
