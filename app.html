@@ -141,7 +141,8 @@ details.adv[open] summary::before{content:'－ '}
 .prow .rk{width:22px;text-align:center;font-size:13px;font-weight:800;color:var(--dim2);flex:0 0 22px}
 .prow .rk.top{color:var(--gold2)}
 .av{width:40px;height:40px;flex:0 0 40px;border-radius:13px;display:grid;place-items:center;
-  font-size:17px;font-weight:600;border:.5px solid rgba(255,255,255,.14)}
+  font-size:17px;font-weight:600;border:.5px solid rgba(255,255,255,.14);
+  line-height:1.15;text-align:center;padding:2px}
 .prow .nm{flex:1;min-width:0}
 .prow .nm b{display:block;font-size:16px;font-weight:600;letter-spacing:-.022em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .prow .nm i{display:block;font-style:normal;font-size:12px;color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -165,6 +166,8 @@ details.adv[open] summary::before{content:'－ '}
 .typecard .lbl{font-size:11.5px;font-weight:800;letter-spacing:.13em;color:var(--dim)}
 .typecard h3{margin:7px 0 0;font-size:26px;font-weight:700;letter-spacing:-.04em}
 .typecard p{margin:11px 0 0;font-size:15.5px;line-height:1.66;color:#cdd3e0;letter-spacing:-.018em}
+.whyline{font-size:13px;color:var(--dim);margin-top:4px;letter-spacing:-.015em;line-height:1.5}
+.whyline::before{content:'— '}
 .chip{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:8px;font-size:12px;font-weight:700;
   background:rgba(255,255,255,.06);border:1px solid var(--line);color:var(--dim)}
 .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
@@ -245,7 +248,7 @@ footer{margin-top:56px;padding-top:22px;border-top:1px solid var(--line);color:v
 <canvas id="stars"></canvas>
 <header>
   <div class="hdr">
-    <a class="logo" href="/" aria-label="인복도 홈">
+    <a class="logo" href="/" aria-label="인연지도 홈">
       <svg class="mk" viewBox="0 0 32 32" fill="none" aria-hidden="true">
         <circle cx="16" cy="16" r="14" stroke="#8a7534" stroke-width="1"/>
         <circle cx="16" cy="16" r="9" stroke="#8a7534" stroke-width=".6" opacity=".55"/>
@@ -254,7 +257,7 @@ footer{margin-top:56px;padding-top:22px;border-top:1px solid var(--line);color:v
         <circle cx="7.5" cy="20" r="1.1" fill="#d9b45b" opacity=".7"/>
         <circle cx="9" cy="9" r="1" fill="#d9b45b" opacity=".6"/>
       </svg>
-      <b>인복도</b><span>人福圖</span>
+      <b>인연지도</b><span>因緣地圖</span>
     </a>
     <div class="sp"></div>
     <button class="ghost" id="navBtn" hidden>내 지도</button>
@@ -366,7 +369,7 @@ function api(path,opt){
       if(!r.ok) throw new Error(j.error||'요청에 실패했습니다.'); return j;});});
 }
 function band(n){
-  if(n>=86)return{label:'인생급 인복',tone:'gold'};
+  if(n>=86)return{label:'인생급 인연',tone:'gold'};
   if(n>=78)return{label:'확실한 내 편',tone:'green'};
   if(n>=70)return{label:'있으면 좋은 사이',tone:'blue'};
   if(n>=61)return{label:'무난한 사이',tone:'gray'};
@@ -573,7 +576,7 @@ function starMap(entries,owner,opt){
     var sp=pts.filter(function(x){return x.id===opt.sel})[0];
     if(sp)labels[opt.sel]={x:sp.x,y:sp.y-11};
   }
-  var s='<svg viewBox="-20 -10 400 400" role="img" aria-label="인복 별자리 지도">';
+  var s='<svg viewBox="-20 -10 400 400" role="img" aria-label="인연 별자리 지도">';
   s+='<defs>'+
      '<radialGradient id="og"><stop offset="0%" stop-color="#fff8e0"/><stop offset="45%" stop-color="#f2dfa5"/><stop offset="100%" stop-color="#d9b45b" stop-opacity="0"/></radialGradient>'+
      '<filter id="gl" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="2.6" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>'+
@@ -636,12 +639,12 @@ function viewHome(){
   app.innerHTML='';
   app.appendChild(h(
   '<section class="fade" style="padding-top:36px">'+
-    '<div class="eyebrow">사주로 그리는 사람 지도</div>'+
-    '<h1>내 곁의 사람들은<br>나에게 <span class="gold">어떤 기운</span>일까</h1>'+
+    '<div class="eyebrow">사주로 그리는 관계 지도</div>'+
+    '<h1>나에게 넌,<br><span class="gold">어떤 인연</span>일까</h1>'+
     '<p class="lead"><b class="gold">내 생년월일을 먼저 넣으세요.</b> 그러면 나만의 링크가 만들어집니다. '+
       '그 링크를 친구에게 보내고 친구가 자기 생일을 넣으면, 두 사람 사이에 오가는 기운을 사주 명리로 풀어 '+
       '<b class="gold">별자리처럼</b> 그려드립니다.</p>'+
-    '<button class="btn" id="go" style="margin-top:26px">내 인복도 만들기</button>'+
+    '<button class="btn" id="go" style="margin-top:26px">내 인연지도 만들기</button>'+
     '<p class="tiny center" style="margin-top:11px">30초면 끝나요 · 가입 없음 · 무료</p>'+
   '</section>'+
 
@@ -654,9 +657,9 @@ function viewHome(){
     '<h2>이렇게 씁니다</h2>'+
     '<div class="card" style="display:flex;flex-direction:column;gap:16px">'+
       step(1,'먼저 내 생년월일을 넣습니다','이 정보로 지도의 중심이 세워집니다. 양력·음력 모두 되고, 태어난 시간은 몰라도 괜찮아요.')+
-      step(2,'내 전용 링크가 만들어집니다','\"내 사주와 인복도를 함께 보고 싶은 친구\"에게 이 링크를 보내세요. 카톡·인스타·단톡방 어디든 됩니다.')+
+      step(2,'내 전용 링크가 만들어집니다','\"내 사주와 인연지도를 함께 보고 싶은 친구\"에게 이 링크를 보내세요. 카톡·인스타·단톡방 어디든 됩니다.')+
       step(3,'친구가 생일을 넣으면 별이 찍힙니다','친구는 나와의 궁합을, 나는 내 지도에 별 하나를 얻습니다. 링크를 받은 사람만 내 지도에 들어옵니다.')+
-      step(4,'인복도 자체를 알릴 수도 있습니다','사주 입력 없이 홈 주소만 보내면, 받는 사람이 각자 자기 지도를 만듭니다. 홍보용으로 쓰세요.')+
+      step(4,'인연지도 자체를 알릴 수도 있습니다','사주 입력 없이 홈 주소만 보내면, 받는 사람이 각자 자기 지도를 만듭니다. 홍보용으로 쓰세요.')+
     '</div>'+
   '</section>'+
 
@@ -677,19 +680,25 @@ function viewHome(){
   '</section>'+
 
   '<section class="sec rv">'+
+    '<h2>열두 가지 사이</h2>'+
+    '<p class="tiny" style="margin:-6px 0 0">두 사람의 사주를 견주면 이 중 하나가 나옵니다. 방향이 있어서, 내가 상대에게와 상대가 나에게가 서로 다를 수 있습니다.</p>'+
+    '<div class="plist" id="typeList"></div>'+
+  '</section>'+
+
+  '<section class="sec rv">'+
     '<h2>열 가지 사람</h2>'+
     '<p class="tiny" style="margin:-6px 0 0">태어난 날의 천간에 따라 나는 이런 사람입니다.</p>'+
     '<div class="plist" id="charList"></div>'+
   '</section>'+
 
   '<section class="sec rv">'+
-    '<button class="btn" id="go2">내 인복도 만들기</button>'+
-    '<button class="btn sec2" id="go3" style="margin-top:10px">인복도 알려주기</button>'+
+    '<button class="btn" id="go2">내 인연지도 만들기</button>'+
+    '<button class="btn sec2" id="go3" style="margin-top:10px">인연지도 알려주기</button>'+
     '<p class="tiny center" style="margin-top:10px">사주를 넣지 않고 이 사이트만 소개하고 싶을 때 쓰세요.</p>'+
   '</section>'+
 
   '<footer>'+
-    '<b style="color:#8a92a6">인복도 人福圖</b><br>'+
+    '<b style="color:#8a92a6">인연지도 因緣地圖</b><br>'+
     '사주 명리는 사람을 이해하는 오래된 언어이지 정답지가 아닙니다. 여기 나온 결과로 사람을 재단하지 마세요. '+
     '실제 관계는 결국 주고받은 말과 시간으로 만들어집니다.<br><br>'+
     '입력한 생년월일은 궁합 계산에만 쓰이며, 다른 참여자에게는 절대 보이지 않습니다.<br><br>'+
@@ -699,7 +708,7 @@ function viewHome(){
 
   el('go').onclick=el('go2').onclick=function(){tap();location.hash='';viewCreate();};
   el('go3').onclick=function(){tap();shareSite();};
-  setDock('<button class="btn">내 인복도 만들기</button>',function(){viewCreate();},'#go');
+  setDock('<button class="btn">내 인연지도 만들기</button>',function(){viewCreate();},'#go');
   reveal(app);
 
   // 데모 지도
@@ -712,13 +721,25 @@ function viewHome(){
   el('demo').innerHTML=starMap(demo,{han:'丙',name:'나'},{});
 
   loadMeta().then(function(){
-    var list=el('charList');if(!list)return;
-    list.innerHTML=CHARS.map(function(c){
+    var list=el('charList');
+    if(list)list.innerHTML=CHARS.map(function(c){
       return '<div class="prow" style="cursor:default">'+
         '<div class="av" style="background:'+c.color+'22;color:'+c.color+'">'+esc(c.han)+'</div>'+
         '<div class="nm"><b>'+esc(c.name)+'</b><i>'+esc(c.tag)+'</i></div>'+
         '<span class="chip" style="flex:0 0 auto">'+esc(ELEM_H[c.elem])+'</span></div>';
     }).join('');
+    var tl=el('typeList');
+    if(tl){
+      var order=['cheoneul','jeongin','pyeonin','jeonggwan','pyeongwan','jeongjae',
+                 'pyeonjae','siksin','sanggwan','bigyeon','geopjae','chungdol'];
+      tl.innerHTML=order.map(function(k){
+        var t=TYPES[k];if(!t)return '';
+        return '<div class="prow" style="cursor:default;align-items:flex-start">'+
+          '<div class="av" style="background:'+t.color+'22;color:'+t.color+';font-size:12px;font-weight:700">'+esc(t.short)+'</div>'+
+          '<div class="nm" style="padding-top:1px"><b style="color:'+t.color+'">'+esc(t.name)+'</b>'+
+          '<i style="white-space:normal">'+esc(t.why)+'</i></div></div>';
+      }).join('');
+    }
   });
   window.scrollTo(0,0);
 }
@@ -747,7 +768,7 @@ function viewCreate(){
         '<div class="tiny" style="margin-top:6px">로그인 없이 만들어도 되지만, 이 브라우저에서만 찾을 수 있어요.</div>'+
         ssoBtns('/')+'</div>'
       : '')+
-    '<div class="card" style="margin-top:22px" id="fw">'+formHTML({cta:'내 인복도 만들기'})+'</div>'+
+    '<div class="card" style="margin-top:22px" id="fw">'+formHTML({cta:'내 인연지도 만들기'})+'</div>'+
   '</section>'));
   bindSso(app);
   bindForm(el('fw'),function(data,done){
@@ -782,7 +803,7 @@ function viewMap(code){
     app.innerHTML='<section class="fade" style="padding-top:60px" class="center">'+
       '<h1 style="font-size:26px">'+esc(e.message)+'</h1>'+
       '<p class="lead">링크가 잘못되었거나 삭제된 지도일 수 있어요.</p>'+
-      '<button class="btn" style="margin-top:20px" onclick="location.href=\'/\'">내 인복도 만들기</button></section>';
+      '<button class="btn" style="margin-top:20px" onclick="location.href=\'/\'">내 인연지도 만들기</button></section>';
   });
 }
 
@@ -793,7 +814,7 @@ function constBox(j){
   if(top){
     var tc=charBy(top.charKey),tt=TYPES[top.typeIn];
     h2='<div class="card" style="margin-top:10px;background:linear-gradient(155deg,rgba(217,180,91,.13),rgba(255,255,255,.03));border-color:rgba(217,180,91,.24)">'+
-      '<div class="eyebrow" style="color:#c9a227">내 1번 인복</div>'+
+      '<div class="eyebrow" style="color:#c9a227">내 1번 인연</div>'+
       '<div style="display:flex;align-items:center;gap:13px;margin-top:11px">'+
         '<div class="av" style="width:48px;height:48px;flex:0 0 48px;background:'+tc.color+'22;color:'+tc.color+';font-size:21px">'+esc(tc.han)+'</div>'+
         '<div style="flex:1;min-width:0"><b style="font-size:19px;letter-spacing:-.03em">'+esc(top.name)+'</b>'+
@@ -843,7 +864,7 @@ function growBox(j){
     (maxed?'':'<button class="btn'+(done?' sec2':'')+'" id="chk" style="margin-top:16px"'+(done?' disabled':'')+'>'+
       (done?'오늘 출석 완료 · 내일 또 오세요':'출석하고 자리 1개 늘리기')+'</button>')+
     '<div class="tiny" style="margin-top:12px;padding-top:11px;border-top:1px solid rgba(255,255,255,.09);line-height:1.65">'+
-      '친구가 내 링크로 들어와 <b style="color:#cdd3e0">자기 인복도를 만들면</b> 자리가 2개씩 더 늘어납니다.</div>'+
+      '친구가 내 링크로 들어와 <b style="color:#cdd3e0">자기 인연지도를 만들면</b> 자리가 2개씩 더 늘어납니다.</div>'+
   '</div>';
 }
 // 로그인한 상태에서 브라우저에만 있던 지도를 자동으로 계정에 붙인다
@@ -910,10 +931,10 @@ function shareBox(code,ownerName){
     '<div class="tiny" style="margin-top:11px;line-height:1.65">단톡방에 보내면 문구까지 같이 나갑니다. '+
       '한 명씩 설득하는 것보다 방에 한 번 던지는 쪽이 훨씬 빨리 찹니다.</div>'+
     '<div style="margin-top:16px;padding-top:15px;border-top:1px solid rgba(255,255,255,.12)">'+
-      '<b style="display:block;font-size:15px;letter-spacing:-.03em">인복도 자체를 알리고 싶다면</b>'+
+      '<b style="display:block;font-size:15px;letter-spacing:-.03em">인연지도 자체를 알리고 싶다면</b>'+
       '<div class="tiny" style="margin-top:5px;line-height:1.65">'+
-        '내 지도가 아니라 <b style="color:#cdd3e0">인복도 홈</b> 주소가 나갑니다. 받는 사람은 각자 자기 지도를 만들게 됩니다.</div>'+
-      '<button class="btn sec2" id="sit" style="margin-top:11px">인복도 알려주기</button>'+
+        '내 지도가 아니라 <b style="color:#cdd3e0">인연지도 홈</b> 주소가 나갑니다. 받는 사람은 각자 자기 지도를 만들게 됩니다.</div>'+
+      '<button class="btn sec2" id="sit" style="margin-top:11px">인연지도 알려주기</button>'+
     '</div>'+
   '</div>';
 }
@@ -927,7 +948,7 @@ function copyLink(code){
 }
 function shareSite(){
   var url=location.origin;
-  var title='인복도 人福圖';
+  var title='인연지도 因緣地圖';
   var txt='생년월일만 넣으면 내 곁의 사람들이 나에게 어떤 기운인지 사주로 풀어주는 곳이에요. 30초면 끝나요.';
   if(window.Kakao&&window.Kakao.isInitialized&&window.Kakao.isInitialized()){
     try{
@@ -935,19 +956,19 @@ function shareSite(){
         objectType:'feed',
         content:{title:title,description:txt,imageUrl:url+'/og.png',
           imageWidth:1200,imageHeight:630,link:{mobileWebUrl:url,webUrl:url}},
-        buttons:[{title:'내 인복도 만들기',link:{mobileWebUrl:url,webUrl:url}}]
+        buttons:[{title:'내 인연지도 만들기',link:{mobileWebUrl:url,webUrl:url}}]
       });
       return;
     }catch(e){}
   }
   if(navigator.share){navigator.share({title:title,text:txt,url:url}).catch(function(){});return;}
   var i=document.createElement('input');i.value=url;document.body.appendChild(i);
-  i.select();try{document.execCommand('copy');toast('인복도 주소를 복사했어요')}catch(e){}
+  i.select();try{document.execCommand('copy');toast('인연지도 주소를 복사했어요')}catch(e){}
   i.remove();
 }
 function doShare(code,ownerName,group){
   var url=location.origin+'/m/'+code;
-  var title=(ownerName?ownerName+'님의 인복도':'인복도');
+  var title=(ownerName?ownerName+'님의 인연지도':'인연지도');
   var txt=group
     ? '우리 방 사람들 다 해보자. 생일만 넣으면 나랑 얼마나 맞는지 사주로 나와요. 30초 걸림'
     : '생년월일만 넣으면 우리 둘 사이에 오가는 기운이 사주로 나와요.';
@@ -978,7 +999,7 @@ function renderOwner(j){
   app.appendChild(h(
   '<section class="fade" style="padding-top:28px">'+
     '<div class="eyebrow">MY MAP</div>'+
-    '<h1 style="font-size:29px">'+esc(j.ownerName)+'님의 인복도</h1>'+
+    '<h1 style="font-size:29px">'+esc(j.ownerName)+'님의 인연지도</h1>'+
     '<p class="lead" style="font-size:14.5px">'+
       (pts.length? '지금까지 <b class="gold">'+pts.length+'명</b>이 별을 남겼습니다. 안쪽에 있을수록 나와 기운이 잘 맞는 사람입니다.'
                  : '아직 아무도 없습니다. 아래 링크를 친구에게 보내보세요.')+'</p>'+
@@ -1012,8 +1033,8 @@ function renderOwner(j){
     tap();
     var t=(j.entries[0]||{}).name;
     var url=location.origin+'/m/'+j.code;
-    var msg=t+'님이 제 1번 인복이래요. 인복도에서 나온 결과예요.';
-    if(navigator.share)navigator.share({title:'인복도',text:msg,url:url}).catch(function(){});
+    var msg=t+'님이 제 1번 인연이래요. 인연지도에서 나온 결과예요.';
+    if(navigator.share)navigator.share({title:'인연지도',text:msg,url:url}).catch(function(){});
     else copyLink(j.code);
   };
   setDock('<button class="btn">'+(j.full?'자리 늘리기':'내 별자리 공유하기')+'</button>',function(){
@@ -1070,9 +1091,11 @@ function selectStar(id){
     '<hr class="d">'+
     '<div class="lbl tiny" style="letter-spacing:.13em;font-weight:800">이 사람은 나에게</div>'+
     '<b style="font-size:16px;color:'+ti.color+'">'+esc(ti.name)+'</b>'+
+    '<div class="whyline">'+esc(ti.why)+'</div>'+
     '<p style="margin:5px 0 0;font-size:13.5px;color:#cdd3e0;line-height:1.7">'+esc(ti.in)+'</p>'+
     '<div class="lbl tiny" style="letter-spacing:.13em;font-weight:800;margin-top:14px">나는 이 사람에게</div>'+
     '<b style="font-size:16px;color:'+to.color+'">'+esc(to.name)+'</b>'+
+    '<div class="whyline">'+esc(to.why)+'</div>'+
     '<p style="margin:5px 0 0;font-size:13.5px;color:#cdd3e0;line-height:1.7">'+esc(to.out)+'</p>'+
     '<div class="tiny" style="margin-top:13px;padding-top:11px;border-top:1px solid var(--line)">💡 '+esc(ti.how)+'</div>'+
   '</div>';
@@ -1134,7 +1157,7 @@ function drawCard(r){
 
   x.textAlign='center';
   x.fillStyle='#b0913f';x.font='600 30px '+F;
-  x.fillText('人 福 圖   인 복 도',W/2,120);
+  x.fillText('因 緣 地 圖   인 연 지 도',W/2,120);
 
   x.fillStyle='#8a92a6';x.font='500 34px '+F;
   x.fillText(r.me.name+'  ×  '+r.ownerName,W/2,214);
@@ -1186,13 +1209,13 @@ function drawCard(r){
 function saveCard(r){
   var c;
   try{c=drawCard(r);}catch(e){toast('이미지를 만들지 못했어요');return;}
-  var name='인복도_'+r.me.name+'_'+r.result.score+'점.png';
+  var name='인연지도_'+r.me.name+'_'+r.result.score+'점.png';
   c.toBlob(function(blob){
     if(!blob){toast('이미지를 만들지 못했어요');return;}
     var file=null;
     try{file=new File([blob],name,{type:'image/png'});}catch(e){}
     if(file&&navigator.canShare&&navigator.canShare({files:[file]})){
-      navigator.share({files:[file],title:'인복도'}).catch(function(){});
+      navigator.share({files:[file],title:'인연지도'}).catch(function(){});
       return;
     }
     var url=URL.createObjectURL(blob);
@@ -1211,15 +1234,15 @@ function renderVisitorFull(j){
   app.appendChild(h(
   '<section class="fade" style="padding-top:34px">'+
     '<div class="eyebrow">자리가 다 찼어요</div>'+
-    '<h1 style="font-size:30px">'+esc(j.ownerName)+'님의 인복도는<br>지금 <span class="gold">'+j.count+'명</span>이 꽉 채웠어요</h1>'+
-    '<p class="lead">조금 늦었네요. 대신 <b>내 인복도</b>를 만들어서 '+esc(j.ownerName)+'님을 초대해보는 건 어때요?</p>'+
-    '<button class="btn" id="mk" style="margin-top:26px">내 인복도 만들기</button>'+
+    '<h1 style="font-size:30px">'+esc(j.ownerName)+'님의 인연지도는<br>지금 <span class="gold">'+j.count+'명</span>이 꽉 채웠어요</h1>'+
+    '<p class="lead">조금 늦었네요. 대신 <b>내 인연지도</b>를 만들어서 '+esc(j.ownerName)+'님을 초대해보는 건 어때요?</p>'+
+    '<button class="btn" id="mk" style="margin-top:26px">내 인연지도 만들기</button>'+
   '</section>'+
   '<section class="sec rv"><div class="mapbox" id="map"></div>'+
     '<p class="tiny center" style="margin-top:-2px">이미 자리를 잡은 사람들입니다.</p></section>'));
   el('map').innerHTML=starMap(j.entries,j.ownerChar,{});
   el('mk').onclick=function(){tap();goCreate(j.code);};
-  setDock('<button class="btn">내 인복도 만들기</button>',function(){goCreate(j.code);},'#mk');
+  setDock('<button class="btn">내 인연지도 만들기</button>',function(){goCreate(j.code);},'#mk');
   reveal(app);window.scrollTo(0,0);
 }
 function renderVisitor(j){
@@ -1229,7 +1252,7 @@ function renderVisitor(j){
   app.appendChild(h(
   '<section class="fade" style="padding-top:30px">'+
     '<div class="eyebrow">초대장</div>'+
-    '<h1 style="font-size:29px">'+esc(j.ownerName)+'님의 인복도에<br>당신의 <span class="gold">별</span>을 남겨주세요</h1>'+
+    '<h1 style="font-size:29px">'+esc(j.ownerName)+'님의 인연지도에<br>당신의 <span class="gold">별</span>을 남겨주세요</h1>'+
     '<p class="lead" style="font-size:14.5px">생년월일만 넣으면 두 사람 사이에 오가는 기운을 사주로 풀어드립니다. '+
       '<b>내가 이 사람에게 어떤 사람인지</b>도 함께 나옵니다.</p>'+
   '</section>'+
@@ -1245,7 +1268,7 @@ function renderVisitor(j){
     '<p class="tiny center" style="margin-top:-2px">이미 자리를 잡은 사람들입니다. 이름만 보이고 생년월일은 아무에게도 보이지 않아요.</p></section>'+
   '<section class="sec fade"><div class="card" id="fw">'+
     formHTML({cta:'내 별 남기기',nameLabel:'뭐라고 부를까요',namePh:'예: 지민, 동아리 지민'})+'</div></section>'+
-  '<section class="sec fade"><button class="btn sec2" id="own">나도 내 인복도 만들기</button></section>'+
+  '<section class="sec fade"><button class="btn sec2" id="own">나도 내 인연지도 만들기</button></section>'+
   '<footer>입력한 생년월일은 궁합 계산에만 쓰이고 지도 주인에게도 보이지 않습니다. 결과는 재미로만 봐주세요.</footer>'));
 
   el('map').innerHTML=starMap(j.entries,j.ownerChar,{});
@@ -1297,7 +1320,7 @@ function renderResult(r,code){
       (r.total>2?' · 상위 '+pct+'%':'')+'</p>'+
     (r.rank===1&&r.total>=3
       ? '<div class="card" style="margin-top:18px;background:linear-gradient(155deg,rgba(217,180,91,.16),rgba(255,255,255,.03));border-color:rgba(217,180,91,.3)">'+
-        '<b style="font-size:17px;letter-spacing:-.03em">지금 '+esc(r.ownerName)+'님의 <span class="gold">1번 인복</span>입니다</b>'+
+        '<b style="font-size:17px;letter-spacing:-.03em">지금 '+esc(r.ownerName)+'님의 <span class="gold">1번 인연</span>입니다</b>'+
         '<div class="tiny" style="margin-top:6px;color:var(--dim)">'+r.total+'명 중에서 가장 기운이 잘 맞는 사람이에요.</div></div>'
       : '')+
   '</section>'+
@@ -1306,11 +1329,13 @@ function renderResult(r,code){
     '<div class="typecard" style="--c:'+to.color+';background:rgba(255,255,255,.035)">'+
       '<div class="lbl">나는 '+esc(r.ownerName)+'님에게</div>'+
       '<h3 style="color:'+to.color+'">'+esc(to.name)+'</h3>'+
+      '<div class="whyline">'+esc(to.why)+'</div>'+
       '<p>'+esc(to.out)+'</p>'+
     '</div>'+
     '<div class="typecard" style="--c:'+ti.color+';background:rgba(255,255,255,.035);margin-top:10px">'+
       '<div class="lbl">'+esc(r.ownerName)+'님은 나에게</div>'+
       '<h3 style="color:'+ti.color+'">'+esc(ti.name)+'</h3>'+
+      '<div class="whyline">'+esc(ti.why)+'</div>'+
       '<p>'+esc(ti.in)+'</p>'+
     '</div>'+
     '<div class="card" style="margin-top:10px"><div class="tiny" style="color:#cdd3e0;font-size:13.5px">💡 '+esc(ti.how)+'</div></div>'+
@@ -1346,11 +1371,11 @@ function renderResult(r,code){
 
   '<section class="sec rv">'+
     '<div class="sharebox">'+
-      '<b style="font-size:15.5px">나도 내 인복도를 만들어볼까요</b>'+
+      '<b style="font-size:15.5px">나도 내 인연지도를 만들어볼까요</b>'+
       '<div class="tiny" style="margin-top:5px;color:var(--dim)">내 링크를 만들어 친구들을 모으면, 누가 나에게 힘이 되는 사람인지 한눈에 보입니다.</div>'+
-      '<button class="btn" id="mk" style="margin-top:13px">내 인복도 만들기</button>'+
+      '<button class="btn" id="mk" style="margin-top:13px">내 인연지도 만들기</button>'+
       '<button class="btn sec2" id="card" style="margin-top:9px">결과 이미지 저장하기</button>'+
-      '<button class="btn sec2" id="sit2" style="margin-top:9px">인복도 알려주기</button>'+
+      '<button class="btn sec2" id="sit2" style="margin-top:9px">인연지도 알려주기</button>'+
       '<button class="btn sec2" id="see" style="margin-top:9px">'+esc(r.ownerName)+'님의 지도 보기</button>'+
     '</div>'+
   '</section>'+
@@ -1368,7 +1393,7 @@ function renderResult(r,code){
   }).catch(function(){
     var box=el('rmap');if(box)box.innerHTML='';
   });
-  setDock('<button class="btn">나도 내 인복도 만들기</button>',function(){goCreate(code);},'#mk, #card');
+  setDock('<button class="btn">나도 내 인연지도 만들기</button>',function(){goCreate(code);},'#mk, #card');
   reveal(app);
   window.scrollTo(0,0);
 }
@@ -1386,12 +1411,12 @@ function renderVisitorMapOnly(code){
     app.innerHTML='';
     app.appendChild(h(
     '<section class="fade" style="padding-top:30px">'+
-      '<div class="eyebrow">'+esc(j.ownerName)+'님의 인복도</div>'+
+      '<div class="eyebrow">'+esc(j.ownerName)+'님의 인연지도</div>'+
       '<h1 style="font-size:27px">지금까지 '+j.count+'명이<br>별을 남겼습니다</h1>'+
     '</section>'+
     '<section class="sec fade"><div class="mapbox" id="map"></div><div id="selBox"></div></section>'+
     '<section class="sec rv">'+shareBox(code,j.ownerName)+'</section>'+
-    '<section class="sec fade"><button class="btn" id="mk">나도 내 인복도 만들기</button></section>'));
+    '<section class="sec fade"><button class="btn" id="mk">나도 내 인연지도 만들기</button></section>'));
     el('map').innerHTML=starMap(j.entries,j.ownerChar,{});
     bindStars(j.entries);
     bindShare(code,j.ownerName);
@@ -1464,7 +1489,7 @@ function viewLogin(next){
   app.appendChild(h(
   '<section class="fade" style="padding-top:44px">'+
     '<div class="eyebrow">LOGIN</div>'+
-    '<h1 style="font-size:31px">내 인복도를<br>계속 <span class="gold">간직하려면</span></h1>'+
+    '<h1 style="font-size:31px">내 인연지도를<br>계속 <span class="gold">간직하려면</span></h1>'+
     '<p class="lead">로그인해두면 폰을 바꿔도, 기록을 지워도 내 지도가 그대로 남습니다. '+
       '출석으로 모은 자리도 함께 따라옵니다.</p>'+
     '<div class="card" style="margin-top:26px">'+ssoBtns(next)+
@@ -1496,10 +1521,10 @@ function viewMine(){
       '<div class="plist" style="margin-top:22px">'+maps.map(function(m){
         return '<button class="prow" data-code="'+esc(m.code)+'">'+
           '<span class="av" style="background:'+m.char.color+'22;color:'+m.char.color+'">'+esc(m.char.han)+'</span>'+
-          '<span class="nm"><b>'+esc(m.name)+'님의 인복도</b><i>별 '+m.count+' / '+m.limit+'명</i></span>'+
+          '<span class="nm"><b>'+esc(m.name)+'님의 인연지도</b><i>별 '+m.count+' / '+m.limit+'명</i></span>'+
           '<span class="tiny">열기 ›</span></button>';
       }).join('')+'</div>'+
-      '<button class="btn" id="new" style="margin-top:22px">새 인복도 만들기</button>'+
+      '<button class="btn" id="new" style="margin-top:22px">새 인연지도 만들기</button>'+
       '<button class="btn sec2" id="out" style="margin-top:9px">로그아웃</button>'+
     '</section>'));
     app.addEventListener('click',function(e){
@@ -1517,7 +1542,7 @@ Promise.all([loadMeta(),loadMe()]).then(function(){
   else if(BOOT.view==='notfound'){
     app.innerHTML='<section class="fade center" style="padding-top:70px">'+
       '<h1 style="font-size:26px">페이지를 찾을 수 없어요</h1>'+
-      '<button class="btn" style="margin-top:22px" onclick="location.href=\'/\'">인복도 홈으로</button></section>';
+      '<button class="btn" style="margin-top:22px" onclick="location.href=\'/\'">인연지도 홈으로</button></section>';
   }
   else viewHome();
   updateNav();

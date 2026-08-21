@@ -1,4 +1,4 @@
-// index.js — 인복도 Cloudflare Worker
+// index.js — 인연지도 Cloudflare Worker
 import { computeSaju } from './saju.js';
 import { analyze, TYPES, CHARACTERS, scoreBand } from './compat.js';
 import { leapMonthOf, lunarMonthLength } from './astro.js';
@@ -462,7 +462,7 @@ function renderPage(meta) {
 <meta name="robots" content="${meta.noindex ? 'noindex,nofollow' : 'index,follow'}">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="ko_KR">
-<meta property="og:site_name" content="인복도">
+<meta property="og:site_name" content="인연지도">
 <meta property="og:title" content="${t}">
 <meta property="og:description" content="${d}">
 <meta property="og:url" content="${u}">
@@ -470,7 +470,7 @@ function renderPage(meta) {
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:type" content="image/png">
-<meta property="og:image:alt" content="인복도 - 사주로 그리는 사람 별자리 지도">
+<meta property="og:image:alt" content="인연지도 - 사주로 그리는 사람 별자리 지도">
 <meta name="twitter:title" content="${t}">
 <meta name="twitter:description" content="${d}">
 <meta name="twitter:image" content="${esc(meta.origin)}/og.png">
@@ -522,8 +522,8 @@ export default {
     }
     if (url.pathname === '/login' || url.pathname === '/me') {
       return new Response(renderPage({
-        title: url.pathname === '/login' ? '인복도 로그인' : '내 지도 · 인복도',
-        desc: '인복도', url: origin + url.pathname, origin,
+        title: url.pathname === '/login' ? '인연지도 로그인' : '내 지도 · 인연지도',
+        desc: '인연지도', url: origin + url.pathname, origin,
         boot: { view: url.pathname === '/login' ? 'login' : 'mine', providers: enabledProviders(env), kakaoKey: env.KAKAO_JS_KEY || '' },
       }), { headers: { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'no-store' } });
     }
@@ -553,9 +553,9 @@ export default {
         }
       } catch (e) { /* 무시 */ }
       const providers = enabledProviders(env);
-      const title = ownerName ? `${ownerName}님의 인복도 · 나는 이 사람에게 어떤 사람일까?` : '인복도';
+      const title = ownerName ? `${ownerName}님의 인연지도 · 나에게 넌, 어떤 인연일까` : '인연지도';
       const desc = ownerName
-        ? `생년월일만 넣으면 ${ownerName}님과 나 사이에 오가는 기운을 사주로 풀어드립니다. 30초면 끝납니다.`
+        ? `생일만 넣으면 ${ownerName}님과 나 사이에 오가는 기운을 사주로 풀어드립니다. 30초면 끝납니다.`
         : '내 사람 별자리를 그려보세요.';
       return new Response(renderPage({ title, desc, url: `${origin}/m/${code}`, origin, boot: { view: 'map', code, ownerName, kakaoKey: env.KAKAO_JS_KEY || '', providers }, noindex: true }), {
         headers: { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'no-store' },
@@ -564,15 +564,15 @@ export default {
 
     if (url.pathname === '/' || url.pathname === '') {
       return new Response(renderPage({
-        title: '인복도 人福圖 · 내 사람 별자리 지도',
-        desc: '내 곁의 사람들이 나에게 어떤 기운을 주는지, 사주 명리로 풀어 별자리처럼 그려드립니다. 링크 하나로 친구들을 모아보세요.',
+        title: '인연지도 · 나에게 넌, 어떤 인연일까',
+        desc: '생일만 넣으면 두 사람 사이에 오가는 기운을 사주로 풀어 별자리처럼 그려드립니다. 링크 하나로 친구들을 모아보세요. 30초면 끝납니다.',
         url: origin, origin, boot: { view: 'home', kakaoKey: env.KAKAO_JS_KEY || '', providers: enabledProviders(env) },
       }), { headers: { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'public, max-age=60' } });
     }
 
     return new Response(renderPage({
-      title: '인복도 · 페이지를 찾을 수 없습니다',
-      desc: '인복도', url: origin, origin, boot: { view: 'notfound' },
+      title: '인연지도 · 페이지를 찾을 수 없습니다',
+      desc: '인연지도', url: origin, origin, boot: { view: 'notfound' },
     }), { status: 404, headers: { 'content-type': 'text/html; charset=utf-8' } });
   },
 };
