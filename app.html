@@ -51,15 +51,57 @@ input,select{font:inherit;color:inherit}
 
 /* ---------- 헤더 ---------- */
 header{position:sticky;top:0;z-index:40;
-  -webkit-backdrop-filter:saturate(180%) blur(20px);backdrop-filter:saturate(180%) blur(20px);
-  background:rgba(8,11,20,.72);
-  border-bottom:.5px solid rgba(255,255,255,.10);
+  -webkit-backdrop-filter:saturate(180%) blur(22px);backdrop-filter:saturate(180%) blur(22px);
+  background:linear-gradient(180deg,rgba(16,13,6,.86),rgba(8,11,20,.80));
+  border-bottom:.5px solid rgba(217,180,91,.20);
   padding-top:var(--safe-t)}
-.hdr{max-width:540px;margin:0 auto;padding:11px 22px;display:flex;align-items:center;gap:10px}
-.logo{display:flex;align-items:center;gap:9px;font-weight:800;letter-spacing:-.02em}
-.logo .mk{width:26px;height:26px;flex:0 0 26px}
-.logo b{font-size:17px}
-.logo span{font-size:11px;color:var(--gold-dim);font-weight:600;letter-spacing:.14em;margin-left:1px}
+.hdr{max-width:540px;margin:0 auto;padding:16px 22px 15px;display:flex;align-items:center;gap:10px}
+.logo{display:flex;align-items:center;gap:11px;font-weight:800;letter-spacing:-.02em}
+.logo .mk{width:34px;height:34px;flex:0 0 34px}
+.logo b{font-size:22px;letter-spacing:-.035em}
+.logo span{font-size:11.5px;color:var(--gold-dim);font-weight:600;letter-spacing:.16em;margin-left:2px}
+.menubtn{width:42px;height:42px;border-radius:13px;display:grid;place-items:center;
+  border:.5px solid rgba(217,180,91,.30);background:rgba(217,180,91,.09);transition:.2s var(--ease)}
+.menubtn:active{transform:scale(.93);background:rgba(217,180,91,.18)}
+.menubtn i{display:block;width:16px;height:1.6px;background:var(--gold2);border-radius:2px;position:relative}
+.menubtn i::before,.menubtn i::after{content:'';position:absolute;left:0;width:16px;height:1.6px;background:var(--gold2);border-radius:2px}
+.menubtn i::before{top:-5px}.menubtn i::after{top:5px}
+
+/* 메뉴 시트 */
+.scrim{position:fixed;inset:0;z-index:60;background:rgba(4,6,12,.62);
+  -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
+  opacity:0;pointer-events:none;transition:opacity .3s var(--ease)}
+.scrim.on{opacity:1;pointer-events:auto}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:61;
+  background:linear-gradient(180deg,#151122,#0c1018);
+  border-top:.5px solid rgba(217,180,91,.28);
+  border-radius:26px 26px 0 0;padding:10px 20px calc(24px + var(--safe-b));
+  transform:translateY(102%);transition:transform .42s var(--ease);
+  box-shadow:0 -20px 60px rgba(0,0,0,.5)}
+.sheet.on{transform:none}
+.sheet .grab{width:38px;height:4px;border-radius:99px;background:rgba(255,255,255,.22);margin:0 auto 16px}
+.sheet h4{margin:0 0 12px;font-size:13px;font-weight:600;letter-spacing:.12em;color:var(--gold-dim)}
+.mrow{display:flex;align-items:center;gap:13px;width:100%;padding:14px 14px;border-radius:16px;
+  background:rgba(255,255,255,.045);border:.5px solid var(--line);text-align:left;margin-bottom:8px;
+  transition:transform .3s var(--spring),background .2s}
+.mrow:active{transform:scale(.98);background:rgba(255,255,255,.08)}
+.mrow .ic{width:38px;height:38px;flex:0 0 38px;border-radius:12px;display:grid;place-items:center;font-size:17px}
+.mrow b{display:block;font-size:16px;font-weight:600;letter-spacing:-.025em}
+.mrow i{display:block;font-style:normal;font-size:12.5px;color:var(--dim);margin-top:1px}
+.mrow .go{color:var(--dim2);font-size:15px}
+
+/* 금빛 섹션 */
+.gold-sec{background:linear-gradient(160deg,rgba(217,180,91,.13),rgba(217,180,91,.03) 60%,transparent);
+  border:.5px solid rgba(217,180,91,.22);border-radius:24px;padding:24px 20px;
+  -webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px)}
+.gold-sec h2{margin-bottom:6px}
+.rule{height:1px;background:linear-gradient(90deg,transparent,rgba(217,180,91,.45),transparent);margin:34px 0}
+.statbar{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:18px}
+.statbox{background:rgba(255,255,255,.045);border:.5px solid var(--line);border-radius:16px;
+  padding:15px 12px;text-align:center}
+.statbox b{display:block;font-size:25px;font-weight:700;letter-spacing:-.045em;color:var(--gold2);
+  font-variant-numeric:tabular-nums;line-height:1.1}
+.statbox i{display:block;font-style:normal;font-size:12px;color:var(--dim);margin-top:5px;white-space:nowrap}
 .hdr .sp{flex:1}
 .ghost{border:1px solid var(--line2);border-radius:999px;padding:7px 14px;font-size:13px;font-weight:600;color:var(--dim);transition:.15s}
 .ghost:hover{color:var(--txt);border-color:var(--gold-dim)}
@@ -127,9 +169,10 @@ details.adv[open] summary::before{content:'－ '}
 .mapbox svg{display:block;width:100%;height:auto;overflow:visible}
 .star{cursor:pointer}
 .star circle.hit{fill:transparent}
-.dirlabel{font-size:9.5px;font-weight:700;letter-spacing:.1em}
-.namelabel{font-size:8.6px;font-weight:600;fill:rgba(233,229,219,.62)}
-.namelabel.on{fill:#f2dfa5}
+.dirlabel{font-size:12px;font-weight:700;letter-spacing:.08em;paint-order:stroke;stroke:rgba(6,9,16,.85);stroke-width:3px;stroke-linejoin:round}
+.namelabel{font-size:11px;font-weight:600;fill:rgba(240,237,230,.92);
+  paint-order:stroke;stroke:rgba(6,9,16,.9);stroke-width:3px;stroke-linejoin:round}
+.namelabel.on{fill:#f7e6ae}
 
 /* ---------- 리스트 ---------- */
 .plist{display:flex;flex-direction:column;gap:8px;margin-top:14px}
@@ -261,8 +304,15 @@ footer{margin-top:56px;padding-top:22px;border-top:1px solid var(--line);color:v
     </a>
     <div class="sp"></div>
     <button class="ghost" id="navBtn" hidden>내 지도</button>
+    <button class="menubtn" id="menuBtn" aria-label="메뉴 열기"><i></i></button>
   </div>
 </header>
+<div class="scrim" id="scrim"></div>
+<div class="sheet" id="sheet" role="dialog" aria-label="메뉴">
+  <div class="grab"></div>
+  <h4>인연지도</h4>
+  <div id="menuList"></div>
+</div>
 
 <main class="wrap" id="app"></main>
 <div class="dock" id="dock"><div class="in"></div></div>
@@ -394,6 +444,14 @@ function constellation(j){
     complete: have===5, have:have, missing:missing,
     gwiin: (j.entries||[]).filter(function(e){return e.cheoneul}).length
   };
+}
+function dayBand(n){
+  if(n>=86)return{label:'아주 좋은 날',tone:'gold'};
+  if(n>=78)return{label:'흐름이 좋은 날',tone:'green'};
+  if(n>=70)return{label:'무난히 풀리는 날',tone:'blue'};
+  if(n>=61)return{label:'평범한 날',tone:'gray'};
+  if(n>=52)return{label:'조심할 날',tone:'amber'};
+  return{label:'웅크릴 날',tone:'red'};
 }
 function charBy(k){for(var i=0;i<CHARS.length;i++)if(CHARS[i].key===k)return CHARS[i];return CHARS[0];}
 function gz(p){return p?STEM_H[p[0]]+BR_H[p[1]]:'—';}
@@ -576,7 +634,7 @@ function starMap(entries,owner,opt){
     var sp=pts.filter(function(x){return x.id===opt.sel})[0];
     if(sp)labels[opt.sel]={x:sp.x,y:sp.y-11};
   }
-  var s='<svg viewBox="-20 -10 400 400" role="img" aria-label="인연 별자리 지도">';
+  var s='<svg viewBox="-26 -16 412 412" role="img" aria-label="인연 별자리 지도">';
   s+='<defs>'+
      '<radialGradient id="og"><stop offset="0%" stop-color="#fff8e0"/><stop offset="45%" stop-color="#f2dfa5"/><stop offset="100%" stop-color="#d9b45b" stop-opacity="0"/></radialGradient>'+
      '<filter id="gl" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="2.6" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>'+
@@ -592,11 +650,11 @@ function starMap(entries,owner,opt){
   });
   // 오행 방위 라벨
   [[0,'水 북',4],[90,'木 동',0],[180,'火 남',1],[270,'金 서',3]].forEach(function(d){
-    var rad=(d[0]-90)*Math.PI/180,R=174;
+    var rad=(d[0]-90)*Math.PI/180,R=178;
     s+='<text class="dirlabel" x="'+(180+Math.cos(rad)*R)+'" y="'+(180+Math.sin(rad)*R+3)+'" text-anchor="middle" fill="'+ECOL[d[2]]+'" opacity=".7">'+d[1]+'</text>';
   });
   [45,135,225,315].forEach(function(a){
-    var rad=(a-90)*Math.PI/180,R=170;
+    var rad=(a-90)*Math.PI/180,R=172;
     s+='<text class="dirlabel" x="'+(180+Math.cos(rad)*R)+'" y="'+(180+Math.sin(rad)*R+3)+'" text-anchor="middle" fill="'+ECOL[2]+'" opacity=".38">土</text>';
   });
   // 연결선
@@ -608,7 +666,7 @@ function starMap(entries,owner,opt){
   s+='<circle cx="180" cy="180" r="26" fill="url(#og)" opacity=".5"/>';
   s+='<circle cx="180" cy="180" r="9.5" fill="#f7ecc8" filter="url(#gl)"/>';
   s+='<text x="180" y="184" text-anchor="middle" font-size="9" font-weight="800" fill="#20180a">'+esc(owner.han)+'</text>';
-  s+='<text x="180" y="201" text-anchor="middle" font-size="10" font-weight="600" fill="#f2dfa5" letter-spacing="-.02em">'+esc(owner.name)+'</text>';
+  s+='<text x="180" y="203" text-anchor="middle" font-size="12" font-weight="700" fill="#f7e6ae" letter-spacing="-.02em" paint-order="stroke" stroke="rgba(6,9,16,.9)" stroke-width="3.4" stroke-linejoin="round">'+esc(owner.name)+'</text>';
   // 참여자 별
   pts.forEach(function(p,i){
     var big=p.score>=82,rr=big?5.2:(p.score>=68?4.2:3.4);
@@ -692,6 +750,20 @@ function viewHome(){
   '</section>'+
 
   '<section class="sec rv">'+
+    '<div class="gold-sec">'+
+      '<div class="eyebrow" style="color:#c9a227">지금까지</div>'+
+      '<b style="display:block;font-size:20px;font-weight:700;letter-spacing:-.035em;margin-top:7px">'+
+        '함께 만든 별자리</b>'+
+      '<div class="statbar" id="statBar">'+
+        '<div class="statbox"><b>—</b><i>오늘 방문</i></div>'+
+        '<div class="statbox"><b>—</b><i>누적 방문</i></div>'+
+        '<div class="statbox"><b>—</b><i>만든 지도</i></div>'+
+        '<div class="statbox"><b>—</b><i>찍힌 별</i></div>'+
+      '</div>'+
+    '</div>'+
+  '</section>'+
+
+  '<section class="sec rv">'+
     '<button class="btn" id="go2">내 인연지도 만들기</button>'+
     '<button class="btn sec2" id="go3" style="margin-top:10px">인연지도 알려주기</button>'+
     '<p class="tiny center" style="margin-top:10px">사주를 넣지 않고 이 사이트만 소개하고 싶을 때 쓰세요.</p>'+
@@ -708,6 +780,13 @@ function viewHome(){
 
   el('go').onclick=el('go2').onclick=function(){tap();location.hash='';viewCreate();};
   el('go3').onclick=function(){tap();shareSite();};
+  api('/api/stats').then(function(st){
+    var bar=el('statBar');if(!bar)return;
+    var v=[[st.today,'오늘 방문'],[st.total,'누적 방문'],[st.maps,'만든 지도'],[st.entries,'찍힌 별']];
+    bar.innerHTML=v.map(function(x){
+      return '<div class="statbox"><b>'+Number(x[0]||0).toLocaleString('ko-KR')+'</b><i>'+x[1]+'</i></div>';
+    }).join('');
+  }).catch(function(){});
   setDock('<button class="btn">내 인연지도 만들기</button>',function(){viewCreate();},'#go');
   reveal(app);
 
@@ -773,6 +852,7 @@ function viewCreate(){
   bindSso(app);
   bindForm(el('fw'),function(data,done){
     if(REF)data.ref=REF;
+    saveBirth(data.name,data.birth);
     api('/api/maps',{method:'POST',body:JSON.stringify(data)}).then(function(j){
       try{sessionStorage.removeItem('inbokdo_ref')}catch(e){}
       var mine=store('inbokdo_mine')||{};
@@ -848,23 +928,28 @@ function capBar(j){
       : '<div class="tiny" style="margin-top:7px">'+(lim-j.count)+'자리 남았어요.</div>');
 }
 function growBox(j){
-  var lim=j.limit||10, maxed=lim>=30;
-  var done=!!j.checkedInToday;
+  var lim=j.limit||5, maxed=lim>=30;
+  var done=!!j.checkedInToday, shared=!!j.sharedToday;
   return '<div class="upsell" id="growBox">'+
     '<div class="eyebrow" style="color:#c9a227">자리 늘리기</div>'+
     '<b style="display:block;font-size:21px;font-weight:700;letter-spacing:-.035em;margin-top:8px">'+
-      (maxed?'출석으로는 다 채웠어요':'하루 한 번 들르면 자리가 하나 늘어요')+'</b>'+
+      (maxed?'늘릴 수 있는 만큼 다 채웠어요':'하루에 두 개까지 늘릴 수 있어요')+'</b>'+
     '<p style="margin:9px 0 0;font-size:14.5px;color:#cdd3e0;line-height:1.66">'+
       (maxed
-        ? '출석으로 늘릴 수 있는 30명을 다 채웠습니다. 이제 친구를 초대해서 늘려보세요.'
-        : '지금 정원은 <b class="gold">'+lim+'명</b>. 출석으로 최대 30명까지 늘릴 수 있어요.')+'</p>'+
+        ? '30명까지 다 채웠습니다. 이제 친구를 초대해서 늘려보세요.'
+        : '지금 정원은 <b class="gold">'+lim+'명</b>. 출석 1개 + 공유 1개, 최대 30명까지 늘릴 수 있어요.')+'</p>'+
+    (maxed?'':'<div class="chips" style="margin-top:12px">'+
+      '<span class="chip"'+(done?' style="color:#8fd6ac;border-color:rgba(78,168,122,.4)"':'')+'>'+(done?'✓ 오늘 출석 완료':'출석 +1')+'</span>'+
+      '<span class="chip"'+(shared?' style="color:#8fd6ac;border-color:rgba(78,168,122,.4)"':'')+'>'+(shared?'✓ 오늘 공유 완료':'공유 +1')+'</span>'+
+      '<span class="chip">초대 성공 +2</span></div>')+
     (j.streak>1?'<div class="chips" style="margin-top:11px"><span class="chip" style="color:#f2dfa5;border-color:rgba(217,180,91,.4)">🔥 '+j.streak+'일 연속</span>'+
       (j.invites?'<span class="chip">초대 '+j.invites+'명 · +'+(j.invites*2)+'자리</span>':'')+'</div>':
      (j.invites?'<div class="chips" style="margin-top:11px"><span class="chip">초대 '+j.invites+'명 · +'+(j.invites*2)+'자리</span></div>':''))+
     (maxed?'':'<button class="btn'+(done?' sec2':'')+'" id="chk" style="margin-top:16px"'+(done?' disabled':'')+'>'+
       (done?'오늘 출석 완료 · 내일 또 오세요':'출석하고 자리 1개 늘리기')+'</button>')+
     '<div class="tiny" style="margin-top:12px;padding-top:11px;border-top:1px solid rgba(255,255,255,.09);line-height:1.65">'+
-      '친구가 내 링크로 들어와 <b style="color:#cdd3e0">자기 인연지도를 만들면</b> 자리가 2개씩 더 늘어납니다.</div>'+
+      '<b style="color:#cdd3e0">공유 버튼을 누르면 하루 1개</b>가 바로 늘고, '+
+      '친구가 내 링크로 들어와 <b style="color:#cdd3e0">자기 인연지도를 만들면</b> 2개가 더 늘어납니다.</div>'+
   '</div>';
 }
 // 로그인한 상태에서 브라우저에만 있던 지도를 자동으로 계정에 붙인다
@@ -986,10 +1071,18 @@ function doShare(code,ownerName,group){
   if(navigator.share){navigator.share({title:title,text:txt,url:url}).catch(function(){});return;}
   copyLink(code);
 }
+function claimShare(code){
+  var mine=store('inbokdo_mine')||{};
+  var tk=mine[code]&&mine[code].token;
+  if(!tk)return;
+  api('/api/maps/'+code+'/shared',{method:'POST',body:JSON.stringify({token:tk})})
+    .then(function(r){ if(r.ok){toast(r.message);setTimeout(function(){viewMap(code)},900);} })
+    .catch(function(){});
+}
 function bindShare(code,ownerName){
-  var c=el('cpy');if(c)c.onclick=function(){tap();copyLink(code);};
-  var s=el('shr');if(s)s.onclick=function(){tap();doShare(code,ownerName);};
-  var g=el('grp');if(g)g.onclick=function(){tap();doShare(code,ownerName,true);};
+  var c=el('cpy');if(c)c.onclick=function(){tap();copyLink(code);claimShare(code);};
+  var s=el('shr');if(s)s.onclick=function(){tap();doShare(code,ownerName);claimShare(code);};
+  var g=el('grp');if(g)g.onclick=function(){tap();doShare(code,ownerName,true);claimShare(code);};
   var t=el('sit');if(t)t.onclick=function(){tap();shareSite();};
 }
 
@@ -1280,6 +1373,7 @@ function renderVisitor(j){
   },'#fw');
   reveal(app);
   bindForm(el('fw'),function(data,done){
+    saveBirth(data.name,data.birth);
     api('/api/maps/'+j.code+'/join',{method:'POST',body:JSON.stringify(data)}).then(function(r){
       var jd=store('inbokdo_joined')||{};
       jd[j.code]={id:r.entryId,token:r.token,name:data.name};
@@ -1482,6 +1576,48 @@ function updateNav(){
   }else b.hidden=true;
 }
 
+/* ===== 메뉴 ===== */
+var MENU=[
+  {k:'today', ic:'☀', c:'#e8a33b', t:'오늘의 운세', d:'오늘 일진과 내 사주를 견줍니다', go:function(){location.href='/today'}},
+  {k:'saju',  ic:'四', c:'#9aa7b8', t:'내 사주팔자', d:'여덟 글자와 오행 분포를 봅니다', go:function(){location.href='/saju'}},
+  {k:'life',  ic:'◈', c:'#4ea87a', t:'분야별 풀이', d:'건강 · 재물 · 일 · 사람', go:function(){location.href='/life'}},
+  {k:'map',   ic:'✦', c:'#d9b45b', t:'내 인연지도', d:'내 사람들의 별자리', go:function(){goMyMap()}},
+  {k:'about', ic:'?', c:'#7a8b99', t:'어떻게 계산하나요', d:'우리가 쓴 명리 방법 공개', go:function(){location.href='/about'}}
+];
+function goMyMap(){
+  var mine=store('inbokdo_mine')||{};
+  var codes=Object.keys(mine);
+  if(!codes.length){ viewCreate(); closeMenu(); return; }
+  codes.sort(function(a,c){return mine[c].at-mine[a].at});
+  location.href='/m/'+codes[0];
+}
+function openMenu(){
+  var list=el('menuList');
+  list.innerHTML=MENU.map(function(m,i){
+    return '<button class="mrow" data-mi="'+i+'">'+
+      '<span class="ic" style="background:'+m.c+'22;color:'+m.c+'">'+m.ic+'</span>'+
+      '<span style="flex:1;min-width:0"><b>'+esc(m.t)+'</b><i>'+esc(m.d)+'</i></span>'+
+      '<span class="go">›</span></button>';
+  }).join('');
+  el('scrim').classList.add('on');
+  el('sheet').classList.add('on');
+}
+function closeMenu(){
+  el('scrim').classList.remove('on');
+  el('sheet').classList.remove('on');
+}
+el('menuBtn').onclick=function(){tap();openMenu();};
+el('scrim').onclick=closeMenu;
+el('menuList').addEventListener('click',function(e){
+  var b=e.target.closest('[data-mi]');if(!b)return;
+  tap();closeMenu();MENU[Number(b.dataset.mi)].go();
+});
+document.addEventListener('keydown',function(e){if(e.key==='Escape')closeMenu();});
+
+/* ===== 내 생년월일 기억 ===== */
+function saveBirth(name,birth){ store('inbokdo_birth',{name:name,birth:birth}); }
+function getBirth(){ return store('inbokdo_birth'); }
+
 /* ===== 화면: 로그인 ===== */
 function viewLogin(next){
   setDock(null);
@@ -1503,6 +1639,217 @@ function viewLogin(next){
   bindSso(app);
   el('skip').onclick=function(){tap();location.href='/'};
   window.scrollTo(0,0);
+}
+
+/* ===== 생년월일이 필요한 화면 공통 ===== */
+function askBirth(opt){
+  setDock(null);
+  app.innerHTML='';
+  app.appendChild(h(
+  '<section class="fade" style="padding-top:32px">'+
+    '<div class="eyebrow">'+esc(opt.eyebrow)+'</div>'+
+    '<h1 style="font-size:30px">'+opt.title+'</h1>'+
+    '<p class="lead" style="font-size:15px">'+opt.lead+'</p>'+
+    '<div class="card" style="margin-top:22px" id="fw">'+formHTML({cta:opt.cta||'보기'})+'</div>'+
+  '</section>'));
+  bindForm(el('fw'),function(data,done){
+    saveBirth(data.name,data.birth);
+    opt.done(data);
+  });
+  window.scrollTo(0,0);
+}
+function fortunePage(view){
+  var b=getBirth();
+  if(!b||!b.birth) return askBirth({
+    eyebrow:view==='today'?'오늘의 운세':view==='saju'?'내 사주팔자':'분야별 풀이',
+    title:'먼저 생년월일을<br>알려주세요',
+    lead:'한 번만 넣으면 이 기기에 저장돼서 다음부터는 바로 보입니다. 서버에 따로 저장하지 않습니다.',
+    cta:'보기',
+    done:function(){fortunePage(view);}
+  });
+  app.innerHTML='<div class="skel" style="height:40px;width:55%;margin-top:34px"></div>'+
+    '<div class="skel" style="height:240px;margin-top:20px"></div>';
+  api('/api/fortune',{method:'POST',body:JSON.stringify({birth:b.birth})})
+    .then(function(j){
+      if(view==='today')renderToday(j,b);
+      else if(view==='saju')renderSaju(j,b);
+      else renderLife(j,b);
+    })
+    .catch(function(e){
+      app.innerHTML='<section class="center" style="padding-top:60px"><h1 style="font-size:24px">'+esc(e.message)+'</h1>'+
+        '<button class="btn" style="margin-top:20px" onclick="location.href=\'/\'">홈으로</button></section>';
+    });
+}
+function pageFoot(cur){
+  var links=MENU.filter(function(m){return m.k!==cur&&m.k!=='map'});
+  return '<section class="sec rv"><h2>이어서 보기</h2><div class="plist">'+
+    links.map(function(m){
+      return '<a class="prow" href="'+(m.k==='today'?'/today':m.k==='saju'?'/saju':m.k==='life'?'/life':'/about')+'">'+
+      '<span class="ic av" style="background:'+m.c+'22;color:'+m.c+'">'+m.ic+'</span>'+
+      '<span class="nm"><b>'+esc(m.t)+'</b><i>'+esc(m.d)+'</i></span><span class="go tiny">›</span></a>';
+    }).join('')+'</div></section>';
+}
+
+/* ===== 화면: 오늘의 운세 ===== */
+function renderToday(j,b){
+  var t=j.today, bd=dayBand(t.score), sc=scColor(bd.tone);
+  var dt=t.date;
+  app.innerHTML='';
+  app.appendChild(h(
+  '<section class="fade" style="padding-top:30px">'+
+    '<div class="eyebrow">'+dt.y+'년 '+dt.m+'월 '+dt.d+'일</div>'+
+    '<h1 style="font-size:31px">'+esc(t.headline)+'</h1>'+
+    '<p class="lead" style="font-size:15px">'+esc(t.body)+'</p>'+
+  '</section>'+
+  '<section class="sec" style="margin-top:26px">'+
+    '<div class="gold-sec center">'+
+      '<div class="eyebrow" style="color:#c9a227">오늘의 기운</div>'+
+      '<div class="scorebig" style="color:'+sc+';font-size:74px">'+t.score+'<small>점</small></div>'+
+      '<div style="margin-top:10px"><span class="band tone-'+bd.tone+'">'+esc(bd.label)+'</span></div>'+
+      '<div class="chips" style="justify-content:center;margin-top:14px">'+
+        '<span class="chip">오늘 일진 '+esc(t.dayGZText)+' '+esc(t.dayGZKo)+'</span>'+
+        '<span class="chip">내 일간 기준 '+esc(t.sipsin)+'</span>'+
+      '</div>'+
+    '</div>'+
+  '</section>'+
+  (t.notes.length?'<section class="sec rv"><h2>오늘 눈여겨볼 것</h2><div class="card">'+
+    t.notes.map(function(n){return '<div class="note"><div class="ic">◈</div><div><b>'+esc(n.t)+'</b>'+
+      '<span>'+esc(n.d)+'</span></div></div>';}).join('')+'</div></section>':'')+
+  '<section class="sec rv"><h2>오늘 챙기면 좋은 것</h2>'+
+    '<div class="card" style="display:flex;gap:12px">'+
+      '<div style="flex:1;text-align:center"><div class="tiny">색</div>'+
+        '<b style="display:block;font-size:15.5px;margin-top:4px;color:#f2dfa5;letter-spacing:-.03em">'+esc(t.lucky.color)+'</b></div>'+
+      '<div style="width:1px;background:var(--line)"></div>'+
+      '<div style="flex:1;text-align:center"><div class="tiny">방향</div>'+
+        '<b style="display:block;font-size:15.5px;margin-top:4px;color:#f2dfa5;letter-spacing:-.03em">'+esc(t.lucky.dir)+'</b></div>'+
+      '<div style="width:1px;background:var(--line)"></div>'+
+      '<div style="flex:1;text-align:center"><div class="tiny">기운</div>'+
+        '<b style="display:block;font-size:15.5px;margin-top:4px;color:#f2dfa5;letter-spacing:-.03em">'+esc(t.lucky.elem)+'</b></div>'+
+    '</div>'+
+    '<p class="tiny" style="margin-top:9px">내 사주에서 가장 얇은 기운을 채우는 쪽입니다.</p>'+
+  '</section>'+
+  '<div class="rule"></div>'+
+  pageFoot('today')+
+  '<footer>오늘의 운세는 오늘 일진(日辰)과 내 일간의 관계로 계산합니다. 재미와 참고로만 봐주세요.</footer>'));
+  reveal(app);window.scrollTo(0,0);
+}
+
+/* ===== 화면: 내 사주팔자 ===== */
+function renderSaju(j,b){
+  var ch=charBy(j.char.key), sa=j.saju, ba=j.areas.balance;
+  app.innerHTML='';
+  app.appendChild(h(
+  '<section class="fade" style="padding-top:30px">'+
+    '<div class="eyebrow">내 사주팔자</div>'+
+    '<h1 style="font-size:30px">나는 <span class="gold">'+esc(ch.name)+'</span></h1>'+
+    '<p class="lead" style="font-size:15px">'+esc(ch.desc)+'</p>'+
+  '</section>'+
+  '<section class="sec" style="margin-top:24px">'+sajuCard(sa,ch)+'</section>'+
+  '<section class="sec rv"><div class="gold-sec">'+
+    '<div class="eyebrow" style="color:#c9a227">기운의 세기</div>'+
+    '<b style="display:block;font-size:21px;font-weight:700;letter-spacing:-.035em;margin-top:8px">'+esc(ba.strength)+'</b>'+
+    '<p style="margin:8px 0 0;font-size:14.5px;color:#cdd3e0;line-height:1.66">'+
+      (ba.strength==='신강'?'나를 밀어주는 기운이 두텁습니다. 스스로 밀어붙이는 힘이 있는 대신, 남 말이 잘 안 들어올 수 있습니다.'
+       :ba.strength==='신약'?'나를 밀어주는 기운이 얇습니다. 혼자보다 사람을 끼고 가는 쪽이 훨씬 유리합니다.'
+       :'한쪽으로 크게 치우치지 않은 편입니다. 상황에 따라 모양이 달라지는 유연한 구조입니다.')+'</p>'+
+    '<div class="chips">'+
+      '<span class="chip">가장 두터움 '+ELEM_H[ba.strong]+' '+ELEM[ba.strong]+'</span>'+
+      '<span class="chip">가장 얇음 '+ELEM_H[ba.weak]+' '+ELEM[ba.weak]+'</span></div>'+
+  '</div></section>'+
+  '<div class="rule"></div>'+
+  pageFoot('saju')+
+  '<footer>절기 기준으로 년·월주를, 율리우스일 기준으로 일주를, 오자둔으로 시주를 세웠습니다. 자세한 방법은 <a href="/about" style="color:#8a92a6;text-decoration:underline">계산 방법</a>에서 볼 수 있습니다.</footer>'));
+  reveal(app);window.scrollTo(0,0);
+}
+
+/* ===== 화면: 분야별 풀이 ===== */
+function renderLife(j,b){
+  var ch=charBy(j.char.key);
+  var cols={health:'#4ea87a',wealth:'#d0a94f',work:'#4f86c6',people:'#d98b8b'};
+  app.innerHTML='';
+  app.appendChild(h(
+  '<section class="fade" style="padding-top:30px">'+
+    '<div class="eyebrow">분야별 풀이</div>'+
+    '<h1 style="font-size:30px">내 사주를<br>네 갈래로 봅니다</h1>'+
+    '<p class="lead" style="font-size:15px">건강·재물·일·사람. 오행 분포와 십신 구성으로 갈래마다 결이 다르게 나옵니다.</p>'+
+  '</section>'+
+  '<section class="sec" style="margin-top:22px">'+
+    j.areas.areas.map(function(a,i){
+      var c=cols[a.key]||'#d9b45b';
+      return '<div class="typecard'+(i?' rv':'')+'" style="--c:'+c+';background:rgba(255,255,255,.035);margin-top:'+(i?10:0)+'px">'+
+        '<div class="lbl" style="color:'+c+'">'+a.icon+' '+esc(a.title)+'</div>'+
+        '<h3 style="font-size:20px;margin-top:6px">'+esc(a.lead)+'</h3>'+
+        '<p>'+esc(a.text)+'</p></div>';
+    }).join('')+
+  '</section>'+
+  '<div class="rule"></div>'+
+  pageFoot('life')+
+  '<footer>오행 분포와 십신 비중으로 뽑은 해석입니다. 의학적 진단이나 투자 조언이 아닙니다.</footer>'));
+  reveal(app);window.scrollTo(0,0);
+}
+
+/* ===== 화면: 계산 방법 ===== */
+function viewAbout(){
+  setDock(null);
+  app.innerHTML='';
+  function blk(n,t,rows,note){
+    return '<div class="card rv" style="margin-top:12px">'+
+      '<div class="eyebrow" style="color:#c9a227">'+n+'</div>'+
+      '<b style="display:block;font-size:19px;font-weight:700;letter-spacing:-.035em;margin-top:7px">'+t+'</b>'+
+      '<div style="margin-top:12px">'+rows.map(function(r){
+        return '<div class="note"><div class="ic">◈</div><div><b>'+r[0]+'</b><span>'+r[1]+'</span></div></div>';
+      }).join('')+'</div>'+
+      (note?'<div class="tiny" style="margin-top:11px;padding-top:11px;border-top:1px solid var(--line);line-height:1.65">'+note+'</div>':'')+
+    '</div>';
+  }
+  app.appendChild(h(
+  '<section class="fade" style="padding-top:30px">'+
+    '<div class="eyebrow">HOW IT WORKS</div>'+
+    '<h1 style="font-size:30px">어떻게<br>계산하나요</h1>'+
+    '<p class="lead" style="font-size:15px">랜덤이 아닙니다. 쓰는 방법을 그대로 공개합니다. '+
+      '<b class="gold">계산에는 정답이 있고, 해석에는 없습니다.</b> 그 경계도 같이 적었습니다.</p>'+
+  '</section>'+
+  '<section class="sec" style="margin-top:22px">'+
+    blk('1','여덟 글자를 세웁니다',[
+      ['년주 — 입춘 기준','1월 1일이 아니라 입춘(立春)이 지나야 새 해로 봅니다. 2월 3일생과 2월 5일생의 띠가 갈리는 이유입니다.'],
+      ['월주 — 12절기 기준','경칩·청명 같은 절기로 월지를 정하고, 월간은 오호둔(五虎遁)으로 뽑습니다.'],
+      ['일주 — 율리우스일 60갑자','날짜를 천문 일련번호로 바꿔 60갑자를 순환시킵니다. 1949년 10월 1일이 갑자일인 것으로 맞춰 검증했습니다.'],
+      ['시주 — 오자둔','12지시에 배당하고 오자둔(五鼠遁)으로 시간을 뽑습니다. 밤 11시 이후는 야자시로 다음 날 일진을 씁니다.']
+    ],'태어난 시간을 모르면 시주만 빼고 나머지 여섯 글자로 계산합니다.')+
+
+    blk('2','절기는 직접 계산합니다',[
+      ['VSOP87','파리천문대의 행성 운동 이론입니다. 태양의 겉보기 황경을 구해 절기 시각을 계산합니다.'],
+      ['삭(新月) 시각','달 위상 공식으로 구합니다. 음력 변환과 윤달 판정에 씁니다.'],
+      ['ΔT 보정','지구 자전이 조금씩 느려지는 것을 보정합니다.'],
+      ['한국 표준시 변천','1954~1961년 UTC+8:30 시기와 1948~1988년 서머타임을 반영합니다.']
+    ],'한국천문연구원 발표 절기 시각과 분 단위까지 일치합니다. 1988년 설날처럼 한국(2/18)과 중국(2/17)이 갈리는 날도 한국 기준으로 맞습니다.')+
+
+    blk('3','관계는 이렇게 봅니다',[
+      ['십신(十神)','두 사람의 일간을 견줘 비견·겁재·식신·상관·편재·정재·편관·정관·편인·정인 중 무엇인지 판정합니다.'],
+      ['지지의 합충','육합·삼합·충·형·해·파를 일지·월지·년지·시지에 가중치를 달리해 봅니다.'],
+      ['천간합·천간충','일간끼리 손을 잡는지 부딪히는지 봅니다.'],
+      ['천을귀인(天乙貴人)','상대의 지지에 내 천을귀인이 들어 있으면 특별한 자리로 봅니다.'],
+      ['오행 보완','내게 얇은 기운을 상대가 채워주는 정도를 점수에 넣습니다. 지장간까지 가중치로 반영합니다.']
+    ])+
+
+    '<div class="gold-sec rv" style="margin-top:16px">'+
+      '<div class="eyebrow" style="color:#c9a227">솔직하게</div>'+
+      '<b style="display:block;font-size:19px;font-weight:700;letter-spacing:-.035em;margin-top:7px">점수표는 고전에 없습니다</b>'+
+      '<p style="margin:9px 0 0;font-size:14.5px;color:#cdd3e0;line-height:1.7">'+
+        '팔자를 세우는 규칙은 전통 그대로이고 검증도 가능합니다. 하지만 <b>정인은 +12점, 충은 −11점</b> 같은 배점은 '+
+        '전통 이론을 저희가 숫자로 옮긴 해석입니다. 어느 고서에 적힌 숫자가 아닙니다.</p>'+
+      '<p style="margin:12px 0 0;font-size:14.5px;color:#cdd3e0;line-height:1.7">'+
+        '관계 유형 이름(호랑이 선생, 밥친구)과 천간 캐릭터 이름(한낮의 해, 큰 산)도 저희가 지었습니다. '+
+        '물상(物象) 비유는 명리학에서 흔히 쓰지만, 그 문구는 저희 글입니다.</p>'+
+      '<p style="margin:12px 0 0;font-size:14.5px;color:#cdd3e0;line-height:1.7">'+
+        '<b class="gold">사주로 사람을 판단하지 마세요.</b> 관계를 한 번 돌아보는 계기 정도로만 써주시면 좋겠습니다.</p>'+
+    '</div>'+
+  '</section>'+
+  '<div class="rule"></div>'+
+  pageFoot('about')+
+  '<footer><a href="/terms" style="color:#8a92a6;text-decoration:underline">이용약관</a> · '+
+  '<a href="/privacy" style="color:#8a92a6;text-decoration:underline">개인정보처리방침</a></footer>'));
+  reveal(app);window.scrollTo(0,0);
 }
 
 /* ===== 화면: 내 지도 목록 ===== */
@@ -1538,6 +1885,8 @@ function viewMine(){
 Promise.all([loadMeta(),loadMe()]).then(function(){
   if(BOOT.view==='login')viewLogin();
   else if(BOOT.view==='mine')viewMine();
+  else if(BOOT.view==='about')viewAbout();
+  else if(BOOT.view==='today'||BOOT.view==='saju'||BOOT.view==='life')fortunePage(BOOT.view);
   else if(BOOT.view==='map')viewMap(BOOT.code);
   else if(BOOT.view==='notfound'){
     app.innerHTML='<section class="fade center" style="padding-top:70px">'+

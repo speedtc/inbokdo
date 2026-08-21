@@ -6,6 +6,7 @@ import APP_HTML from './app.html';
 import OG_PNG from './og.png';
 import { handleAuth, currentUser, ensureAuthSchema, enabledProviders } from './auth.js';
 import { privacyPage, termsPage } from './legal.js';
+import { todayFortune, lifeAreas, todayKST } from './fortune.js';
 
 const ALPHABET = '23456789abcdefghjkmnpqrstuvwxyz';
 function randCode(n = 7) {
@@ -91,7 +92,7 @@ async function ensureSchema(db) {
       day_stem INTEGER NOT NULL,
       views INTEGER DEFAULT 0,
       plan TEXT NOT NULL DEFAULT 'free',
-      entry_limit INTEGER NOT NULL DEFAULT 10,
+      entry_limit INTEGER NOT NULL DEFAULT 5,
       unlocked_at INTEGER,
       created_at INTEGER NOT NULL
     )`),
@@ -116,19 +117,27 @@ async function ensureSchema(db) {
       child TEXT PRIMARY KEY, parent TEXT NOT NULL, created_at INTEGER NOT NULL
     )`),
     db.prepare(`CREATE INDEX IF NOT EXISTS idx_ref_parent ON referrals(parent)`),
+    db.prepare(`CREATE TABLE IF NOT EXISTS shares (
+      code TEXT NOT NULL, day TEXT NOT NULL, created_at INTEGER NOT NULL,
+      PRIMARY KEY (code, day)
+    )`),
+    db.prepare(`CREATE TABLE IF NOT EXISTS stats (
+      day TEXT PRIMARY KEY, hits INTEGER NOT NULL DEFAULT 0
+    )`),
   ]);
   // 기존 DB 대비 컬럼 보강 (이미 있으면 무시)
   for (const sql of [
     `ALTER TABLE maps ADD COLUMN plan TEXT NOT NULL DEFAULT 'free'`,
-    `ALTER TABLE maps ADD COLUMN entry_limit INTEGER NOT NULL DEFAULT 10`,
+    `ALTER TABLE maps ADD COLUMN entry_limit INTEGER NOT NULL DEFAULT 5`,
     `ALTER TABLE maps ADD COLUMN unlocked_at INTEGER`,
     `ALTER TABLE maps ADD COLUMN ref_code TEXT`,
     `ALTER TABLE maps ADD COLUMN streak INTEGER NOT NULL DEFAULT 0`,
     `ALTER TABLE maps ADD COLUMN last_checkin TEXT`,
+    `ALTER TABLE maps ADD COLUMN last_share TEXT`,
   ]) { try { await db.prepare(sql).run(); } catch (e) { /* 이미 존재 */ } }
 }
 
-const FREE_LIMIT = 10;      // 기본 정원
+const FREE_LIMIT = 5;       // 기본 정원
 const CHECKIN_CAP = 30;     // 출석체크로 늘릴 수 있는 최대치
 const REF_BONUS = 2;        // 내 링크로 들어온 친구가 지도를 만들면 주는 자리
 const REF_CAP = 60;         // 초대 보상 포함 상한
@@ -161,6 +170,17 @@ function entryRow(r) {
     cheoneul: !!res.cheoneul,
     createdAt: r.created_at,
   };
+}
+
+/** 방문 카운트 (같은 사람이 여러 번 들어와도 계속 셈) */
+async function bumpStats(env) {
+  try {
+    const day = kstDay();
+    await env.DB.prepare(
+      `INSERT INTO stats (day, hits) VALUES (?, 1)
+       ON CONFLICT(day) DO UPDATE SET hits = hits + 1`
+    ).bind(day).run();
+  } catch (e) { /* 통계는 실패해도 서비스에 영향 없음 */ }
 }
 
 // 결제 검증 자리. 실제 PG(카카오페이·토스·Stripe 등)를 붙일 때 이 함수만 채우면 된다.
@@ -222,10 +242,10 @@ async function handleApi(request, env, url) {
     const ref = typeof body.ref === 'string' && /^[0-9a-z]{4,12}$/.test(body.ref) ? body.ref : null;
 
     await db.prepare(
-      `INSERT INTO maps (code, owner_name, owner_token, birth_json, saju_json, day_stem, ref_code, user_id, created_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
+      `INSERT INTO maps (code, owner_name, owner_token, birth_json, saju_json, day_stem, ref_code, user_id, entry_limit, plan, created_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'free', ?)`
     ).bind(code, name, token, JSON.stringify(birth), JSON.stringify(saju), saju.dayStem, ref,
-      me ? me.id : null, Date.now()).run();
+      me ? me.id : null, FREE_LIMIT, Date.now()).run();
 
     // 초대 보상: 내 링크를 타고 온 사람이 자기 지도를 만들면 초대한 쪽 정원 +2
     let refRewarded = false;
@@ -271,6 +291,7 @@ async function handleApi(request, env, url) {
       full: results.length >= limitOf(row),
       saved: isOwner ? !!row.user_id : undefined,
       checkedInToday: isOwner ? row.last_checkin === kstDay() : undefined,
+      sharedToday: isOwner ? row.last_share === kstDay() : undefined,
       streak: isOwner ? (row.streak || 0) : undefined,
       canCheckin: isOwner ? (limitOf(row) < CHECKIN_CAP) : undefined,
       invites: isOwner ? (await db.prepare(`SELECT COUNT(*) AS n FROM referrals WHERE parent = ?`).bind(code).first()).n : undefined,
@@ -411,6 +432,58 @@ async function handleApi(request, env, url) {
       message: `자리 한 개가 늘었어요. 이제 ${next}명까지 받을 수 있어요.` });
   }
 
+  // 공유 보상: 하루 1회, 자리 1개
+  const mShare = path.match(/^\/api\/maps\/([0-9a-z]{4,12})\/shared$/);
+  if (mShare && request.method === 'POST') {
+    const code = mShare[1];
+    const body = await request.json().catch(() => ({}));
+    const row = await db.prepare(`SELECT * FROM maps WHERE code = ?`).bind(code).first();
+    if (!row) return bad('없는 지도입니다.', 404);
+    const owns = (me && row.user_id && row.user_id === me.id) || body.token === row.owner_token;
+    if (!owns) return bad('지도 주인만 받을 수 있어요.', 403);
+
+    const today = kstDay();
+    if (row.last_share === today) {
+      return json({ ok: false, reason: 'ALREADY', limit: limitOf(row), message: '공유 보상은 하루에 한 번이에요.' });
+    }
+    const cur = limitOf(row);
+    if (cur >= CHECKIN_CAP) {
+      await db.prepare(`UPDATE maps SET last_share = ? WHERE code = ?`).bind(today, code).run();
+      return json({ ok: false, reason: 'MAXED', limit: cur, message: `늘릴 수 있는 최대(${CHECKIN_CAP}명)에 도달했어요.` });
+    }
+    const next = Math.min(CHECKIN_CAP, cur + 1);
+    await db.batch([
+      db.prepare(`INSERT OR IGNORE INTO shares (code, day, created_at) VALUES (?, ?, ?)`).bind(code, today, Date.now()),
+      db.prepare(`UPDATE maps SET entry_limit = ?, last_share = ? WHERE code = ?`).bind(next, today, code),
+    ]);
+    return json({ ok: true, limit: next, gained: 1, message: `공유 고마워요. 자리가 하나 늘어 ${next}명까지 받을 수 있어요.` });
+  }
+
+  // 오늘의 운세 + 분야별 풀이
+  if (path === '/api/fortune' && request.method === 'POST') {
+    const body = await request.json().catch(() => null);
+    const err = validBirth(body?.birth);
+    if (err) return bad(err);
+    let s;
+    try { s = computeSaju(normBirth(body.birth)); } catch (e) { return bad(e.message || '계산 실패'); }
+    return json({
+      char: charPayload(s.dayStem),
+      saju: sajuPayload(s),
+      today: todayFortune(s),
+      areas: lifeAreas(s),
+    });
+  }
+
+  // 방문 통계
+  if (path === '/api/stats' && request.method === 'GET') {
+    const today = kstDay();
+    const a = await db.prepare(`SELECT hits FROM stats WHERE day = ?`).bind(today).first();
+    const b = await db.prepare(`SELECT SUM(hits) AS n FROM stats`).first();
+    const c = await db.prepare(`SELECT COUNT(*) AS n FROM maps`).first();
+    const e = await db.prepare(`SELECT COUNT(*) AS n FROM entries`).first();
+    return json({ today: (a && a.hits) || 0, total: (b && b.n) || 0, maps: c.n, entries: e.n });
+  }
+
   // 정원 늘리기 (결제/후원 연동 예정)
   const mUnlock = path.match(/^\/api\/maps\/([0-9a-z]{4,12})\/unlock$/);
   if (mUnlock && request.method === 'POST') {
@@ -520,6 +593,21 @@ export default {
         headers: { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'public, max-age=3600' },
       });
     }
+    const PAGES = {
+      '/today': { view: 'today', title: '오늘의 운세 · 인연지도', desc: '오늘 일진과 내 사주를 견줘 오늘 하루의 결을 풀어드립니다.' },
+      '/saju': { view: 'saju', title: '내 사주팔자 · 인연지도', desc: '생년월일시를 여덟 글자로 세우고 오행 분포까지 보여드립니다.' },
+      '/life': { view: 'life', title: '분야별 풀이 · 인연지도', desc: '건강·재물·일·사람. 내 원국을 네 갈래로 나눠 풀어드립니다.' },
+      '/about': { view: 'about', title: '어떻게 계산하나요 · 인연지도', desc: '인연지도가 쓰는 명리학 방법과 천문 계산을 그대로 공개합니다.' },
+    };
+    if (PAGES[url.pathname]) {
+      const pg = PAGES[url.pathname];
+      if (env.DB) ctx.waitUntil(bumpStats(env));
+      return new Response(renderPage({
+        title: pg.title, desc: pg.desc, url: origin + url.pathname, origin,
+        boot: { view: pg.view, providers: enabledProviders(env), kakaoKey: env.KAKAO_JS_KEY || '' },
+      }), { headers: { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'no-store' } });
+    }
+
     if (url.pathname === '/login' || url.pathname === '/me') {
       return new Response(renderPage({
         title: url.pathname === '/login' ? '인연지도 로그인' : '내 지도 · 인연지도',
@@ -557,17 +645,19 @@ export default {
       const desc = ownerName
         ? `생일만 넣으면 ${ownerName}님과 나 사이에 오가는 기운을 사주로 풀어드립니다. 30초면 끝납니다.`
         : '내 사람 별자리를 그려보세요.';
+      if (env.DB) ctx.waitUntil(bumpStats(env));
       return new Response(renderPage({ title, desc, url: `${origin}/m/${code}`, origin, boot: { view: 'map', code, ownerName, kakaoKey: env.KAKAO_JS_KEY || '', providers }, noindex: true }), {
         headers: { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'no-store' },
       });
     }
 
     if (url.pathname === '/' || url.pathname === '') {
+      if (env.DB) ctx.waitUntil(bumpStats(env));
       return new Response(renderPage({
         title: '인연지도 · 나에게 넌, 어떤 인연일까',
         desc: '생일만 넣으면 두 사람 사이에 오가는 기운을 사주로 풀어 별자리처럼 그려드립니다. 링크 하나로 친구들을 모아보세요. 30초면 끝납니다.',
         url: origin, origin, boot: { view: 'home', kakaoKey: env.KAKAO_JS_KEY || '', providers: enabledProviders(env) },
-      }), { headers: { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'public, max-age=60' } });
+      }), { headers: { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'no-store' } });
     }
 
     return new Response(renderPage({
