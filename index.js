@@ -174,13 +174,20 @@ function entryRow(r) {
 
 /** 방문 카운트 (같은 사람이 여러 번 들어와도 계속 셈) */
 async function bumpStats(env) {
+  const day = kstDay();
+  const sql = `INSERT INTO stats (day, hits) VALUES (?, 1)
+               ON CONFLICT(day) DO UPDATE SET hits = hits + 1`;
   try {
-    const day = kstDay();
-    await env.DB.prepare(
-      `INSERT INTO stats (day, hits) VALUES (?, 1)
-       ON CONFLICT(day) DO UPDATE SET hits = hits + 1`
-    ).bind(day).run();
-  } catch (e) { /* 통계는 실패해도 서비스에 영향 없음 */ }
+    await env.DB.prepare(sql).bind(day).run();
+  } catch (e) {
+    // 테이블이 아직 없으면 만들고 한 번 더 (통계는 실패해도 서비스에 영향 없음)
+    try {
+      await env.DB.prepare(
+        `CREATE TABLE IF NOT EXISTS stats (day TEXT PRIMARY KEY, hits INTEGER NOT NULL DEFAULT 0)`
+      ).run();
+      await env.DB.prepare(sql).bind(day).run();
+    } catch (e2) { /* 무시 */ }
+  }
 }
 
 // 결제 검증 자리. 실제 PG(카카오페이·토스·Stripe 등)를 붙일 때 이 함수만 채우면 된다.
