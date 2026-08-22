@@ -66,7 +66,7 @@ header{position:sticky;top:0;z-index:40;
 .ghost:hover{color:var(--gold2);border-color:rgba(193,154,46,.55)}
 
 /* 상단 고정 메뉴 */
-.nav{max-width:540px;margin:0 auto;padding:0 22px 11px;display:flex;gap:7px;
+.nav{position:relative;max-width:540px;margin:0 auto;padding:0 22px 11px;display:flex;gap:7px;
   overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
 .nav::-webkit-scrollbar{display:none}
 .nv{flex:0 0 auto;display:inline-flex;align-items:center;gap:6px;padding:8px 13px;border-radius:999px;
@@ -1716,7 +1716,10 @@ function buildNav(){
     if(a.dataset.mk==='map'){e.preventDefault();tap();goMyMap();}
   });
   var on=nav.querySelector('.nv.on');
-  if(on&&on.offsetLeft>90)nav.scrollLeft=on.offsetLeft-70;
+  if(on){
+    var d=on.getBoundingClientRect().left-nav.getBoundingClientRect().left+nav.scrollLeft;
+    if(d>90)nav.scrollLeft=d-70;
+  }
 }
 function openMenu(){}
 function closeMenu(){}
