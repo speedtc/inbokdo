@@ -678,12 +678,12 @@ export default {
       });
     }
     const PAGES = {
-      '/today': { view: 'today', title: '오늘의 운세 · 인연지도', desc: '오늘 일진과 내 사주를 견줘 오늘 하루의 결을 풀어드립니다.' },
-      '/saju': { view: 'saju', title: '내 사주팔자 · 인연지도', desc: '생년월일시를 여덟 글자로 세우고 오행 분포까지 보여드립니다.' },
-      '/life': { view: 'life', title: '분야별 풀이 · 인연지도', desc: '건강·재물·일·사람. 내 원국을 네 갈래로 나눠 풀어드립니다.' },
+      '/today': { view: 'today', title: '오늘의 운세 · 인연지도', desc: '오늘 일진과 내 사주를 견줘 오늘 하루의 결을 풀어드립니다. 무료입니다.' },
+      '/saju': { view: 'saju', title: '내 사주팔자 · 인연지도', desc: '생년월일시를 여덟 글자로 세우고 오행 분포까지 보여드립니다. 무료입니다.' },
+      '/life': { view: 'life', title: '분야별 풀이 · 인연지도', desc: '건강·재물·일·사람. 내 원국을 네 갈래로 나눠 풀어드립니다. 무료입니다.' },
       '/about': { view: 'about', title: '어떻게 계산하나요 · 인연지도', desc: '인연지도가 쓰는 명리학 방법과 천문 계산을 그대로 공개합니다.' },
       '/my': { view: 'profile', title: '내 사주 · 인연지도', desc: '생년월일을 한 번만 넣으면 오늘의 운세·사주팔자·분야별 풀이가 바로 열립니다.' },
-      '/wealth': { view: 'wealthNew', title: '재물지도 · 인연지도', desc: '단톡방 사람들의 재물 사주를 한 장의 지도에 모읍니다. 가운데가 財, 안쪽에 있을수록 재물 그릇이 큰 사람입니다.' },
+      '/wealth': { view: 'wealthNew', title: '재물지도 · 인연지도', desc: '단톡방 사람들의 재물 사주를 한 장의 지도에 모읍니다. 가운데가 財, 안쪽에 있을수록 재물 그릇이 큰 사람입니다. 무료입니다.' },
     };
     if (PAGES[url.pathname]) {
       const pg = PAGES[url.pathname];
@@ -729,7 +729,7 @@ export default {
       const providers = enabledProviders(env);
       const title = ownerName ? `${ownerName}님의 인연지도 · 나에게 넌, 어떤 인연일까` : '인연지도';
       const desc = ownerName
-        ? `생일만 넣으면 ${ownerName}님과 나 사이에 오가는 기운을 사주로 풀어드립니다. 30초면 끝납니다.`
+        ? `생일만 넣으면 ${ownerName}님과 나 사이에 오가는 기운을 사주로 풀어드립니다. 가입도 결제도 없이 30초면 끝납니다.`
         : '내 사람 별자리를 그려보세요.';
       if (env.DB) ctx.waitUntil(bumpStats(env));
       return new Response(renderPage({ title, desc, url: `${origin}/m/${code}`, origin, boot: { view: 'map', code, ownerName, kakaoKey: env.KAKAO_JS_KEY || '', providers }, noindex: true }), {
@@ -751,7 +751,7 @@ export default {
       const providers = enabledProviders(env);
       const title = title2 ? `${title2} · 재물지도` : '재물지도 · 인연지도';
       const desc = title2
-        ? `생일만 넣으면 내 재물 사주가 이 지도에 찍힙니다. 가운데가 財, 안쪽에 있을수록 재물 그릇이 큰 사람입니다.`
+        ? `생일만 넣으면 내 재물 사주가 이 지도에 찍힙니다. 가운데가 財, 안쪽에 있을수록 재물 그릇이 큰 사람입니다. 무료입니다.`
         : '단톡방 사람들의 재물 사주를 한 장의 지도에 모읍니다.';
       if (env.DB) ctx.waitUntil(bumpStats(env));
       return new Response(renderPage({
@@ -765,7 +765,7 @@ export default {
       if (env.DB) ctx.waitUntil(bumpStats(env));
       return new Response(renderPage({
         title: '인연지도 · 나에게 넌, 어떤 인연일까',
-        desc: '생일만 넣으면 두 사람 사이에 오가는 기운을 사주로 풀어 별자리처럼 그려드립니다. 링크 하나로 친구들을 모아보세요. 30초면 끝납니다.',
+        desc: '사주팔자·오늘의 운세·인연지도·재물지도, 모든 메뉴가 무료입니다. 생일만 넣으면 두 사람 사이에 오가는 기운을 별자리처럼 그려드립니다. 가입도 결제도 없이 30초면 끝납니다.',
         url: origin, origin, boot: { view: 'home', kakaoKey: env.KAKAO_JS_KEY || '', providers: enabledProviders(env) },
       }), { headers: { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'no-store' } });
     }

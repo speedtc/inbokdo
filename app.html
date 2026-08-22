@@ -65,10 +65,22 @@ header{position:sticky;top:0;z-index:40;
   color:#5f5849;background:#fff;transition:.15s;white-space:nowrap}
 .ghost:hover{color:var(--gold2);border-color:rgba(193,154,46,.55)}
 
-/* 상단 고정 메뉴 */
-.nav{position:relative;max-width:540px;margin:0 auto;padding:0 22px 11px;display:flex;gap:7px;
-  overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
-.nav::-webkit-scrollbar{display:none}
+/* 별자리 메뉴 */
+.navsky{max-width:540px;margin:0 auto;padding:14px 20px 2px;position:relative}
+.navsky::before{content:'';position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(58% 68% at 50% 38%,rgba(217,180,91,.13),transparent 70%)}
+.navsky svg{display:block;width:100%;height:auto;overflow:visible;position:relative}
+.nvsline{stroke:rgba(193,154,46,.32);stroke-width:1}
+.nvsdot{fill:#c9a227;transition:fill .18s,r .2s var(--spring)}
+.nvst{font-size:11.5px;font-weight:600;letter-spacing:-.035em;fill:#6b6455;transition:fill .18s}
+.nvsa{cursor:pointer}
+.nvsa:hover .nvsdot{fill:#e0b93f}
+.nvsa:hover .nvst{fill:#a07c1c}
+.nvsa:active .nvsdot{fill:#8a6a10}
+.nvsa.on .nvsdot{fill:#a07c1c}
+.nvsa.on .nvst{fill:#8a6a10;font-weight:800}
+.nvsring{fill:none;stroke:rgba(193,154,46,.55);stroke-width:1.3}
+.nvshit{fill:transparent}
 /* 상단 내 사주 + 방문 통계 */
 .subbar{border-bottom:1px solid rgba(150,120,40,.13);background:linear-gradient(180deg,rgba(255,253,247,.9),rgba(251,247,236,.6))}
 .sbin{max-width:540px;margin:0 auto;padding:8px 22px;display:flex;align-items:center;gap:10px}
@@ -358,12 +370,12 @@ footer{margin-top:56px;padding-top:22px;border-top:1px solid var(--line);color:v
     <div class="sp"></div>
     <button class="ghost" id="navBtn" hidden>내 지도</button>
   </div>
-  <nav class="nav" id="nav" aria-label="주요 메뉴"></nav>
 </header>
 <div class="subbar"><div class="sbin">
-  <button class="biochip" id="bioBtn" type="button"></button>
+  <button class="biochip" id="bioBtn" type="button" hidden></button>
   <div class="hstat" id="hstat"><span>오늘 <b>—</b></span><span>누적 <b>—</b></span></div>
 </div></div>
+<div class="navsky" id="navsky" aria-label="주요 메뉴"></div>
 
 <main class="wrap" id="app"></main>
 <div class="dock" id="dock"><div class="in"></div></div>
@@ -2058,25 +2070,44 @@ function goMyMap(){
 function menuHref(k){
   return k==='today'?'/today':k==='saju'?'/saju':k==='life'?'/life':k==='about'?'/about':k==='profile'?'/my':k==='wealth'?'/wealth':'#';
 }
+/* 본문 상단 별자리 메뉴 — 여덟 개 별을 눌러 이동한다 */
+var NAVSKY=[
+  {k:'map',     t:'내 인연지도', x: 62, y: 46, r:6.2},
+  {k:'wealth',  t:'재물지도',   x:182, y: 30, r:6.2},
+  {k:'today',   t:'오늘의 운세', x:300, y: 56, r:6.2},
+  {k:'saju',    t:'사주팔자',   x:110, y:108, r:4.8},
+  {k:'life',    t:'분야별 풀이', x:240, y:106, r:4.8},
+  {k:'profile', t:'내 사주',    x:174, y:146, r:3.9},
+  {k:'about',   t:'계산 방법',  x:306, y:136, r:3.9},
+  {k:'home',    t:'홈',        x: 38, y:140, r:3.9}
+];
+var NAVLINE=[[0,1],[1,2],[0,3],[3,5],[5,4],[4,1],[4,6],[7,3],[2,6]];
 function buildNav(){
-  var nav=el('nav');if(!nav)return;
+  var box=el('navsky');if(!box)return;
   var cur=BOOT.view||'home';
   if(cur==='map'){ var mn=store('inbokdo_mine')||{}; if(!mn[BOOT.code])cur=''; }
   if(cur==='room'||cur==='wealthNew')cur='wealth';
-  nav.innerHTML='<a class="nv'+(cur==='home'?' on':'')+'" href="/"><span class="i">★</span>홈</a>'+
-    MENU.map(function(m){
-      return '<a class="nv'+(cur===m.k?' on':'')+'" href="'+menuHref(m.k)+'" data-mk="'+m.k+'">'+
-        '<span class="i" style="color:'+m.c+'">'+m.ic+'</span>'+esc(m.t)+'</a>';
-    }).join('');
-  nav.addEventListener('click',function(e){
-    var a=e.target.closest('[data-mk]');if(!a)return;
-    if(a.dataset.mk==='map'){e.preventDefault();tap();goMyMap();}
+
+  var P={};NAVSKY.forEach(function(n){P[n.k]=n;});
+  var g='<svg viewBox="0 0 360 176" role="navigation" aria-label="주요 메뉴">';
+  NAVLINE.forEach(function(L){
+    var a=NAVSKY[L[0]],b=NAVSKY[L[1]];
+    g+='<line class="nvsline" x1="'+a.x+'" y1="'+a.y+'" x2="'+b.x+'" y2="'+b.y+'"/>';
   });
-  var on=nav.querySelector('.nv.on');
-  if(on){
-    var d=on.getBoundingClientRect().left-nav.getBoundingClientRect().left+nav.scrollLeft;
-    if(d>90)nav.scrollLeft=d-70;
-  }
+  NAVSKY.forEach(function(n){
+    var on=(cur===n.k);
+    g+='<a class="nvsa'+(on?' on':'')+'" href="'+(n.k==='home'?'/':menuHref(n.k))+'" data-mk="'+n.k+'">'+
+      (on?'<circle class="nvsring" cx="'+n.x+'" cy="'+n.y+'" r="'+(n.r+4.5)+'"/>':'')+
+      '<circle class="nvsdot" cx="'+n.x+'" cy="'+n.y+'" r="'+n.r+'"/>'+
+      '<text class="nvst" x="'+n.x+'" y="'+(n.y+16)+'" text-anchor="middle">'+esc(n.t)+'</text>'+
+      '<circle class="nvshit" cx="'+n.x+'" cy="'+(n.y+5)+'" r="29"/></a>';
+  });
+  g+='</svg>';
+  box.innerHTML=g;
+  box.addEventListener('click',function(e){
+    var a=e.target.closest('[data-mk]');if(!a)return;
+    if(a.getAttribute('data-mk')==='map'){e.preventDefault();tap();goMyMap();}
+  });
 }
 function openMenu(){}
 function closeMenu(){}
@@ -2093,12 +2124,8 @@ function birthText(b){
 function paintBio(){
   var el2=el('bioBtn');if(!el2)return;
   var b=getBirth();
-  if(!b||!b.birth){
-    el2.className='biochip empty';
-    el2.innerHTML='＋ 내 사주 등록 (한 번만)';
-    el2.onclick=function(){tap();viewProfile();history.pushState({},'','/my');};
-    return;
-  }
+  if(!b||!b.birth){ el2.hidden=true; return; }
+  el2.hidden=false;
   el2.className='biochip';
   var c=b.charKey?charBy(b.charKey):null;
   el2.innerHTML='<span class="bh" style="background:'+((c&&c.color)||'#c19a2e')+'1f;color:'+((c&&c.color)||'#a07c1c')+'">'+
@@ -2122,12 +2149,15 @@ function viewProfile(){
   app.innerHTML='';
   var head='<section class="fade" style="padding-top:30px">'+
     '<div class="eyebrow">내 사주</div>'+
-    '<h1 style="font-size:30px">'+(b&&b.birth?'등록되어 있습니다':'한 번만<br>넣으면 끝입니다')+'</h1>'+
+    '<h1 style="font-size:30px">'+(b&&b.birth?'등록되어 있습니다':'아직 넣은<br>생년월일이 없어요')+'</h1>'+
     '<p class="lead" style="font-size:15px">'+
       (b&&b.birth
         ? '이 생년월일로 <b>오늘의 운세 · 내 사주팔자 · 분야별 풀이</b>가 바로 열립니다. 이 기기에만 저장되고 서버에는 남기지 않습니다.'
-        : '한 번 넣어두면 <b>오늘의 운세 · 내 사주팔자 · 분야별 풀이</b>를 매번 다시 입력하지 않아도 됩니다. 이 기기에만 저장되고 서버에는 남기지 않습니다.')+
+        : '따로 등록할 필요 없습니다. <b class="gold">인연지도를 만들 때 넣은 생년월일</b>이 그대로 여기에 저장돼서, '+
+          '그 뒤로는 오늘의 운세도 사주팔자도 다시 입력하지 않아도 됩니다.')+
     '</p>'+
+    (b&&b.birth?'':'<button class="btn" id="gomap" style="margin-top:24px">내 인연지도 만들기</button>'+
+      '<p class="tiny center" style="margin-top:10px">30초면 끝나요 · 가입 없음 · 무료</p>')+
   '</section>';
   var body='';
   if(b&&b.birth){
@@ -2145,9 +2175,15 @@ function viewProfile(){
       '<button class="btn sec2" id="del" style="margin-top:9px">이 기기에서 지우기</button>'+
     '</section>';
   }
-  body+='<section class="sec '+(b&&b.birth?'rv':'fade')+'" id="formSec"'+(b&&b.birth?' hidden':'')+'>'+
-    (b&&b.birth?'<h2>생년월일 바꾸기</h2>':'')+
-    '<div class="card" id="fw">'+formHTML({cta:b&&b.birth?'바꾸기':'등록하고 시작하기'})+'</div>'+
+  if(!(b&&b.birth)){
+    body+='<section class="sec fade" style="margin-top:26px">'+
+      '<button class="btn sec2" id="openForm">지도 없이 생년월일만 넣기</button>'+
+      '<p class="tiny center" style="margin-top:9px">오늘의 운세만 보고 싶을 때 쓰세요.</p>'+
+    '</section>';
+  }
+  body+='<section class="sec '+(b&&b.birth?'rv':'fade')+'" id="formSec" hidden>'+
+    '<h2>'+(b&&b.birth?'생년월일 바꾸기':'생년월일 넣기')+'</h2>'+
+    '<div class="card" id="fw">'+formHTML({cta:b&&b.birth?'바꾸기':'저장하고 오늘의 운세 보기'})+'</div>'+
   '</section>';
   app.appendChild(h(head+body+
     '<footer>생년월일은 이 브라우저에만 저장됩니다. 지도에 참여할 때를 빼면 서버로 보내지 않습니다.</footer>'));
@@ -2163,6 +2199,12 @@ function viewProfile(){
     }).catch(function(){ var box=el('pcard'); if(box)box.innerHTML='<div class="tiny">사주를 불러오지 못했습니다.</div>'; });
     el('chg').onclick=function(){tap();var f=el('formSec');f.hidden=false;f.scrollIntoView({behavior:'smooth',block:'center'});};
     el('del').onclick=function(){tap();clearBirth();paintBio();viewProfile();};
+  }else{
+    var gm=el('gomap');if(gm)gm.onclick=function(){tap();location.href='/';};
+    var of=el('openForm');if(of)of.onclick=function(){
+      tap();var f=el('formSec');f.hidden=false;f.scrollIntoView({behavior:'smooth',block:'center'});
+      setTimeout(function(){var n=f.querySelector('#fName');if(n)n.focus();},420);
+    };
   }
   bindForm(el('fw'),function(data,done){
     saveBirth(data.name,data.birth);paintBio();
@@ -2218,7 +2260,7 @@ function fortunePage(view){
   if(!b||!b.birth) return askBirth({
     eyebrow:view==='today'?'오늘의 운세':view==='saju'?'내 사주팔자':'분야별 풀이',
     title:'먼저 생년월일을<br>알려주세요',
-    lead:'한 번만 넣으면 이 기기에 저장돼서 다음부터는 바로 보입니다. 서버에 따로 저장하지 않습니다.',
+    lead:'한 번만 넣으면 이 기기에 저장돼서 <b>모든 메뉴가 그대로 열립니다.</b> 인연지도를 만들 때 넣으셨다면 이 화면은 다시 안 나옵니다. 서버에 따로 저장하지 않습니다.',
     cta:'보기',
     done:function(){fortunePage(view);}
   });
