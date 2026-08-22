@@ -329,6 +329,8 @@ details.adv[open] summary::before{content:'－ '}
   color:#8a7c5c;border:1px solid rgba(217,180,91,.28);border-radius:999px;padding:2px 8px}
 .adwrap{margin-top:26px}
 .adwrap .tiny{margin-top:8px;text-align:center}
+.hocode{margin-top:14px;padding:16px;border-radius:13px;background:rgba(240,232,210,.55);border:1px solid rgba(217,180,91,.4);text-align:center}
+.hocode .hoc{font-size:34px;font-weight:800;letter-spacing:.22em;color:#a07c1c;font-variant-numeric:tabular-nums}
 .consent{margin-top:18px;padding:14px 15px;border:1px solid rgba(60,48,16,.15);border-radius:13px;background:rgba(240,232,210,.42)}
 .consent .chk{display:flex;align-items:flex-start;gap:9px;font-size:13.5px;line-height:1.65;color:#4a4438;cursor:pointer}
 .consent .chk input{margin-top:2px;width:18px;height:18px;flex:0 0 18px;accent-color:#a07c1c}
@@ -637,8 +639,7 @@ table.wonguk td{padding:0;vertical-align:top}
     <div class="sfl">
       <a href="/terms">이용약관</a><span>·</span>
       <a href="/privacy">개인정보처리방침</a><span>·</span>
-      <a id="sfContact" href="#" target="_blank" rel="noopener">문의·후원</a><span>·</span>
-      <a id="sfAd" href="#" target="_blank" rel="noopener">광고 문의</a>
+      <a id="sfContact" href="#" target="_blank" rel="noopener">후원 &amp; 광고 문의</a>
     </div>
     <div class="sfc"><b>© 2026 speedtc.</b> All rights reserved.</div>
     <div class="sfn">사주 계산 방식과 해석 문장, 지도 구성과 화면 디자인은 speedtc 의 저작물입니다.
@@ -1240,8 +1241,7 @@ function legalFoot(extra){
   return '<footer>'+(extra||'')+
     '<a href="/terms" style="color:#7a7365;text-decoration:underline">이용약관</a> · '+
     '<a href="/privacy" style="color:#7a7365;text-decoration:underline">개인정보처리방침</a> · '+
-    '<a href="'+esc(CONTACT)+'" target="_blank" rel="noopener" style="color:#7a7365;text-decoration:underline">문의·후원</a> · '+
-    '<a href="'+esc(CONTACT)+'" target="_blank" rel="noopener" style="color:#7a7365;text-decoration:underline">광고 문의</a>'+
+    '<a href="'+esc(CONTACT)+'" target="_blank" rel="noopener" style="color:#7a7365;text-decoration:underline">후원 &amp; 광고 문의</a>'+
     copyRight()+
   '</footer>';
 }
@@ -1474,8 +1474,7 @@ function viewHome(){
     '입력한 생년월일은 궁합 계산에만 쓰이며, 다른 참여자에게는 절대 보이지 않습니다.<br><br>'+
     '<a href="/terms" style="color:#7a7365;text-decoration:underline">이용약관</a> · '+
     '<a href="/privacy" style="color:#7a7365;text-decoration:underline">개인정보처리방침</a> · '+
-    '<a href="'+esc(CONTACT)+'" target="_blank" rel="noopener" style="color:#7a7365;text-decoration:underline">문의·후원</a> · '+
-    '<a href="'+esc(CONTACT)+'" target="_blank" rel="noopener" style="color:#7a7365;text-decoration:underline">광고 문의</a>'+
+    '<a href="'+esc(CONTACT)+'" target="_blank" rel="noopener" style="color:#7a7365;text-decoration:underline">후원 &amp; 광고 문의</a>'+
     copyRight()+
   '</footer>'));
 
@@ -1629,14 +1628,16 @@ function constBox(j){
     '<p style="margin:8px 0 0;font-size:14.5px;color:#4a4438;line-height:1.66">'+esc(k.desc)+'.'+
       (k.gwiin?' 그중 <b class="gold">천을귀인이 '+k.gwiin+'명</b> 있습니다.':'')+'</p>'+
     '<div class="chips">'+
+      '<span class="chip">'+(j.count||0)+'명 참여</span>'+
       (k.complete
-        ? '<span class="chip" style="color:#a07c1c;border-color:rgba(217,180,91,.45)">★ 다섯 자리 완성</span>'
-        : '<span class="chip">자리 '+k.have+'/5</span>'+
-          (k.missing.length&&k.missing.length<=3?'<span class="chip">아직 빈 자리 · '+esc(k.missing.join(', '))+'</span>':''))+
+        ? '<span class="chip" style="color:#a07c1c;border-color:rgba(217,180,91,.45)">★ 다섯 방향 다 모임</span>'
+        : '<span class="chip">방향 '+k.have+'/5 모임</span>'+
+          (k.missing.length&&k.missing.length<=3?'<span class="chip">아직 없는 방향 · '+esc(k.missing.join(', '))+'</span>':''))+
     '</div>'+
     (k.complete
       ? '<div class="tiny" style="margin-top:11px">주는 사람, 받는 사람, 나란한 사람이 모두 있습니다. 한쪽으로 기울지 않은 인복입니다.</div>'
-      : '<div class="tiny" style="margin-top:11px">주고받음의 다섯 자리가 다 차면 별자리가 완성됩니다.</div>')+
+      : '<div class="tiny" style="margin-top:11px">이건 인원 수가 아니라 <b style="color:#4a4438">기운의 방향</b>입니다. '+
+        '주고받음의 다섯 방향이 다 모이면 별자리가 완성돼요. <b style="color:#4a4438">참여 인원은 제한이 없습니다.</b></div>')+
   '</div>'+h2;
 }
 function claimIfNeeded(j){
@@ -3121,9 +3122,11 @@ function viewProfile(){
     '<div class="card" id="fw">'+formHTML(birthPrefill({noConsent:true,cta:b&&b.birth?'바꾸기':pend?'저장하고 내 사주 보기':'저장하고 오늘의 운세 보기'}))+'</div>'+
   '</section>';
   app.appendChild(h(head+body+
+    '<section class="sec rv">'+handoffBox()+'</section>'+
     '<section class="sec rv">'+pageShareBox('home')+'</section>'+
   '<section class="sec rv">'+adBox()+'</section>'+
     '<footer>생년월일은 이 브라우저에만 저장됩니다. 지도에 참여할 때를 빼면 서버로 보내지 않습니다.</footer>'));
+  bindHandoff();
 
   if(b&&b.birth){
     api('/api/fortune',{method:'POST',body:JSON.stringify({birth:b.birth})}).then(function(j){
@@ -3150,6 +3153,65 @@ function viewProfile(){
   });
   window.scrollTo(0,0);
 }
+/* ===== 기기 이동: 휴대폰 → PC =====
+   내 사주와 내가 만든 지도 목록은 기기(localStorage)에만 있다.
+   1회용 6자리 코드로 옮긴다. 15분 만료, 한 번 읽으면 서버에서 삭제. */
+var HANDOFF_KEYS=['inbokdo_birth','inbokdo_mine','inbokdo_joined','inbokdo_myroom'];
+function handoffBox(){
+  return '<div class="card">'+
+    '<div class="eyebrow" style="color:#c9a227">기기 옮기기</div>'+
+    '<b style="display:block;font-size:19px;font-weight:700;letter-spacing:-.035em;margin-top:8px">'+
+      '휴대폰에서 하던 걸 PC에서 이어서</b>'+
+    '<div class="tiny" style="margin-top:7px;line-height:1.7;color:var(--dim)">'+
+      '내 사주와 내가 만든 지도는 <b style="color:#4a4438">그 기기에만</b> 저장됩니다. '+
+      '아래에서 코드를 뽑아 다른 기기에 넣으면 그대로 넘어갑니다. '+
+      '코드는 <b style="color:#4a4438">15분</b>만 살아 있고 한 번 쓰면 사라집니다.</div>'+
+    '<button class="btn sec2" id="hoMake" style="margin-top:14px">이 기기에서 코드 뽑기</button>'+
+    '<div id="hoOut" class="hocode" hidden></div>'+
+    '<div style="margin-top:16px;padding-top:15px;border-top:1px solid rgba(60,48,16,.13)">'+
+      '<b style="display:block;font-size:15px;letter-spacing:-.03em">다른 기기에서 뽑은 코드가 있다면</b>'+
+      '<div class="linkrow" style="margin-top:10px">'+
+        '<input id="hoIn" maxlength="6" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="여섯 자리 코드">'+
+        '<button id="hoGo">가져오기</button></div>'+
+      '<div class="err" id="hoErr"></div>'+
+      '<div class="tiny" style="margin-top:8px;line-height:1.65">가져오면 이 기기에 저장된 내용은 새 것으로 바뀝니다.</div>'+
+    '</div>'+
+  '</div>';
+}
+function bindHandoff(){
+  var mk=el('hoMake'), out=el('hoOut'), go=el('hoGo'), inp=el('hoIn'), er=el('hoErr');
+  if(mk)mk.onclick=function(){
+    tap();
+    var pack={};
+    HANDOFF_KEYS.forEach(function(k){ var v=store(k); if(v)pack[k]=v; });
+    if(!Object.keys(pack).length){ if(out){out.hidden=false;out.innerHTML='<div class="tiny">아직 옮길 내용이 없어요. 생년월일을 먼저 넣어주세요.</div>';} return; }
+    mk.innerHTML='<span class="spin"></span>'; mk.disabled=true;
+    api('/api/handoff',{method:'POST',body:JSON.stringify({data:JSON.stringify(pack)})})
+      .then(function(j){
+        mk.disabled=false; mk.textContent='코드 다시 뽑기';
+        out.hidden=false;
+        out.innerHTML='<div class="hoc">'+esc(j.code)+'</div>'+
+          '<div class="tiny" style="margin-top:8px;line-height:1.7">다른 기기에서 <b style="color:#4a4438">'+
+          esc(location.host)+'/my</b> 를 열고 이 코드를 넣으세요. '+j.minutes+'분 안에 쓰셔야 합니다.</div>';
+      })
+      .catch(function(e){ mk.disabled=false; mk.textContent='이 기기에서 코드 뽑기';
+        out.hidden=false; out.innerHTML='<div class="tiny">'+esc(e.message||'코드를 뽑지 못했어요.')+'</div>'; });
+  };
+  if(go)go.onclick=function(){
+    var c=(inp.value||'').trim().toLowerCase().replace(/[^a-z2-9]/g,'');
+    if(c.length!==6){ er.textContent='여섯 자리 코드를 넣어주세요.'; return; }
+    er.textContent=''; go.innerHTML='<span class="spin"></span>'; go.disabled=true;
+    api('/api/handoff/'+c,{method:'POST',body:'{}'})
+      .then(function(j){
+        var pack=JSON.parse(j.data);
+        HANDOFF_KEYS.forEach(function(k){ if(pack[k]!==undefined)store(k,pack[k]); });
+        toast('불러왔어요');
+        setTimeout(function(){ location.href='/my'; },700);
+      })
+      .catch(function(e){ go.disabled=false; go.textContent='가져오기'; er.textContent=e.message||'가져오지 못했어요.'; });
+  };
+}
+
 function getBirth(){
   var b=store('inbokdo_birth');
   if(!b) return b;
@@ -4017,8 +4079,7 @@ function scrollToArea(){
   return true;
 }
 window.addEventListener('hashchange',function(){ scrollToArea(); });
-(function(){var a=document.getElementById('sfContact'),b=document.getElementById('sfAd');
-  if(a)a.href=CONTACT; if(b)b.href=CONTACT;})();
+(function(){var a=document.getElementById('sfContact'); if(a)a.href=CONTACT;})();
 buildNav();paintStat();bindPageShare();
 Promise.all([loadMeta(),loadMe()]).then(function(){
   paintBio();

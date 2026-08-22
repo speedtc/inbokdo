@@ -177,6 +177,12 @@ async function ensureSchema(db) {
       created_at INTEGER NOT NULL
     )`),
     db.prepare(`CREATE INDEX IF NOT EXISTS idx_room_entries ON room_entries(code, score DESC)`),
+    // 기기 이동용 1회용 코드 (휴대폰 → PC). 15분 뒤 만료, 한 번 읽으면 삭제.
+    db.prepare(`CREATE TABLE IF NOT EXISTS handoff (
+      code TEXT PRIMARY KEY,
+      data TEXT NOT NULL,
+      expires_at INTEGER NOT NULL
+    )`),
   ]);
   // 기존 DB 대비 컬럼 보강 (이미 있으면 무시)
   for (const sql of [
@@ -191,7 +197,7 @@ async function ensureSchema(db) {
 }
 
 // 정원 제한 없음. 한 지도가 받을 수 있는 절대 상한만 둔다.
-const HARD_CAP = 300;       // 절대 상한
+const HARD_CAP = 0;         // 0 = 인원 제한 없음 (entry_limit 컬럼 호환용으로만 남김)
 
 /** 한국 날짜 문자열 (YYYY-MM-DD) */
 function kstDay(ts) {
@@ -264,7 +270,7 @@ async function handleApi(request, env, url) {
       providers: enabledProviders(env),
       maps: results.map((r) => ({
         code: r.code, name: r.owner_name, char: charPayload(r.day_stem),
-        count: r.n, limit: HARD_CAP, createdAt: r.created_at,
+        count: r.n, limit: null, createdAt: r.created_at,
       })),
     });
   }
@@ -329,7 +335,7 @@ async function handleApi(request, env, url) {
     const row = await db.prepare(`SELECT * FROM maps WHERE code = ?`).bind(code).first();
     if (!row) return bad('없는 지도입니다.', 404);
     const { results } = await db.prepare(
-      `SELECT id, name, score, day_stem, result_json, created_at FROM entries WHERE code = ? ORDER BY score DESC, id ASC LIMIT 300`
+      `SELECT id, name, score, day_stem, result_json, created_at FROM entries WHERE code = ? ORDER BY score DESC, id ASC LIMIT 2000`
     ).bind(code).all();
     const saju = JSON.parse(row.saju_json);
     const isOwner = (me && row.user_id && row.user_id === me.id)
@@ -341,8 +347,8 @@ async function handleApi(request, env, url) {
       ownerSaju: isOwner ? sajuPayload(saju) : { dist: saju.dist, zodiac: saju.zodiac },
       isOwner,
       count: results.length,
-      limit: HARD_CAP,
-      full: results.length >= HARD_CAP,
+      limit: null,
+      full: false,
       saved: isOwner ? !!row.user_id : undefined,
       invites: isOwner ? (await db.prepare(`SELECT COUNT(*) AS n FROM referrals WHERE parent = ?`).bind(code).first()).n : undefined,
       entries: results.map((r, i) => ({ ...entryRow(r), rank: i + 1 })),
@@ -364,14 +370,7 @@ async function handleApi(request, env, url) {
     const row = await db.prepare(`SELECT * FROM maps WHERE code = ?`).bind(code).first();
     if (!row) return bad('없는 지도입니다.', 404);
 
-    const cnt = await db.prepare(`SELECT COUNT(*) AS n FROM entries WHERE code = ?`).bind(code).first();
-    if (cnt.n >= HARD_CAP) {
-      return json({
-        error: `이 지도는 최대 ${HARD_CAP}명까지 받을 수 있어요.`,
-        reason: 'LIMIT', limit: HARD_CAP, count: cnt.n,
-        ownerName: row.owner_name,
-      }, 402);
-    }
+    // 참여 인원 제한 없음
 
     const birth = normBirth(body.birth);
     let B;
@@ -511,6 +510,37 @@ async function handleApi(request, env, url) {
   }
 
   // 사주 심화 풀이
+  // ===== 기기 이동 (휴대폰에서 뽑은 코드를 PC에 넣으면 내 사주·내 지도가 그대로 넘어간다) =====
+  const HANDOFF_TTL = 15 * 60 * 1000;
+  const HANDOFF_ABC = 'abcdefghjkmnpqrstuvwxyz23456789'; // 헷갈리는 글자(i,l,o,0,1) 제외
+  if (path === '/api/handoff' && request.method === 'POST') {
+    const body = await request.json().catch(() => null);
+    if (!body || typeof body.data !== 'string') return bad('보낼 내용이 없습니다.');
+    if (body.data.length > 60000) return bad('내용이 너무 큽니다.');
+    try { await db.prepare(`DELETE FROM handoff WHERE expires_at < ?`).bind(Date.now()).run(); } catch (e) {}
+    let code = null;
+    for (let t = 0; t < 6 && !code; t++) {
+      const buf = crypto.getRandomValues(new Uint8Array(6));
+      const c = Array.from(buf, (b) => HANDOFF_ABC[b % HANDOFF_ABC.length]).join('');
+      const dup = await db.prepare(`SELECT code FROM handoff WHERE code = ?`).bind(c).first();
+      if (!dup) code = c;
+    }
+    if (!code) return bad('잠시 후 다시 시도해 주세요.', 503);
+    await db.prepare(`INSERT INTO handoff (code, data, expires_at) VALUES (?, ?, ?)`)
+      .bind(code, body.data, Date.now() + HANDOFF_TTL).run();
+    return json({ code, minutes: 15 });
+  }
+  const mHand = path.match(/^\/api\/handoff\/([a-z2-9]{6})$/);
+  if (mHand && request.method === 'POST') {
+    const code = mHand[1];
+    const row = await db.prepare(`SELECT data, expires_at FROM handoff WHERE code = ?`).bind(code).first();
+    if (!row) return bad('코드를 찾을 수 없어요. 다시 뽑아 주세요.', 404);
+    // 한 번 쓰면 없앤다
+    try { await db.prepare(`DELETE FROM handoff WHERE code = ?`).bind(code).run(); } catch (e) {}
+    if (row.expires_at < Date.now()) return bad('코드가 만료됐어요. 다시 뽑아 주세요.', 410);
+    return json({ data: row.data });
+  }
+
   if (path === '/api/deep' && request.method === 'POST') {
     const body = await request.json().catch(() => null);
     if (!body) return bad('요청을 읽을 수 없습니다.');
@@ -624,8 +654,8 @@ async function handleApi(request, env, url) {
       code, topic: row.topic, title: row.title,
       isOwner,
       count: results.length,
-      limit: HARD_CAP,
-      full: results.length >= HARD_CAP,
+      limit: null,
+      full: false,
       entries: results.map((r, i) => ({ ...roomEntryRow(r), rank: i + 1 })),
       createdAt: row.created_at,
     });
@@ -645,10 +675,7 @@ async function handleApi(request, env, url) {
     const row = await db.prepare(`SELECT * FROM rooms WHERE code = ?`).bind(code).first();
     if (!row) return bad('없는 방입니다.', 404);
 
-    const cnt = await db.prepare(`SELECT COUNT(*) AS n FROM room_entries WHERE code = ?`).bind(code).first();
-    if (cnt.n >= HARD_CAP) {
-      return json({ error: `이 방은 최대 ${HARD_CAP}명까지 받을 수 있어요.`, reason: 'LIMIT' }, 402);
-    }
+    // 참여 인원 제한 없음
 
     const birth = normBirth(body.birth);
     const topic = isTopic(row.topic) ? row.topic : 'wealth';
