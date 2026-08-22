@@ -118,6 +118,13 @@ header{position:sticky;top:0;z-index:40;
 .nvsbadge rect{fill:#c9a227}
 .nvsbadge text{font-size:9.5px;font-weight:800;letter-spacing:-.02em;fill:#fffaf0}
 .nvsa.on .nvsbadge rect{fill:#a07c1c}
+.nvtline{stroke:rgba(193,154,46,.42);stroke-width:1;stroke-dasharray:3 3}
+.nvtdot{fill:#d8b552;transition:fill .18s}
+.nvtt{font-size:9.8px;font-weight:700;letter-spacing:-.05em;fill:#8a8271;transition:fill .18s}
+.nvta{cursor:pointer}
+.nvta:hover .nvtdot{fill:#c19a2e}
+.nvta:hover .nvtt{fill:#a07c1c}
+.nvtcap{font-size:8.6px;font-weight:700;letter-spacing:.06em;fill:#b4ab98}
 /* 상단 내 사주 + 방문 통계 */
 .subbar{border-bottom:1px solid rgba(150,120,40,.13);background:linear-gradient(180deg,rgba(255,253,247,.9),rgba(251,247,236,.6))}
 .sbin{max-width:540px;margin:0 auto;padding:8px 22px;display:flex;align-items:center;gap:10px}
@@ -280,6 +287,12 @@ details.adv[open] summary::before{content:'－ '}
   color:#8a7c5c;border:1px solid rgba(217,180,91,.28);border-radius:999px;padding:2px 8px}
 .adwrap{margin-top:26px}
 .adwrap .tiny{margin-top:8px;text-align:center}
+.adask{display:flex;align-items:center;justify-content:center;gap:7px;flex-wrap:wrap;
+  margin-top:10px;padding:9px 12px;border:1px dashed var(--line2);border-radius:12px;
+  background:rgba(255,255,255,.55);text-decoration:none}
+.adask .q{font-size:12px;color:var(--dim);letter-spacing:-.03em}
+.adask .a{font-size:12.5px;font-weight:800;color:#a07c1c;letter-spacing:-.03em}
+.adask:active{transform:scale(.99)}
 .maplg{margin-top:6px;display:flex;flex-direction:column;gap:7px;align-items:center}
 .mlrow{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
 .mlx{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;color:#c6cddb;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.13);border-radius:999px;padding:3px 9px 3px 7px;letter-spacing:-.02em;white-space:nowrap}
@@ -522,6 +535,7 @@ table.wonguk td{padding:0;vertical-align:top}
 .acard .tip{margin-top:9px;padding-top:9px;border-top:1px solid var(--line);font-size:12.8px;color:#6b6355;line-height:1.65}
 .acard .tip b{color:#a07c1c}
 .acard .lk{display:inline-block;margin-top:9px;font-size:12.5px;font-weight:700;color:#a07c1c;text-decoration:none}
+.acard.hit{border-color:rgba(193,154,46,.62);box-shadow:0 0 0 3px rgba(193,154,46,.16)}
 </style>
 </head>
 <body>
@@ -963,6 +977,9 @@ function adBox(note){
         '<span><u>클릭시 오픈채팅방으로 이동됩니다</u> ›</span></span>'+
     '</a>'+
     (note?'<div class="tiny">'+note+'</div>':'')+
+    '<a class="adask" href="'+esc(CONTACT)+'" target="_blank" rel="noopener">'+
+      '<span class="q">이 자리에 광고를 싣고 싶으신가요?</span>'+
+      '<span class="a">광고 문의하기 ›</span></a>'+
   '</div>';
 }
 /* 페이지별 공유 */
@@ -1062,7 +1079,8 @@ function legalFoot(extra){
   return '<footer>'+(extra||'')+
     '<a href="/terms" style="color:#7a7365;text-decoration:underline">이용약관</a> · '+
     '<a href="/privacy" style="color:#7a7365;text-decoration:underline">개인정보처리방침</a> · '+
-    '<a href="'+esc(CONTACT)+'" target="_blank" rel="noopener" style="color:#7a7365;text-decoration:underline">문의·후원</a>'+
+    '<a href="'+esc(CONTACT)+'" target="_blank" rel="noopener" style="color:#7a7365;text-decoration:underline">문의·후원</a> · '+
+    '<a href="'+esc(CONTACT)+'" target="_blank" rel="noopener" style="color:#7a7365;text-decoration:underline">광고 문의</a>'+
   '</footer>';
 }
 function mapLegend(AX,ORDER,RG){
@@ -1292,7 +1310,8 @@ function viewHome(){
     '입력한 생년월일은 궁합 계산에만 쓰이며, 다른 참여자에게는 절대 보이지 않습니다.<br><br>'+
     '<a href="/terms" style="color:#7a7365;text-decoration:underline">이용약관</a> · '+
     '<a href="/privacy" style="color:#7a7365;text-decoration:underline">개인정보처리방침</a> · '+
-    '<a href="'+esc(CONTACT)+'" target="_blank" rel="noopener" style="color:#7a7365;text-decoration:underline">문의·후원</a>'+
+    '<a href="'+esc(CONTACT)+'" target="_blank" rel="noopener" style="color:#7a7365;text-decoration:underline">문의·후원</a> · '+
+    '<a href="'+esc(CONTACT)+'" target="_blank" rel="noopener" style="color:#7a7365;text-decoration:underline">광고 문의</a>'+
   '</footer>'));
 
   el('go').onclick=el('go2').onclick=function(){tap();location.hash='';viewCreate();};
@@ -1365,7 +1384,8 @@ function viewCreate(){
         ssoBtns('/')+'</div>'
       : '')+
     '<div class="card" style="margin-top:22px" id="fw">'+formHTML(birthPrefill({cta:'내 인연지도 만들기'}))+'</div>'+
-  '</section>'));
+  '</section>'+
+  '<section class="sec rv">'+adBox()+'</section>'));
   bindSso(app);
   bindForm(el('fw'),function(data,done){
     if(REF)data.ref=REF;
@@ -1549,6 +1569,7 @@ function renderOwner(j){
     : '')+
   '<section class="sec rv" id="listSec"></section>'+
   '<section class="sec rv" id="meSec"></section>'+
+  '<section class="sec rv">'+adBox()+'</section>'+
   '<footer>결과는 재미로 보는 것이지 사람을 판단하는 기준이 아닙니다. 참여자의 생년월일은 저장되지만 누구에게도 표시되지 않습니다.</footer>'));
 
   el('map').innerHTML=starMap(pts,j.ownerChar,{sel:SEL});
@@ -1797,6 +1818,7 @@ function renderVisitor(j){
   '<section class="sec fade" id="fwrap"'+(getBirth()&&getBirth().birth?' hidden':'')+'><div class="card" id="fw">'+
     formHTML(birthPrefill({cta:'내 별 남기기',nameLabel:'뭐라고 부를까요',namePh:'예: 지민, 동아리 지민'}))+'</div></section>'+
   '<section class="sec fade"><button class="btn sec2" id="own">나도 내 인연지도 만들기</button></section>'+
+  '<section class="sec rv">'+adBox()+'</section>'+
   '<footer>입력한 생년월일은 궁합 계산에만 쓰이고 지도 주인에게도 보이지 않습니다. 결과는 재미로만 봐주세요.</footer>'));
 
   el('map').innerHTML=starMap(j.entries,j.ownerChar,{});
@@ -1927,6 +1949,7 @@ function renderResult(r,code){
       '<button class="btn sec2" id="see" style="margin-top:9px">'+esc(r.ownerName)+'님의 지도 보기</button>'+
     '</div>'+
   '</section>'+
+  '<section class="sec rv">'+adBox()+'</section>'+
   '<footer>사주는 사람을 이해하는 언어이지 정답지가 아닙니다. 낮은 점수가 나빠도 실제 관계는 얼마든지 달라집니다.</footer>'));
 
   el('mk').onclick=function(){tap();goCreate(code);};
@@ -2115,6 +2138,7 @@ function needBirthView(label){
   '</section>'+
   '<section class="sec fade" style="margin-top:26px">'+introBox(
     label==='오늘의 운세'?'today':label==='내 사주팔자'?'saju':label==='분야별 풀이'?'life':'tojeong')+'</section>'+
+  '<section class="sec rv">'+adBox()+'</section>'+
   '<footer>생년월일 말고는 아무것도 묻지 않습니다.</footer>'));
   var b=el('goinp');if(b)b.onclick=function(){tap();location.href='/my';};
   var nb=el('needBio');if(nb)nb.classList.add('pulse');
@@ -2691,6 +2715,24 @@ var NAVSKY=[
   {k:'about',   t:'계산 방법',  x:236, y:212, r:3.9},
   {k:'home',    t:'홈',        x: 30, y:104, r:3.9}
 ];
+
+/* 분야별 풀이에서 꼬리처럼 이어지는 아홉 갈래 */
+var NAVTAIL=[
+  {k:'health', t:'건강'},{k:'wealth', t:'재물'},{k:'work', t:'일'},
+  {k:'love',   t:'애정'},{k:'study',  t:'문서'},{k:'family',t:'가정'},
+  {k:'people', t:'사람'},{k:'move',   t:'이동'},{k:'late',  t:'말년'}
+];
+function tailPts(){
+  // 왼쪽(건강)에서 오른쪽(말년)으로 읽히고, 오른쪽 끝이 분야별 풀이 별과 이어진다
+  var out=[],n=NAVTAIL.length;
+  for(var i=0;i<n;i++){
+    var t=i/(n-1);
+    var x=26+t*310;
+    var y=254-Math.sin(t*Math.PI)*10-t*6;
+    out.push({x:x,y:y,k:NAVTAIL[i].k,t:NAVTAIL[i].t});
+  }
+  return out;
+}
 var NAVLINE=[[0,1],[1,2],[0,3],[3,4],[4,1],[2,4],[3,6],[4,7],[5,6],[6,7],[5,8],[8,6],[6,9],[9,7],[10,0],[10,5]];
 function buildNav(){
   var box=el('navsky');if(!box)return;
@@ -2700,7 +2742,7 @@ function buildNav(){
   if(cur==='roomNew')cur=(BOOT.topic||'wealth');
 
   var P={};NAVSKY.forEach(function(n){P[n.k]=n;});
-  var g='<svg viewBox="0 0 360 240" role="navigation" aria-label="주요 메뉴">';
+  var g='<svg viewBox="0 0 360 292" role="navigation" aria-label="주요 메뉴">';
   NAVLINE.forEach(function(L){
     var a=NAVSKY[L[0]],b=NAVSKY[L[1]];
     g+='<line class="nvsline" x1="'+a.x+'" y1="'+a.y+'" x2="'+b.x+'" y2="'+b.y+'"/>';
@@ -2715,6 +2757,17 @@ function buildNav(){
       '<text class="nvst" x="'+n.x+'" y="'+(n.y+16)+'" text-anchor="middle">'+esc(n.t)+'</text>'+
       '<circle class="nvshit" cx="'+n.x+'" cy="'+(n.y+5)+'" r="29"/></a>';
   });
+  // ── 분야별 풀이에서 뻗어 나가는 아홉 갈래 꼬리 ──
+  var TP=tailPts(), L=P.life;
+  var chain='<polyline class="nvtline" fill="none" points="'+
+    TP.map(function(q){return q.x+','+q.y;}).join(' ')+' '+L.x+','+(L.y+5)+'"/>';
+  var tails=TP.map(function(q){
+    return '<a class="nvta" href="/life#'+q.k+'" data-tail="'+q.k+'">'+
+      '<circle class="nvtdot" cx="'+q.x+'" cy="'+q.y+'" r="3.1"/>'+
+      '<text class="nvtt" x="'+q.x+'" y="'+(q.y+12.5)+'" text-anchor="middle">'+esc(q.t)+'</text>'+
+      '<circle class="nvshit" cx="'+q.x+'" cy="'+(q.y+4)+'" r="17"/></a>';
+  }).join('');
+  g+=chain+tails;
   g+='</svg>';
   box.innerHTML=g;
   box.addEventListener('click',function(e){
@@ -2820,6 +2873,7 @@ function viewProfile(){
   '</section>';
   app.appendChild(h(head+body+
     '<section class="sec rv">'+pageShareBox('home')+'</section>'+
+  '<section class="sec rv">'+adBox()+'</section>'+
     '<footer>생년월일은 이 브라우저에만 저장됩니다. 지도에 참여할 때를 빼면 서버로 보내지 않습니다.</footer>'));
 
   if(b&&b.birth){
@@ -3454,7 +3508,7 @@ function renderLife(j,b){
   '<section class="sec rv" style="margin-top:18px">'+
     L.areas.map(function(a){
       var c=AC[a.key]||'#c19a2e';
-      return '<div class="acard">'+
+      return '<div class="acard" id="area-'+a.key+'">'+
         '<div class="top">'+
           '<div class="ico" style="background:'+c+'1c;color:'+c+'">'+esc(a.icon)+'</div>'+
           '<div class="nm"><b>'+esc(a.title)+'</b><i>'+esc(a.lead)+'</i></div>'+
@@ -3516,7 +3570,10 @@ function renderLife(j,b){
   '<section class="sec rv">'+pageShareBox('life')+'</section>'+
   pageFoot('life')+
   '<footer>오행 분포와 십신 비중, 지지의 합충, 신살을 함께 넣어 낸 해석입니다. 의학적 진단이나 투자 조언이 아닙니다.</footer>'));
-  reveal(app);window.scrollTo(0,0);
+  reveal(app);
+  // 별자리 꼬리에서 갈래를 눌러 들어오면 그 카드로 데려간다
+  if(location.hash) setTimeout(function(){ if(!scrollToArea())window.scrollTo(0,0); },260);
+  else window.scrollTo(0,0);
 }
 
 /* ===== 화면: 계산 방법 ===== */
@@ -3670,7 +3727,8 @@ function viewMine(){
       }).join('')+'</div>'+
       '<button class="btn" id="new" style="margin-top:22px">새 인연지도 만들기</button>'+
       '<button class="btn sec2" id="out" style="margin-top:9px">로그아웃</button>'+
-    '</section>'));
+    '</section>'+
+    '<section class="sec rv">'+adBox()+'</section>'));
     app.addEventListener('click',function(e){
       var b=e.target.closest('[data-code]');if(b)location.href='/m/'+b.dataset.code;
     });
@@ -3679,6 +3737,18 @@ function viewMine(){
     window.scrollTo(0,0);
   });
 }
+function scrollToArea(){
+  var want=(location.hash||'').replace('#','');
+  if(!want)return false;
+  var card=document.getElementById('area-'+want);
+  if(!card)return false;
+  card.classList.remove('rv');card.style.opacity=1;card.style.transform='none';
+  window.scrollTo({top:card.getBoundingClientRect().top+window.pageYOffset-78,behavior:'smooth'});
+  card.classList.add('hit');
+  setTimeout(function(){card.classList.remove('hit');},2200);
+  return true;
+}
+window.addEventListener('hashchange',function(){ scrollToArea(); });
 buildNav();paintStat();bindPageShare();
 Promise.all([loadMeta(),loadMe()]).then(function(){
   paintBio();
