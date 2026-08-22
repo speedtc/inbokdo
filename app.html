@@ -206,6 +206,23 @@ details.adv[open] summary::before{content:'－ '}
 .star circle.hit{fill:transparent}
 .dirlabel{font-size:12px;font-weight:700;letter-spacing:.08em;paint-order:stroke;stroke:rgba(6,9,16,.85);stroke-width:3px;stroke-linejoin:round}
 .ringlabel{font-size:9.5px;font-weight:600;letter-spacing:-.01em;fill:#8a92a6;opacity:.85;paint-order:stroke;stroke:rgba(6,9,16,.92);stroke-width:3px;stroke-linejoin:round}
+/* 광고 슬롯 */
+.adbox{display:block;position:relative;border-radius:18px;overflow:hidden;text-decoration:none;
+  border:1px solid rgba(217,180,91,.28);background:#0b0f1a;
+  box-shadow:0 6px 20px rgba(30,24,8,.16);
+  transition:transform .28s var(--spring),box-shadow .2s,border-color .2s}
+.adbox:active{transform:scale(.985)}
+.adbox:hover{box-shadow:0 8px 26px rgba(30,24,8,.26);border-color:rgba(217,180,91,.5)}
+.adbox img{display:block;width:100%;height:auto}
+.adcta{display:flex;align-items:center;justify-content:space-between;gap:10px;
+  padding:9px 12px 10px;font-size:12px;font-weight:600;letter-spacing:-.02em;color:#c9b070;
+  background:#0b0f1a}
+.adcta u{text-decoration:underline;text-underline-offset:2px;color:#f2dfa5}
+.adbox:hover .adcta u{color:#fff3cf}
+.adtag{flex:0 0 auto;font-size:9.5px;font-weight:700;letter-spacing:.1em;
+  color:#8a7c5c;border:1px solid rgba(217,180,91,.28);border-radius:999px;padding:2px 8px}
+.adwrap{margin-top:26px}
+.adwrap .tiny{margin-top:8px;text-align:center}
 .maplg{margin-top:6px;display:flex;flex-direction:column;gap:7px;align-items:center}
 .mlrow{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
 .mlx{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;color:#c6cddb;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.13);border-radius:999px;padding:3px 9px 3px 7px;letter-spacing:-.02em;white-space:nowrap}
@@ -301,14 +318,6 @@ details.adv[open] summary::before{content:'－ '}
 .cap .bt i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#cda549,#f0d590);transition:width .8s var(--ease)}
 .cap .bt.full i{background:linear-gradient(90deg,#c05353,#e08a6a)}
 .cap b{font-size:13px;font-weight:600;color:var(--dim);font-variant-numeric:tabular-nums;letter-spacing:-.01em}
-.upsell{background:linear-gradient(155deg,#fdf2d4,#fffdf7 65%);
-  border:1px solid rgba(193,154,46,.34);border-radius:var(--r);padding:22px;
-  box-shadow:0 1px 2px rgba(70,56,20,.05),0 10px 30px rgba(160,124,28,.10)}
-.upsell .px{display:flex;align-items:baseline;gap:6px;margin-top:12px}
-.upsell .px b{font-size:30px;font-weight:700;letter-spacing:-.04em;color:var(--gold2)}
-.upsell ul{margin:14px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:8px}
-.upsell li{font-size:14.5px;color:#4a4438;display:flex;gap:9px;letter-spacing:-.018em}
-.upsell li::before{content:'✓';color:var(--gold2);font-weight:700;flex:0 0 14px}
 .sso{display:flex;flex-direction:column;gap:9px;margin-top:16px}
 .sso button{display:flex;align-items:center;justify-content:center;gap:9px;width:100%;min-height:54px;
   border-radius:16px;font-weight:700;font-size:16.5px;letter-spacing:-.022em;
@@ -388,6 +397,7 @@ var AXES={
   'bi'  :{key:'bi'  ,name:'나란한 자리'      ,short:'나란함'    ,sipsin:'비겁',angle:275,col:'#9aa3b8',lcol:'#5c6579',
           desc:'나와 같은 결입니다. 주고받는 것 없이 옆에 서 있는 사이입니다.'}
 };
+var CONTACT=(window.__CONTACT__||'https://open.kakao.com/me/speedtc');
 var AXIS_ORDER=['in','gwan','sik','jae','bi'];
 /* 재물지도 — 버는 방식 5자리 (중앙은 사람이 아니라 財) */
 var WAXES={
@@ -738,6 +748,46 @@ function placeRings(pts,AX,ORDER,RG){
   });
   return out;
 }
+/* 광고 슬롯 — 지금은 자체 채널 하나만 노출한다 */
+var ADS=[{
+  href:'https://open.kakao.com/o/gEn88Wkc',
+  img:'/ad1.png',
+  title:'多주소 · 다주택 & 주택임대사업 이야기',
+  sub:'다주택자 오픈채팅방',
+  cta:'들어가기'
+}];
+function adBox(note){
+  var a=ADS[0];if(!a)return '';
+  return '<div class="adwrap">'+
+    '<a class="adbox" href="'+esc(a.href)+'" target="_blank" rel="noopener">'+
+      '<img src="'+esc(a.img)+'" alt="'+esc(a.title)+'" decoding="async" width="720" height="222">'+
+      '<span class="adcta"><span class="adtag">광고</span>'+
+        '<span><u>클릭시 오픈채팅방으로 이동됩니다</u> ›</span></span>'+
+    '</a>'+
+    (note?'<div class="tiny">'+note+'</div>':'')+
+  '</div>';
+}
+function supportBox(){
+  return '<div class="sharebox">'+
+    '<div class="eyebrow" style="color:#c9a227">이 서비스는 전부 무료입니다</div>'+
+    '<b style="display:block;font-size:19px;font-weight:700;letter-spacing:-.035em;margin-top:8px">'+
+      '기능을 잠가서 돈을 받지 않습니다</b>'+
+    '<p style="margin:9px 0 0;font-size:14.5px;color:#4a4438;line-height:1.7">'+
+      '인연지도도, 재물지도도, 인원 제한도 없습니다. 앞으로도 그럴 생각입니다.<br>'+
+      '대신 서버비와 만드는 시간은 <b class="gold">후원</b>으로 채웁니다. '+
+      '후원한다고 점수가 좋아지거나 기능이 열리지는 않습니다. 그냥 계속 굴러가게 하는 돈입니다.</p>'+
+    '<a class="btn sec2" href="'+esc(CONTACT)+'" target="_blank" rel="noopener" style="margin-top:15px;text-decoration:none">'+
+      '카카오톡으로 후원·광고 문의</a>'+
+    '<div class="tiny center" style="margin-top:9px">프로그램 사용 문의도 같은 곳으로 주세요.</div>'+
+  '</div>';
+}
+function legalFoot(extra){
+  return '<footer>'+(extra||'')+
+    '<a href="/terms" style="color:#7a7365;text-decoration:underline">이용약관</a> · '+
+    '<a href="/privacy" style="color:#7a7365;text-decoration:underline">개인정보처리방침</a> · '+
+    '<a href="'+esc(CONTACT)+'" target="_blank" rel="noopener" style="color:#7a7365;text-decoration:underline">문의·후원</a>'+
+  '</footer>';
+}
 function mapLegend(AX,ORDER,RG){
   AX=AX||AXES;ORDER=ORDER||AXIS_ORDER;RG=RG||RINGS;
   return '<div class="maplg">'+
@@ -914,11 +964,15 @@ function viewHome(){
     '</div>'+
   '</section>'+
 
+  '<section class="sec rv">'+adBox('부동산·임대사업 이야기를 나누는 방입니다.')+'</section>'+
+
   '<section class="sec rv">'+
     '<button class="btn" id="go2">내 인연지도 만들기</button>'+
     '<button class="btn sec2" id="go3" style="margin-top:10px">인연지도 알려주기</button>'+
     '<p class="tiny center" style="margin-top:10px">사주를 넣지 않고 이 사이트만 소개하고 싶을 때 쓰세요.</p>'+
   '</section>'+
+
+  '<section class="sec rv">'+supportBox()+'</section>'+
 
   '<footer>'+
     '<b style="color:#7a7365">인연지도 因緣地圖</b><br>'+
@@ -926,7 +980,8 @@ function viewHome(){
     '실제 관계는 결국 주고받은 말과 시간으로 만들어집니다.<br><br>'+
     '입력한 생년월일은 궁합 계산에만 쓰이며, 다른 참여자에게는 절대 보이지 않습니다.<br><br>'+
     '<a href="/terms" style="color:#7a7365;text-decoration:underline">이용약관</a> · '+
-    '<a href="/privacy" style="color:#7a7365;text-decoration:underline">개인정보처리방침</a>'+
+    '<a href="/privacy" style="color:#7a7365;text-decoration:underline">개인정보처리방침</a> · '+
+    '<a href="'+esc(CONTACT)+'" target="_blank" rel="noopener" style="color:#7a7365;text-decoration:underline">문의·후원</a>'+
   '</footer>'));
 
   el('go').onclick=el('go2').onclick=function(){tap();location.hash='';viewCreate();};
@@ -1773,6 +1828,7 @@ function renderRoom(j,mine){
   (meRow?'':'<section class="sec fade"><div class="card" id="fw">'+
     formHTML({cta:'내 재물 별 찍기',nameLabel:'뭐라고 부를까요',namePh:'예: 평원, 김대리'})+'</div></section>')+
   '<section class="sec rv" id="wlist"></section>'+
+  '<section class="sec rv">'+adBox()+'</section>'+
   '<section class="sec rv"><button class="btn sec2" id="wnew">다른 방 만들기</button>'+
     '<button class="btn sec2" id="wmy" style="margin-top:9px">내 인연지도 만들기</button></section>'+
   '<footer>재물운은 타고난 그릇을 보는 것이지 지금 통장 잔고가 아닙니다. 입력한 생년월일은 다른 참여자에게 보이지 않습니다.</footer>'));
@@ -1908,6 +1964,7 @@ function renderRoomResult(r,code){
   '<section class="sec fade"><h2>내 사주</h2>'+sajuCard(r.me.saju,ch)+'</section>'+
 
   '<section class="sec rv">'+roomShareBox(code,r.title)+'</section>'+
+  '<section class="sec rv">'+adBox()+'</section>'+
   '<section class="sec rv"><button class="btn" id="back">지도에서 순위 보기</button>'+
     '<button class="btn sec2" id="mkmap" style="margin-top:9px">내 인연지도도 만들기</button></section>'+
   '<footer>재물운은 타고난 그릇을 보는 것이지 지금 통장 잔고가 아닙니다. 투자 판단의 근거로 쓰지 마세요.</footer>'));
@@ -2358,10 +2415,11 @@ function viewAbout(){
         '<b class="gold">사주로 사람을 판단하지 마세요.</b> 관계를 한 번 돌아보는 계기 정도로만 써주시면 좋겠습니다.</p>'+
     '</div>'+
   '</section>'+
+  '<section class="sec rv">'+supportBox()+'</section>'+
+  '<section class="sec rv">'+adBox()+'</section>'+
   '<div class="rule"></div>'+
   pageFoot('about')+
-  '<footer><a href="/terms" style="color:#7a7365;text-decoration:underline">이용약관</a> · '+
-  '<a href="/privacy" style="color:#7a7365;text-decoration:underline">개인정보처리방침</a></footer>'));
+  legalFoot()));
   reveal(app);window.scrollTo(0,0);
 }
 

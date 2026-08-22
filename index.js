@@ -5,6 +5,7 @@ import { wealthScore, WAXES, WAXIS_ORDER, WRINGS } from './wealth.js';
 import { leapMonthOf, lunarMonthLength } from './astro.js';
 import APP_HTML from './app.html';
 import OG_PNG from './og.png';
+import AD1_PNG from './ad1.png';
 import { handleAuth, currentUser, ensureAuthSchema, enabledProviders } from './auth.js';
 import { privacyPage, termsPage } from './legal.js';
 import { todayFortune, lifeAreas, todayKST } from './fortune.js';
@@ -216,8 +217,6 @@ async function bumpStats(env) {
   }
 }
 
-// 결제 검증 자리. 실제 PG(카카오페이·토스·Stripe 등)를 붙일 때 이 함수만 채우면 된다.
-
 async function handleApi(request, env, url) {
   const db = env.DB;
   const path = url.pathname;
@@ -314,7 +313,6 @@ async function handleApi(request, env, url) {
       isOwner,
       count: results.length,
       limit: HARD_CAP,
-      plan: row.plan || 'free',
       full: results.length >= HARD_CAP,
       saved: isOwner ? !!row.user_id : undefined,
       invites: isOwner ? (await db.prepare(`SELECT COUNT(*) AS n FROM referrals WHERE parent = ?`).bind(code).first()).n : undefined,
@@ -629,7 +627,8 @@ function renderPage(meta) {
 <meta name="twitter:card" content="summary_large_image">
 <link rel="canonical" href="${u}">`;
   return APP_HTML.replace('<!--HEAD-->', head)
-    .replace('<!--BOOT-->', `<script>window.__BOOT__=${JSON.stringify(meta.boot || {})}</script>`);
+    .replace('<!--BOOT-->', `<script>window.__BOOT__=${JSON.stringify(meta.boot || {})};`
+      + `window.__CONTACT__=${JSON.stringify(meta.contact || 'https://open.kakao.com/me/speedtc')}</script>`);
 }
 
 export default {
@@ -658,6 +657,12 @@ export default {
 
     if (url.pathname === '/og.png') {
       return new Response(OG_PNG, {
+        headers: { 'content-type': 'image/png', 'cache-control': 'public, max-age=604800' },
+      });
+    }
+
+    if (url.pathname === '/ad1.png') {
+      return new Response(AD1_PNG, {
         headers: { 'content-type': 'image/png', 'cache-control': 'public, max-age=604800' },
       });
     }
