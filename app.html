@@ -114,6 +114,21 @@ header{position:sticky;top:0;z-index:40;
 .whobar .w2{flex:0 0 auto;font-size:12px;font-weight:800;letter-spacing:-.03em;color:#a07c1c;
   text-decoration:none;background:var(--gold-soft);border-radius:999px;padding:5px 10px}
 .whobar .w2:active{transform:scale(.97)}
+.cpr{margin-top:16px;padding-top:14px;border-top:1px solid var(--line);
+  font-size:12px;line-height:1.7;color:var(--dim2);letter-spacing:-.02em}
+.cpr b{color:var(--dim);font-weight:700}
+.cpr span{display:block;margin-top:5px;font-size:11.5px;color:var(--dim2);word-break:keep-all}
+.sitefoot{margin-top:38px;padding:26px 18px calc(112px + env(safe-area-inset-bottom));
+  border-top:1px solid var(--line);background:rgba(255,255,255,.5)}
+.sfin{max-width:540px;margin:0 auto;text-align:center}
+.sfb{font-size:13.5px;font-weight:800;letter-spacing:-.04em;color:var(--dim)}
+.sfb i{font-style:normal;font-weight:600;color:var(--dim2);margin-left:4px}
+.sfl{margin-top:11px;display:flex;justify-content:center;align-items:center;gap:7px;flex-wrap:wrap}
+.sfl a{font-size:12.5px;color:var(--dim);text-decoration:underline;text-underline-offset:2px}
+.sfl span{color:var(--dim2);font-size:11px}
+.sfc{margin-top:14px;font-size:12.5px;color:var(--dim2);letter-spacing:-.02em}
+.sfc b{color:var(--dim);font-weight:800}
+.sfn{margin-top:7px;font-size:11.5px;line-height:1.7;color:var(--dim2);word-break:keep-all}
 .btlbox{border-radius:20px;padding:16px 17px 15px;border:1px solid rgba(193,154,46,.34);
   background:linear-gradient(155deg,rgba(217,180,91,.16),#fffdf7 62%);box-shadow:var(--sh)}
 .btag{display:inline-block;font-size:11px;font-weight:800;letter-spacing:.02em;color:#fffaf0;
@@ -610,6 +625,20 @@ table.wonguk td{padding:0;vertical-align:top}
 <div class="navsky" id="navsky" aria-label="주요 메뉴"></div>
 
 <main class="wrap" id="app"></main>
+<footer class="sitefoot">
+  <div class="sfin">
+    <div class="sfb">스피드 운세지도 <i>運勢地圖</i></div>
+    <div class="sfl">
+      <a href="/terms">이용약관</a><span>·</span>
+      <a href="/privacy">개인정보처리방침</a><span>·</span>
+      <a id="sfContact" href="#" target="_blank" rel="noopener">문의·후원</a><span>·</span>
+      <a id="sfAd" href="#" target="_blank" rel="noopener">광고 문의</a>
+    </div>
+    <div class="sfc"><b>© 2026 speedtc.</b> All rights reserved.</div>
+    <div class="sfn">사주 계산 방식과 해석 문장, 지도 구성과 화면 디자인은 speedtc 의 저작물입니다.
+      무단 복제·전재·재배포 및 영리 목적의 이용을 금합니다.</div>
+  </div>
+</footer>
 <div class="dock" id="dock"><div class="in"></div></div>
 <div class="toast" id="toast"></div>
 <!--BOOT-->
@@ -1174,12 +1203,23 @@ function supportBox(){
     '<div class="tiny center" style="margin-top:9px">프로그램 사용 문의도 같은 곳으로 주세요.</div>'+
   '</div>';
 }
+
+/* 저작권 표기 */
+function copyRight(){
+  return '<div class="cpr">'+
+    '<b>© 2026 speedtc.</b> All rights reserved.'+
+    '<span>사주 계산 방식과 해석 문장, 지도 구성과 화면 디자인은 speedtc 의 저작물입니다. '+
+      '무단 복제·전재·재배포 및 영리 목적의 이용을 금합니다.</span>'+
+  '</div>';
+}
+
 function legalFoot(extra){
   return '<footer>'+(extra||'')+
     '<a href="/terms" style="color:#7a7365;text-decoration:underline">이용약관</a> · '+
     '<a href="/privacy" style="color:#7a7365;text-decoration:underline">개인정보처리방침</a> · '+
     '<a href="'+esc(CONTACT)+'" target="_blank" rel="noopener" style="color:#7a7365;text-decoration:underline">문의·후원</a> · '+
     '<a href="'+esc(CONTACT)+'" target="_blank" rel="noopener" style="color:#7a7365;text-decoration:underline">광고 문의</a>'+
+    copyRight()+
   '</footer>';
 }
 function mapLegend(AX,ORDER,RG){
@@ -1413,6 +1453,7 @@ function viewHome(){
     '<a href="/privacy" style="color:#7a7365;text-decoration:underline">개인정보처리방침</a> · '+
     '<a href="'+esc(CONTACT)+'" target="_blank" rel="noopener" style="color:#7a7365;text-decoration:underline">문의·후원</a> · '+
     '<a href="'+esc(CONTACT)+'" target="_blank" rel="noopener" style="color:#7a7365;text-decoration:underline">광고 문의</a>'+
+    copyRight()+
   '</footer>'));
 
   el('go').onclick=el('go2').onclick=function(){tap();location.hash='';viewCreate();};
@@ -3937,6 +3978,8 @@ function scrollToArea(){
   return true;
 }
 window.addEventListener('hashchange',function(){ scrollToArea(); });
+(function(){var a=document.getElementById('sfContact'),b=document.getElementById('sfAd');
+  if(a)a.href=CONTACT; if(b)b.href=CONTACT;})();
 buildNav();paintStat();bindPageShare();
 Promise.all([loadMeta(),loadMe()]).then(function(){
   paintBio();

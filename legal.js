@@ -28,10 +28,16 @@ td{color:#c3cad8}
 .date{color:#5d6579;font-size:13.5px}
 .back{display:inline-block;margin-bottom:26px;color:#8a92a6;font-size:14px;text-decoration:none}
 .note{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.10);border-radius:14px;padding:16px;margin:18px 0}
-footer{margin-top:56px;padding-top:20px;border-top:1px solid rgba(255,255,255,.09);color:#5d6579;font-size:13px}
+footer{margin-top:56px;padding-top:20px;border-top:1px solid rgba(255,255,255,.09);color:#5d6579;font-size:13px;line-height:1.7}
 </style></head>
 <body><div class="w"><a class="back" href="/">← 스피드 운세지도</a>${body}
-<footer>스피드 운세지도 運勢地圖</footer></div></body></html>`;
+<footer>
+<div style="font-weight:600;color:#8a92a6">스피드 운세지도 運勢地圖</div>
+<div style="margin-top:8px">© 2026 speedtc. All rights reserved.</div>
+<div style="margin-top:6px;font-size:12.5px;color:#4d5567;line-height:1.7">
+본 서비스의 사주 계산 방식, 해석 문장, 지도 구성, 화면 디자인은 speedtc 의 저작물입니다.
+무단 복제·전재·재배포 및 영리 목적의 이용을 금합니다.</div>
+</footer></div></body></html>`;
 
 export function privacyPage(env) {
   const kakao = env.CONTACT_KAKAO || 'https://open.kakao.com/me/speedtc';
