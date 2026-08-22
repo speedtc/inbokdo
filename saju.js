@@ -206,6 +206,24 @@ export const GAN_CHUNG = { 0: 6, 6: 0, 1: 7, 7: 1, 2: 8, 8: 2, 3: 9, 9: 3 };
 export const SIPSIN = ['비견', '겁재', '식신', '상관', '편재', '정재', '편관', '정관', '편인', '정인'];
 
 /** 나(me)의 일간 기준, 상대 천간의 십신 */
+/**
+ * 원국 전체의 십신 비중(%) — 지장간까지 가중해서 센다.
+ * 일간 자신은 제외한다(비견으로 세면 왜곡됨).
+ * 반환: [비견, 겁재, 식신, 상관, 편재, 정재, 편관, 정관, 편인, 정인]
+ */
+export function sipsinTally(s) {
+  const t = new Array(10).fill(0);
+  const me = s.dayStem, P = s.pillars;
+  const addStem = (st, w) => { t[sipsin(me, st)] += w; };
+  const addBranch = (b, w) => { for (const [hs, hw] of HIDDEN[b]) t[sipsin(me, hs)] += w * hw; };
+  addStem(P.year.stem, 1.0); addBranch(P.year.branch, 1.0);
+  addStem(P.month.stem, 1.4); addBranch(P.month.branch, 1.6);
+  addBranch(P.day.branch, 1.4);
+  if (P.hour) { addStem(P.hour.stem, 1.0); addBranch(P.hour.branch, 1.0); }
+  const total = t.reduce((a, b) => a + b, 0) || 1;
+  return t.map((v) => Math.round((v / total) * 1000) / 10);
+}
+
 export function sipsin(meStem, otherStem) {
   const me = STEM_ELEM[meStem], ot = STEM_ELEM[otherStem];
   const same = STEM_YANG[meStem] === STEM_YANG[otherStem];

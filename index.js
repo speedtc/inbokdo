@@ -1,6 +1,7 @@
 // index.js — 인연지도 Cloudflare Worker
 import { computeSaju } from './saju.js';
 import { analyze, TYPES, CHARACTERS, scoreBand, AXES, AXIS_ORDER } from './compat.js';
+import { wealthScore, WAXES, WAXIS_ORDER, WRINGS } from './wealth.js';
 import { leapMonthOf, lunarMonthLength } from './astro.js';
 import APP_HTML from './app.html';
 import OG_PNG from './og.png';
@@ -124,6 +125,28 @@ async function ensureSchema(db) {
     db.prepare(`CREATE TABLE IF NOT EXISTS stats (
       day TEXT PRIMARY KEY, hits INTEGER NOT NULL DEFAULT 0
     )`),
+    // 분야별 방 (재물지도 등). 주인이 중앙에 서지 않고 주제가 중앙에 선다.
+    db.prepare(`CREATE TABLE IF NOT EXISTS rooms (
+      code TEXT PRIMARY KEY,
+      topic TEXT NOT NULL DEFAULT 'wealth',
+      title TEXT NOT NULL,
+      owner_token TEXT NOT NULL,
+      user_id INTEGER,
+      created_at INTEGER NOT NULL
+    )`),
+    db.prepare(`CREATE TABLE IF NOT EXISTS room_entries (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      code TEXT NOT NULL,
+      name TEXT NOT NULL,
+      birth_json TEXT NOT NULL,
+      saju_json TEXT NOT NULL,
+      result_json TEXT NOT NULL,
+      score INTEGER NOT NULL,
+      day_stem INTEGER NOT NULL,
+      token TEXT NOT NULL,
+      created_at INTEGER NOT NULL
+    )`),
+    db.prepare(`CREATE INDEX IF NOT EXISTS idx_room_entries ON room_entries(code, score DESC)`),
   ]);
   // 기존 DB 대비 컬럼 보강 (이미 있으면 무시)
   for (const sql of [
@@ -396,6 +419,161 @@ async function handleApi(request, env, url) {
     } catch (e) { return bad(e.message || '계산 실패'); }
   }
 
+  /* ══════════ 재물지도 (분야별 방) ══════════ */
+
+  function roomEntryRow(r) {
+    const res = JSON.parse(r.result_json);
+    return {
+      id: r.id,
+      name: r.name,
+      score: r.score,
+      axis: res.axis,
+      band: res.band,
+      bandLabel: res.bandLabel,
+      charKey: CHARACTERS[r.day_stem].key,
+      elem: CHARACTERS[r.day_stem].elem,
+      createdAt: r.created_at,
+    };
+  }
+
+  // 방 만들기
+  if (path === '/api/rooms' && request.method === 'POST') {
+    const body = await request.json().catch(() => null);
+    if (!body) return bad('요청을 읽을 수 없습니다.');
+    const name = cleanName(body.name);
+    if (!name) return bad('이름 또는 닉네임을 입력해 주세요.');
+    const title = cleanName(body.title) || `${name}님의 재물지도`;
+    const err = validBirth(body.birth);
+    if (err) return bad(err);
+
+    let saju;
+    try { saju = computeSaju(normBirth(body.birth)); } catch (e) { return bad(e.message || '사주를 계산할 수 없습니다.'); }
+    const res = wealthScore(saju);
+
+    const me = await currentUser(request, env);
+    const code = randCode();
+    const token = randToken();
+    const entryToken = randToken();
+    const now = Date.now();
+
+    await db.prepare(
+      `INSERT INTO rooms (code, topic, title, owner_token, user_id, created_at) VALUES (?, 'wealth', ?, ?, ?, ?)`
+    ).bind(code, title, token, me ? me.id : null, now).run();
+
+    const ins = await db.prepare(
+      `INSERT INTO room_entries (code, name, birth_json, saju_json, result_json, score, day_stem, token, created_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
+    ).bind(code, name, JSON.stringify(normBirth(body.birth)), JSON.stringify(saju),
+      JSON.stringify(res), res.score, saju.dayStem, entryToken, now).run();
+
+    return json({
+      code, token, title,
+      entryId: ins.meta.last_row_id, entryToken,
+      me: { name, char: charPayload(saju.dayStem), saju: sajuPayload(saju) },
+      result: res, rank: 1, total: 1,
+    });
+  }
+
+  // 방 보기
+  const mRoom = path.match(/^\/api\/rooms\/([0-9a-z]{4,12})$/);
+  if (mRoom && request.method === 'GET') {
+    const code = mRoom[1];
+    const row = await db.prepare(`SELECT * FROM rooms WHERE code = ?`).bind(code).first();
+    if (!row) return bad('없는 방입니다.', 404);
+    const rs = await db.prepare(
+      `SELECT * FROM room_entries WHERE code = ? ORDER BY score DESC, id ASC`
+    ).bind(code).all();
+    const results = rs.results || [];
+    const me = await currentUser(request, env);
+    const isOwner = (me && row.user_id && row.user_id === me.id) ||
+      url.searchParams.get('token') === row.owner_token;
+    return json({
+      code, topic: row.topic, title: row.title,
+      isOwner,
+      count: results.length,
+      limit: HARD_CAP,
+      full: results.length >= HARD_CAP,
+      entries: results.map((r, i) => ({ ...roomEntryRow(r), rank: i + 1 })),
+      createdAt: row.created_at,
+    });
+  }
+
+  // 방 참여
+  const mRoomJoin = path.match(/^\/api\/rooms\/([0-9a-z]{4,12})\/join$/);
+  if (mRoomJoin && request.method === 'POST') {
+    const code = mRoomJoin[1];
+    const body = await request.json().catch(() => null);
+    if (!body) return bad('요청을 읽을 수 없습니다.');
+    const name = cleanName(body.name);
+    if (!name) return bad('이름 또는 닉네임을 입력해 주세요.');
+    const err = validBirth(body.birth);
+    if (err) return bad(err);
+
+    const row = await db.prepare(`SELECT * FROM rooms WHERE code = ?`).bind(code).first();
+    if (!row) return bad('없는 방입니다.', 404);
+
+    const cnt = await db.prepare(`SELECT COUNT(*) AS n FROM room_entries WHERE code = ?`).bind(code).first();
+    if (cnt.n >= HARD_CAP) {
+      return json({ error: `이 방은 최대 ${HARD_CAP}명까지 받을 수 있어요.`, reason: 'LIMIT' }, 402);
+    }
+
+    const birth = normBirth(body.birth);
+    let saju;
+    try { saju = computeSaju(birth); } catch (e) { return bad(e.message || '사주를 계산할 수 없습니다.'); }
+    const res = wealthScore(saju);
+
+    const token = randToken();
+    const ins = await db.prepare(
+      `INSERT INTO room_entries (code, name, birth_json, saju_json, result_json, score, day_stem, token, created_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
+    ).bind(code, name, JSON.stringify(birth), JSON.stringify(saju),
+      JSON.stringify(res), res.score, saju.dayStem, token, Date.now()).run();
+
+    const id = ins.meta.last_row_id;
+    const rank = await db.prepare(
+      `SELECT COUNT(*) + 1 AS r FROM room_entries WHERE code = ? AND (score > ? OR (score = ? AND id < ?))`
+    ).bind(code, res.score, res.score, id).first();
+
+    return json({
+      code, title: row.title,
+      entryId: id, entryToken: token,
+      me: { name, char: charPayload(saju.dayStem), saju: sajuPayload(saju) },
+      result: res, rank: rank.r, total: cnt.n + 1,
+    });
+  }
+
+  // 방 결과 다시 보기
+  const mRoomEntry = path.match(/^\/api\/rooms\/([0-9a-z]{4,12})\/entries\/(\d+)$/);
+  if (mRoomEntry && request.method === 'GET') {
+    const [, code, id] = mRoomEntry;
+    const token = url.searchParams.get('token') || '';
+    const row = await db.prepare(`SELECT * FROM room_entries WHERE code = ? AND id = ?`).bind(code, id).first();
+    if (!row || row.token !== token) return bad('결과를 찾을 수 없습니다.', 404);
+    const room = await db.prepare(`SELECT title FROM rooms WHERE code = ?`).bind(code).first();
+    const rank = await db.prepare(
+      `SELECT COUNT(*) + 1 AS r FROM room_entries WHERE code = ? AND (score > ? OR (score = ? AND id < ?))`
+    ).bind(code, row.score, row.score, row.id).first();
+    const total = await db.prepare(`SELECT COUNT(*) AS n FROM room_entries WHERE code = ?`).bind(code).first();
+    return json({
+      code, title: room ? room.title : '재물지도',
+      entryId: row.id, entryToken: token,
+      me: { name: row.name, char: charPayload(row.day_stem), saju: sajuPayload(JSON.parse(row.saju_json)) },
+      result: JSON.parse(row.result_json), rank: rank.r, total: total.n,
+    });
+  }
+
+  // 내 사주만으로 재물 점수 (방 없이)
+  if (path === '/api/wealth' && request.method === 'POST') {
+    const body = await request.json().catch(() => null);
+    if (!body) return bad('요청을 읽을 수 없습니다.');
+    const err = validBirth(body.birth);
+    if (err) return bad(err);
+    try {
+      const s = computeSaju(normBirth(body.birth));
+      return json({ char: charPayload(s.dayStem), saju: sajuPayload(s), result: wealthScore(s) });
+    } catch (e) { return bad(e.message || '계산 실패'); }
+  }
+
   // 방문 통계
   if (path === '/api/stats' && request.method === 'GET') {
     const today = kstDay();
@@ -419,7 +597,7 @@ async function handleApi(request, env, url) {
 
   // 메타데이터
   if (path === '/api/meta') {
-    return new Response(JSON.stringify({ types: TYPES, characters: CHARACTERS, axes: AXES, axisOrder: AXIS_ORDER }), {
+    return new Response(JSON.stringify({ types: TYPES, characters: CHARACTERS, axes: AXES, axisOrder: AXIS_ORDER, waxes: WAXES, waxisOrder: WAXIS_ORDER, wrings: WRINGS }), {
       headers: { 'content-type': 'application/json; charset=utf-8', 'cache-control': 'public, max-age=3600' },
     });
   }
@@ -500,6 +678,7 @@ export default {
       '/life': { view: 'life', title: '분야별 풀이 · 인연지도', desc: '건강·재물·일·사람. 내 원국을 네 갈래로 나눠 풀어드립니다.' },
       '/about': { view: 'about', title: '어떻게 계산하나요 · 인연지도', desc: '인연지도가 쓰는 명리학 방법과 천문 계산을 그대로 공개합니다.' },
       '/my': { view: 'profile', title: '내 사주 · 인연지도', desc: '생년월일을 한 번만 넣으면 오늘의 운세·사주팔자·분야별 풀이가 바로 열립니다.' },
+      '/wealth': { view: 'wealthNew', title: '재물지도 · 인연지도', desc: '단톡방 사람들의 재물 사주를 한 장의 지도에 모읍니다. 가운데가 財, 안쪽에 있을수록 재물 그릇이 큰 사람입니다.' },
     };
     if (PAGES[url.pathname]) {
       const pg = PAGES[url.pathname];
@@ -551,6 +730,30 @@ export default {
       return new Response(renderPage({ title, desc, url: `${origin}/m/${code}`, origin, boot: { view: 'map', code, ownerName, kakaoKey: env.KAKAO_JS_KEY || '', providers }, noindex: true }), {
         headers: { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'no-store' },
       });
+    }
+
+    const mRoomPage = url.pathname.match(/^\/w\/([0-9a-z]{4,12})\/?$/);
+    if (mRoomPage) {
+      const code = mRoomPage[1];
+      let title2 = '';
+      try {
+        if (env.DB) {
+          await ensureSchema(env.DB);
+          const row = await env.DB.prepare(`SELECT title FROM rooms WHERE code = ?`).bind(code).first();
+          if (row) title2 = row.title;
+        }
+      } catch (e) { /* 무시 */ }
+      const providers = enabledProviders(env);
+      const title = title2 ? `${title2} · 재물지도` : '재물지도 · 인연지도';
+      const desc = title2
+        ? `생일만 넣으면 내 재물 사주가 이 지도에 찍힙니다. 가운데가 財, 안쪽에 있을수록 재물 그릇이 큰 사람입니다.`
+        : '단톡방 사람들의 재물 사주를 한 장의 지도에 모읍니다.';
+      if (env.DB) ctx.waitUntil(bumpStats(env));
+      return new Response(renderPage({
+        title, desc, url: `${origin}/w/${code}`, origin,
+        boot: { view: 'room', code, roomTitle: title2, kakaoKey: env.KAKAO_JS_KEY || '', providers },
+        noindex: true,
+      }), { headers: { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'no-store' } });
     }
 
     if (url.pathname === '/' || url.pathname === '') {
