@@ -31,7 +31,7 @@ td{color:#c3cad8}
 footer{margin-top:56px;padding-top:20px;border-top:1px solid rgba(255,255,255,.09);color:#5d6579;font-size:13px}
 </style></head>
 <body><div class="w"><a class="back" href="/">← 스피드 운세지도</a>${body}
-<footer>📚 스피드 운세지도 運勢地圖</footer></div></body></html>`;
+<footer>스피드 운세지도 運勢地圖</footer></div></body></html>`;
 
 export function privacyPage(env) {
   const kakao = env.CONTACT_KAKAO || 'https://open.kakao.com/me/speedtc';

@@ -7,7 +7,7 @@
 <!--HEAD-->
 <link rel="preconnect" href="https://cdn.jsdelivr.net">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>&#9733;</text></svg>">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><circle cx='16' cy='16' r='15' fill='%230b0f1a'/><path d='M8.4 10.6 16 16 23.8 8.8M16 16 12.4 24M16 16 24.6 20.4' fill='none' stroke='%23c9a227' stroke-width='1.2' stroke-linecap='round'/><circle cx='8.4' cy='10.6' r='2' fill='%23d9b45b'/><circle cx='23.8' cy='8.8' r='1.6' fill='%23d9b45b'/><circle cx='12.4' cy='24' r='1.6' fill='%23d9b45b'/><circle cx='24.6' cy='20.4' r='1.4' fill='%23d9b45b'/><path d='M16 10.9l1.4 3.7 3.7 1.4-3.7 1.4-1.4 3.7-1.4-3.7-3.7-1.4 3.7-1.4z' fill='%23f0d590'/></svg>">
 <style>
 *,*::before,*::after{box-sizing:border-box}
 [hidden]{display:none!important}
@@ -56,12 +56,12 @@ header{position:sticky;top:0;z-index:40;
   border-bottom:1px solid rgba(150,120,40,.16);
   padding-top:var(--safe-t)}
 .hdr{max-width:540px;margin:0 auto;padding:13px 22px 10px;display:flex;align-items:center;gap:10px}
-.logo{display:flex;align-items:baseline;gap:8px;font-weight:800;letter-spacing:-.02em}
-.logo .mk{width:32px;height:32px;flex:0 0 32px}
-.logo b{font-size:19px;letter-spacing:-.042em;color:#231f18;white-space:nowrap;display:flex;align-items:center;gap:5px}
-.logo .lg-e{font-size:23px;line-height:1}
-.logo .gd{color:#a07c1c}
-.logo span{font-size:11px;color:var(--gold-dim);font-weight:600;letter-spacing:.16em;margin-left:2px}
+.logo{display:flex;align-items:center;gap:9px}
+.logo .mk{width:31px;height:31px;flex:0 0 31px;display:block}
+.logo .wm{display:flex;flex-direction:column;line-height:1}
+.logo .wm i{font-style:normal;font-size:10.5px;font-weight:700;letter-spacing:.17em;
+  color:var(--gold-dim);text-transform:none}
+.logo .wm b{font-size:21px;font-weight:800;letter-spacing:-.05em;color:#1d1a14;margin-top:3px;white-space:nowrap}
 .hdr .sp{flex:1}
 .ghost{border:1px solid rgba(60,48,16,.18);border-radius:999px;padding:7px 14px;font-size:13px;font-weight:600;
   color:#5f5849;background:#fff;transition:.15s;white-space:nowrap}
@@ -69,6 +69,15 @@ header{position:sticky;top:0;z-index:40;
 
 /* 별자리 메뉴 */
 /* 토정비결 */
+.intro{background:linear-gradient(155deg,#fdf6e2,#fff 58%);border-color:rgba(193,154,46,.28)}
+.uphint{margin-top:16px;display:flex;align-items:flex-start;gap:8px;padding:11px 15px;border-radius:16px;
+  font-size:13.5px;font-weight:600;letter-spacing:-.025em;color:#5a4408;line-height:1.6;
+  background:linear-gradient(180deg,#fdf3d4,#f7e6ae);border:1px solid rgba(160,124,28,.32)}
+.uphint .tx{flex:1;min-width:0}
+.uphint .tx b{color:#7a5c08;font-weight:800}
+.uphint .ar{flex:0 0 auto;font-size:16px;font-weight:800;line-height:1.35;animation:upar 1.4s var(--ease) infinite}
+@keyframes upar{0%,100%{transform:translateY(0)}45%{transform:translateY(-4px)}}
+@media(prefers-reduced-motion:reduce){.uphint .ar{animation:none}}
 .gwae{position:relative;border-radius:24px;padding:26px 22px 24px;text-align:center;overflow:hidden;
   background:radial-gradient(120% 90% at 50% -10%,rgba(217,180,91,.22),transparent 62%),
     linear-gradient(180deg,#131a2c,#0a0f1c 60%);
@@ -389,7 +398,18 @@ footer{margin-top:56px;padding-top:22px;border-top:1px solid var(--line);color:v
 <header>
   <div class="hdr">
     <a class="logo" href="/" aria-label="스피드 운세지도 홈">
-      <b><span class="lg-e">📚</span>스피드 <span class="gd">운세지도</span></b><span>運勢地圖</span>
+      <svg class="mk" viewBox="0 0 32 32" aria-hidden="true">
+        <circle cx="16" cy="16" r="14.2" fill="none" stroke="#c9a227" stroke-width="1.1" opacity=".38"/>
+        <circle cx="16" cy="16" r="8.6" fill="none" stroke="#c9a227" stroke-width=".8" opacity=".24"/>
+        <path d="M8.4 10.6 16 16 23.8 8.8M16 16 12.4 24M16 16 24.6 20.4" fill="none"
+              stroke="#c9a227" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" opacity=".55"/>
+        <circle cx="8.4" cy="10.6" r="1.9" fill="#b8912a"/>
+        <circle cx="23.8" cy="8.8" r="1.5" fill="#d9b45b"/>
+        <circle cx="12.4" cy="24" r="1.5" fill="#b8912a"/>
+        <circle cx="24.6" cy="20.4" r="1.3" fill="#d9b45b"/>
+        <path d="M16 10.9l1.35 3.75L21.1 16l-3.75 1.35L16 21.1l-1.35-3.75L10.9 16l3.75-1.35z" fill="#e0b93f"/>
+      </svg>
+      <span class="wm"><i>스피드</i><b>운세지도</b></span>
     </a>
     <div class="sp"></div>
     <button class="ghost" id="navBtn" hidden>내 지도</button>
@@ -1082,7 +1102,7 @@ function viewHome(){
   '<section class="sec rv">'+supportBox()+'</section>'+
 
   '<footer>'+
-    '<b style="color:#7a7365">📚 스피드 운세지도 運勢地圖</b><br>'+
+    '<b style="color:#7a7365">스피드 운세지도 運勢地圖</b><br>'+
     '사주 명리는 사람을 이해하는 오래된 언어이지 정답지가 아닙니다. 여기 나온 결과로 사람을 재단하지 마세요. '+
     '실제 관계는 결국 주고받은 말과 시간으로 만들어집니다.<br><br>'+
     '입력한 생년월일은 궁합 계산에만 쓰이며, 다른 참여자에게는 절대 보이지 않습니다.<br><br>'+
@@ -1331,6 +1351,7 @@ function renderOwner(j){
       (pts.length? '지금까지 <b class="gold">'+pts.length+'명</b>이 별을 남겼습니다. 안쪽에 있을수록 나와 기운이 잘 맞는 사람입니다.'
                  : '아직 아무도 없습니다. 아래 링크를 친구에게 보내보세요. 몇 명이 오든 다 받습니다.')+'</p>'+
   '</section>'+
+  '<section class="sec rv" style="margin-top:26px">'+introBox('map')+'</section>'+
   '<section class="sec rv" style="margin-top:30px">'+constBox(j)+'</section>'+
   '<section class="sec fade" style="margin-top:20px"><div class="sky"><div class="mapbox" id="map"></div>'+mapLegend()+'</div>'+
     '<div id="selBox"></div></section>'+
@@ -1756,16 +1777,66 @@ function renderVisitorMapOnly(code){
   });
 }
 
+/* 메뉴 설명 카드 — 이 메뉴가 무엇인지 */
+var INTRO={
+  today:{t:'오늘의 운세란',
+    d:'오늘 하루의 결을 봅니다. 오늘 날짜의 간지(일진)와 내가 태어난 날의 천간(일간)을 견줘, 오늘 어떤 기운이 들어오는지 풀어드립니다.',
+    n:'매일 0시(한국 시각)에 바뀝니다. 사주는 평생 그대로지만 이건 날마다 달라집니다.',
+    c:['매일 바뀜','일진 × 일간','무료']},
+  saju:{t:'사주팔자란',
+    d:'태어난 연·월·일·시를 각각 두 글자씩, 모두 <b>여덟 글자</b>로 세운 것입니다. 이 여덟 글자가 평생 바뀌지 않는 내 원국(原局)입니다.',
+    n:'절기 기준으로 년주와 월주를, 율리우스일로 일주를, 오자둔으로 시주를 뽑습니다. 오행이 어디에 몰렸는지, 힘이 센지 약한지까지 봅니다.',
+    c:['절기 기준','오행 분포','신강·신약']},
+  life:{t:'분야별 풀이란',
+    d:'내 사주 하나를 <b>건강 · 재물 · 일과 성취 · 사람</b> 네 갈래로 나눠 풀어드립니다.',
+    n:'오행이 어디에 몰리고 어디가 얇은지를 보고, 몸에서 먼저 신호가 오는 곳과 돈이 도는 방식, 조직과 사람에서의 결을 짚습니다.',
+    c:['건강','재물','일과 성취','사람']},
+  tojeong:{t:'토정비결이란',
+    d:'한 해의 결을 보는 옛 방식입니다. 세는나이와 그 해의 태세, 태어난 달과 날을 써서 <b>144괘</b> 중 하나를 뽑습니다.',
+    n:'사주 명리와는 계산 체계가 다릅니다. 사주는 평생 그대로지만 토정비결은 해가 바뀌면 괘도 바뀝니다.',
+    c:['144괘','전통 작괘법','해마다 바뀜']},
+  map:{t:'인연지도란',
+    d:'내 링크를 받은 사람이 생일을 넣으면, 그 사람이 <b>나에게 어떤 기운인지</b>를 사주로 풀어 별 하나로 찍습니다.',
+    n:'별의 방향은 주고받음(누가 채워주고 누가 이끄는지), 거리는 궁합 점수입니다. 사람이 모일수록 별자리가 완성됩니다.',
+    c:['관계 점수','주고받음','인원 제한 없음']}
+};
+function introBox(k){
+  var I=INTRO[k];if(!I)return '';
+  return '<div class="card intro">'+
+    '<div class="eyebrow" style="color:#c9a227">이 메뉴는</div>'+
+    '<b style="display:block;font-size:18px;font-weight:700;letter-spacing:-.035em;margin-top:7px">'+esc(I.t)+'</b>'+
+    '<p style="margin:9px 0 0;font-size:14.5px;line-height:1.75;color:#4a4438">'+I.d+'</p>'+
+    '<p class="tiny" style="margin:9px 0 0;line-height:1.7">'+I.n+'</p>'+
+    '<div class="chips">'+I.c.map(function(x){return '<span class="chip">'+esc(x)+'</span>';}).join('')+'</div>'+
+  '</div>';
+}
+
+/* 사주 미등록 안내 — 입력은 오른쪽 위에서만 */
+function needBirthView(label){
+  setDock(null);
+  app.innerHTML='';
+  app.appendChild(h(
+  '<section class="fade" style="padding-top:26px">'+
+    '<div class="eyebrow">'+esc(label)+'</div>'+
+    '<h1 style="font-size:29px">사주 정보를<br>먼저 넣어주세요</h1>'+
+    '<div class="uphint"><span class="ar">↑</span>'+
+      '<span class="tx">화면 <b>오른쪽 위</b>의 <b>사주 정보를 입력하세요</b>를 눌러주세요</span></div>'+
+    '<p class="lead" style="font-size:15px">생년월일은 <b>한 번만</b> 넣으면 됩니다. 그 뒤로는 오늘의 운세도, 사주팔자도, 토정비결도 다시 묻지 않습니다. '+
+      '이 기기에만 저장되고 서버에는 남기지 않습니다.</p>'+
+    '<button class="btn" id="goinp" style="margin-top:22px">사주 정보 넣으러 가기</button>'+
+  '</section>'+
+  '<section class="sec fade" style="margin-top:26px">'+introBox(
+    label==='오늘의 운세'?'today':label==='내 사주팔자'?'saju':label==='분야별 풀이'?'life':'tojeong')+'</section>'+
+  '<footer>생년월일 말고는 아무것도 묻지 않습니다.</footer>'));
+  var b=el('goinp');if(b)b.onclick=function(){tap();location.href='/my';};
+  var nb=el('needBio');if(nb)nb.classList.add('pulse');
+  reveal(app);window.scrollTo(0,0);
+}
+
 /* ═════════ 토정비결 ═════════ */
 function viewTojeong(){
   var b=getBirth();
-  if(!b||!b.birth) return askBirth({
-    eyebrow:'토정비결',
-    title:'먼저 생년월일을<br>알려주세요',
-    lead:'한 번만 넣으면 이 기기에 저장돼서 <b>모든 메뉴가 그대로 열립니다.</b> 서버에 따로 저장하지 않습니다.',
-    cta:'토정비결 보기',
-    done:function(){viewTojeong();}
-  });
+  if(!b||!b.birth) return needBirthView('토정비결');
   app.innerHTML='<div class="skel" style="height:40px;width:55%;margin-top:34px"></div>'+
     '<div class="skel" style="height:260px;margin-top:20px"></div>';
   api('/api/tojeong',{method:'POST',body:JSON.stringify({birth:b.birth})})
@@ -1825,6 +1896,7 @@ function renderTojeong(j,b){
   '</div></section>'+
 
   '<section class="sec fade"><h2>내 사주</h2>'+sajuCard(j.saju,ch)+'</section>'+
+  '<section class="sec rv">'+introBox('tojeong')+'</section>'+
   '<section class="sec rv">'+pageShareBox('tojeong')+'</section>'+
   '<section class="sec rv">'+adBox()+'</section>'+
   pageFoot('tojeong')+
@@ -1995,6 +2067,13 @@ function renderRoom(j,mine){
         '<button class="btn sec2" id="mydet" style="margin-top:14px">내 결과 자세히 보기</button>'+
       '</div></section>'
     : '')+
+  '<section class="sec rv" style="margin-top:22px"><div class="card intro">'+
+    '<div class="eyebrow" style="color:#c9a227">이 지도는</div>'+
+    '<b style="display:block;font-size:18px;font-weight:700;letter-spacing:-.035em;margin-top:7px">'+esc(T.label)+'란</b>'+
+    '<p style="margin:9px 0 0;font-size:14.5px;line-height:1.75;color:#4a4438">'+esc(T.tagline)+'. '+esc(T.lead)+'</p>'+
+    '<p class="tiny" style="margin:9px 0 0;line-height:1.7">'+esc(T.partsNote)+'</p>'+
+    '<div class="chips">'+T.order.map(function(k){return '<span class="chip">'+esc(T.axes[k].short)+'</span>';}).join('')+'</div>'+
+  '</div></section>'+
   '<section class="sec fade" style="margin-top:18px"><div class="sky"><div class="mapbox" id="wmap"></div>'+tLegend(topic)+'</div>'+
     '<div id="wsel"></div></section>'+
   '<section class="sec rv">'+roomShareBox(j.code,j.title,topic)+'</section>'+
@@ -2416,31 +2495,9 @@ function viewLogin(next){
 }
 
 /* ===== 생년월일이 필요한 화면 공통 ===== */
-function askBirth(opt){
-  setDock(null);
-  app.innerHTML='';
-  app.appendChild(h(
-  '<section class="fade" style="padding-top:32px">'+
-    '<div class="eyebrow">'+esc(opt.eyebrow)+'</div>'+
-    '<h1 style="font-size:30px">'+opt.title+'</h1>'+
-    '<p class="lead" style="font-size:15px">'+opt.lead+'</p>'+
-    '<div class="card" style="margin-top:22px" id="fw">'+formHTML({cta:opt.cta||'보기'})+'</div>'+
-  '</section>'));
-  bindForm(el('fw'),function(data,done){
-    saveBirth(data.name,data.birth);paintBio();
-    opt.done(data);
-  });
-  window.scrollTo(0,0);
-}
 function fortunePage(view){
   var b=getBirth();
-  if(!b||!b.birth) return askBirth({
-    eyebrow:view==='today'?'오늘의 운세':view==='saju'?'내 사주팔자':'분야별 풀이',
-    title:'먼저 생년월일을<br>알려주세요',
-    lead:'한 번만 넣으면 이 기기에 저장돼서 <b>모든 메뉴가 그대로 열립니다.</b> 인연지도를 만들 때 넣으셨다면 이 화면은 다시 안 나옵니다. 서버에 따로 저장하지 않습니다.',
-    cta:'보기',
-    done:function(){fortunePage(view);}
-  });
+  if(!b||!b.birth) return needBirthView(view==='today'?'오늘의 운세':view==='saju'?'내 사주팔자':'분야별 풀이');
   app.innerHTML='<div class="skel" style="height:40px;width:55%;margin-top:34px"></div>'+
     '<div class="skel" style="height:240px;margin-top:20px"></div>';
   api('/api/fortune',{method:'POST',body:JSON.stringify({birth:b.birth})})
@@ -2504,6 +2561,7 @@ function renderToday(j,b){
     '<p class="tiny" style="margin-top:9px">내 사주에서 가장 얇은 기운을 채우는 쪽입니다.</p>'+
   '</section>'+
   '<div class="rule"></div>'+
+  '<section class="sec rv">'+introBox('today')+'</section>'+
   '<section class="sec rv">'+pageShareBox('today')+'</section>'+
   pageFoot('today')+
   '<footer>오늘의 운세는 오늘 일진(日辰)과 내 일간의 관계로 계산합니다. 재미와 참고로만 봐주세요.</footer>'));
@@ -2533,6 +2591,7 @@ function renderSaju(j,b){
       '<span class="chip">가장 얇음 '+ELEM_H[ba.weak]+' '+ELEM[ba.weak]+'</span></div>'+
   '</div></section>'+
   '<div class="rule"></div>'+
+  '<section class="sec rv">'+introBox('saju')+'</section>'+
   '<section class="sec rv">'+pageShareBox('saju')+'</section>'+
   pageFoot('saju')+
   '<footer>절기 기준으로 년·월주를, 율리우스일 기준으로 일주를, 오자둔으로 시주를 세웠습니다. 자세한 방법은 <a href="/about" style="color:#7a7365;text-decoration:underline">계산 방법</a>에서 볼 수 있습니다.</footer>'));
@@ -2560,6 +2619,7 @@ function renderLife(j,b){
     }).join('')+
   '</section>'+
   '<div class="rule"></div>'+
+  '<section class="sec rv">'+introBox('life')+'</section>'+
   '<section class="sec rv">'+pageShareBox('life')+'</section>'+
   pageFoot('life')+
   '<footer>오행 분포와 십신 비중으로 뽑은 해석입니다. 의학적 진단이나 투자 조언이 아닙니다.</footer>'));
