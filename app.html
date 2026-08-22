@@ -104,6 +104,21 @@ header{position:sticky;top:0;z-index:40;
 .navsky::before{content:'';position:absolute;inset:0;pointer-events:none;
   background:radial-gradient(58% 68% at 50% 38%,rgba(217,180,91,.13),transparent 70%)}
 .navsky svg{display:block;width:100%;height:auto;overflow:visible;position:relative}
+.navnote{position:relative;margin:10px auto 0;max-width:420px;text-align:center;
+  font-size:11.8px;line-height:1.6;letter-spacing:-.03em;color:var(--dim);word-break:keep-all}
+.navnote b{color:#a07c1c;font-weight:700}
+.btlbox{border-radius:20px;padding:16px 17px 15px;border:1px solid rgba(193,154,46,.34);
+  background:linear-gradient(155deg,rgba(217,180,91,.16),#fffdf7 62%);box-shadow:var(--sh)}
+.btag{display:inline-block;font-size:11px;font-weight:800;letter-spacing:.02em;color:#fffaf0;
+  background:linear-gradient(135deg,#c9a227,#a07c1c);border-radius:999px;padding:5px 12px}
+.bhook{margin:11px 0 0;font-size:16px;font-weight:800;letter-spacing:-.04em;color:#231f18;line-height:1.5;word-break:keep-all}
+.bsteps{margin-top:13px;display:flex;flex-direction:column;gap:8px}
+.bstep{display:flex;align-items:flex-start;gap:9px;font-size:13.6px;line-height:1.6;color:#4a4438;word-break:keep-all}
+.bstep .n{flex:0 0 20px;height:20px;border-radius:50%;background:#c19a2e;color:#fff;
+  font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;margin-top:1px}
+.bwin{margin-top:13px;padding:10px 12px;border-radius:12px;background:rgba(255,255,255,.75);
+  border:1px solid rgba(193,154,46,.28);font-size:13.6px;line-height:1.6;color:#4a4438;word-break:keep-all}
+.bwin b{color:#a07c1c;font-weight:800}
 .nvsline{stroke:rgba(193,154,46,.32);stroke-width:1}
 .nvsdot{fill:#c9a227;transition:fill .18s,r .2s var(--spring)}
 .nvst{font-size:11.5px;font-weight:600;letter-spacing:-.035em;fill:#6b6455;transition:fill .18s}
@@ -113,6 +128,9 @@ header{position:sticky;top:0;z-index:40;
 .nvsa:active .nvsdot{fill:#8a6a10}
 .nvsa.on .nvsdot{fill:#a07c1c}
 .nvsa.on .nvst{fill:#8a6a10;font-weight:800}
+.nvss{font-size:8.4px;font-weight:700;letter-spacing:-.045em;fill:#b8925f;transition:fill .18s}
+.nvsa:hover .nvss{fill:#a07c1c}
+.nvsa.on .nvss{fill:#a07c1c}
 .nvsring{fill:none;stroke:rgba(193,154,46,.55);stroke-width:1.3}
 .nvshit{fill:transparent}
 .nvsbadge rect{fill:#c9a227}
@@ -1180,18 +1198,19 @@ var HOME_MENU=[
   {h:'/today',  ic:'☀', c:'#e8a33b', t:'오늘의 운세',    d:'일진 · 12시진 흐름 · 오늘 맞는 띠 · 이번 주'},
   {h:'/tojeong',ic:'卦', c:'#b8746e', t:'토정비결',      d:'144괘 · 여덟 갈래 · 12개월 월운', tag:'NEW'},
   {h:'/life',   ic:'◈', c:'#4ea87a', t:'분야별 풀이',    d:'건강·재물·일·애정·문서·가정·사람·이동·말년'},
-  {h:'/wealth', ic:'財', c:'#c19a2e', t:'재물지도',      d:'단톡방에서 누가 돈그릇이 큰 사람인가'},
-  {h:'/love',   ic:'緣', c:'#b8446e', t:'연애지도',      d:'누구에게 인연이 먼저 올까'},
-  {h:'/work',   ic:'業', c:'#3c6ca6', t:'일운지도',      d:'누가 크게 쓰일 사람일까'},
+  {h:'/wealth', ic:'財', c:'#c19a2e', t:'재물지도',      d:'우리 방에서 누가 제일 부자 될 사주야?', tag:'단톡 배틀'},
+  {h:'/love',   ic:'緣', c:'#b8446e', t:'연애지도',      d:'우리 중에 누가 제일 인기 사주야?', tag:'단톡 배틀'},
+  {h:'/work',   ic:'業', c:'#3c6ca6', t:'일운지도',      d:'10년 뒤에 누가 제일 잘 나갈까?', tag:'단톡 배틀'},
+  {h:'/map',    ic:'✦', c:'#d9b45b', t:'내 인연지도',    d:'우리 중에 누가 제일 나랑 잘 맞아?', tag:'단톡 배틀'},
   {h:'/about',  ic:'?', c:'#7a8b99', t:'계산 방법',     d:'우리가 쓴 명리 방법을 그대로 공개합니다'}
 ];
 var HOME_TOPIC=[
-  {h:'/wealth',han:'財',c:'#c19a2e',t:'재물지도',d:'누가 돈그릇이 제일 큰 사람일까',
-   b:'가운데가 財, 안쪽에 있을수록 재물 그릇이 큰 사람입니다. 연봉이나 자산은 묻지 않습니다.'},
-  {h:'/love',han:'緣',c:'#b8446e',t:'연애지도',d:'누구에게 인연이 먼저 올까',
-   b:'가운데가 緣, 안쪽에 있을수록 인연이 두터운 사람입니다. 애인 유무는 묻지 않습니다.'},
-  {h:'/work',han:'業',c:'#3c6ca6',t:'일운지도',d:'누가 크게 쓰일 사람일까',
-   b:'가운데가 業, 안쪽에 있을수록 크게 쓰이는 사주입니다. 직업이나 연봉은 묻지 않습니다.'}
+  {h:'/wealth',han:'財',c:'#c19a2e',t:'재물지도',d:'누가 돈그릇이 제일 큰 사람일까',tag:'단톡방 돈그릇 배틀',
+   b:'"우리 방에서 누가 제일 부자 될 사주야?" 링크를 던지면 각자 생일만 넣고, 가운데 財에 가까운 순으로 줄이 섭니다. 연봉도 자산도 묻지 않습니다.'},
+  {h:'/love',han:'緣',c:'#b8446e',t:'연애지도',d:'누구에게 인연이 먼저 올까',tag:'단톡방 인기 사주 배틀',
+   b:'"우리 중에 누가 제일 인기 사주야?" 가운데 緣에 가까울수록 인연이 두터운 사람입니다. 애인이 있는지는 묻지 않습니다.'},
+  {h:'/work',han:'業',c:'#3c6ca6',t:'일운지도',d:'누가 크게 쓰일 사람일까',tag:'단톡방 출세 배틀',
+   b:'"10년 뒤에 누가 제일 잘 나갈까?" 가운데 業에 가까울수록 크게 쓰이는 사주입니다. 직업도 연봉도 묻지 않습니다.'}
 ];
 
 function viewHome(){
@@ -1216,7 +1235,7 @@ function viewHome(){
     '<h2>전부 무료로 봅니다</h2>'+
     '<p class="tiny" style="margin:-6px 0 12px">가입도 결제도 없습니다. 생년월일을 <b>한 번만</b> 넣으면 아래 메뉴가 전부 열립니다.</p>'+
     '<div class="plist">'+HOME_MENU.map(function(m){
-      return '<a class="prow" href="'+esc(m.h)+'">'+
+      return '<a class="prow"'+(m.h==='/map'?' data-mkmap="1" href="/"':' href="'+esc(m.h)+'"')+'>'+
         '<span class="av" style="background:'+m.c+'1c;color:'+m.c+'">'+esc(m.ic)+'</span>'+
         '<span class="nm"><b>'+esc(m.t)+'</b><i>'+esc(m.d)+'</i></span>'+
         (m.tag?'<span class="chip" style="margin-left:auto;flex:0 0 auto">'+esc(m.tag)+'</span>':'')+
@@ -1272,6 +1291,7 @@ function viewHome(){
           '<div class="av" style="width:46px;height:46px;flex:0 0 46px;background:'+x.c+'1f;color:'+x.c+';font-size:21px">'+esc(x.han)+'</div>'+
           '<div style="flex:1;min-width:0"><b style="font-size:18px;letter-spacing:-.03em">'+esc(x.t)+'</b>'+
           '<div class="tiny" style="color:var(--dim)">'+esc(x.d)+'</div></div>'+
+          (x.tag?'<span class="btag" style="flex:0 0 auto;font-size:10px;padding:4px 9px">'+esc(x.tag)+'</span>':'')+
         '</div>'+
         '<p style="margin:12px 0 0;font-size:14px;color:#4a4438;line-height:1.7">'+esc(x.b)+'</p>'+
         '<a class="btn sec2" style="margin-top:13px;display:block;text-align:center;text-decoration:none" href="'+esc(x.h)+'">'+esc(x.t)+' 만들기</a>'+
@@ -1315,6 +1335,10 @@ function viewHome(){
   '</footer>'));
 
   el('go').onclick=el('go2').onclick=function(){tap();location.hash='';viewCreate();};
+  app.addEventListener('click',function(e){
+    var a=e.target.closest('[data-mkmap]');
+    if(a){e.preventDefault();tap();location.hash='';viewCreate();}
+  });
   el('go3').onclick=function(){tap();shareSite();};
   api('/api/stats').then(function(st){
     var bar=el('statBar');if(!bar)return;
@@ -1377,6 +1401,18 @@ function viewCreate(){
     '<p class="lead" style="font-size:14.5px">이 정보로 지도의 중심을 세웁니다. 다 넣으면 <b class="gold">내 전용 링크</b>가 나오고, '+
       '그 링크를 받은 친구가 자기 생일을 넣을 때마다 내 지도에 별이 하나씩 찍힙니다. '+
       '친구에게는 이름만 보이고 생년월일은 보이지 않습니다.</p>'+
+    '<div class="btlbox" style="margin-top:20px">'+
+      '<div class="btag">단톡방 내 편 찾기</div>'+
+      '<p class="bhook">"우리 중에 누가 제일 나랑 잘 맞아?" 링크 하나면 답이 나옵니다.</p>'+
+      '<div class="bsteps">'+
+        '<div class="bstep"><span class="n">1</span><span>내 생일을 넣으면 나만의 링크가 생깁니다</span></div>'+
+        '<div class="bstep"><span class="n">2</span><span>그 링크를 단톡방·개인톡에 던집니다</span></div>'+
+        '<div class="bstep"><span class="n">3</span><span>친구가 생일을 넣을 때마다 내 지도에 별이 하나씩 찍힙니다</span></div>'+
+      '</div>'+
+      '<div class="bwin">다른 지도는 <b>각자의 그릇</b>을 겨루지만, 인연지도는 <b>나와 그 사람 사이</b>를 봅니다. '+
+        '점수가 높을수록 내 쪽으로 가까이 들어옵니다.</div>'+
+      '<p class="tiny" style="margin:9px 0 0">친구에게는 이름만 보이고 생년월일은 보이지 않습니다.</p>'+
+    '</div>'+
     (!ME&&PROVIDERS.length
       ? '<div class="card" style="margin-top:22px;border-color:rgba(217,180,91,.26);background:linear-gradient(155deg,rgba(217,180,91,.14),rgba(255,255,255,.6))">'+
         '<b style="font-size:16px;letter-spacing:-.03em">먼저 로그인하면 지도가 계정에 저장됩니다</b>'+
@@ -2288,6 +2324,37 @@ function tTone(b){
 }
 
 /* 방 만들기 화면 */
+
+/* 지도형 메뉴 — 단톡방 배틀 설명 */
+var BATTLE={
+  wealth:{tag:'단톡방 돈그릇 배틀', win:'제일 안쪽에 들어간 사람이 그 방의 <b>돈그릇 1등</b>입니다',
+    steps:['방을 만들고 내 생일을 넣습니다','링크를 단톡방에 던집니다','들어온 사람마다 별이 하나씩 찍히고 순위가 갈립니다'],
+    hook:'"우리 방에서 누가 제일 부자 될 사주야?" 한 줄이면 방이 뒤집힙니다.',
+    safe:'연봉도 자산도 묻지 않습니다. 오직 사주로만 겨룹니다.'},
+  love:{tag:'단톡방 인기 사주 배틀', win:'제일 안쪽에 들어간 사람이 그 방의 <b>인연 1등</b>입니다',
+    steps:['방을 만들고 내 생일을 넣습니다','링크를 단톡방에 던집니다','누구에게 인연이 먼저 오는지 순위가 갈립니다'],
+    hook:'"우리 중에 누가 제일 인기 사주야?" 솔로방·동기방에서 제일 잘 터집니다.',
+    safe:'애인이 있는지 없는지 묻지 않습니다. 타고난 결만 봅니다.'},
+  work:{tag:'단톡방 출세 배틀', win:'제일 안쪽에 들어간 사람이 그 방의 <b>성취 1등</b>입니다',
+    steps:['방을 만들고 내 생일을 넣습니다','링크를 단톡방에 던집니다','누가 크게 쓰일 사주인지 순위가 갈립니다'],
+    hook:'"10년 뒤에 누가 제일 잘 나갈까?" 회사 동기방에서 제일 잘 터집니다.',
+    safe:'직업도 연봉도 직급도 묻지 않습니다. 타고난 쓰임만 봅니다.'}
+};
+function battleBox(topic){
+  var Bt=BATTLE[topic]; if(!Bt) return '';
+  return '<section class="sec fade" style="margin-top:20px">'+
+    '<div class="btlbox">'+
+      '<div class="btag">'+esc(Bt.tag)+'</div>'+
+      '<p class="bhook">'+esc(Bt.hook)+'</p>'+
+      '<div class="bsteps">'+Bt.steps.map(function(x,i){
+        return '<div class="bstep"><span class="n">'+(i+1)+'</span><span>'+esc(x)+'</span></div>';
+      }).join('')+'</div>'+
+      '<div class="bwin">'+Bt.win+'</div>'+
+      '<p class="tiny" style="margin:9px 0 0">'+esc(Bt.safe)+' 입력한 생일은 다른 참여자에게 보이지 않습니다.</p>'+
+    '</div>'+
+  '</section>';
+}
+
 function viewRoomNew(topic){
   setDock(null);
   var T=TP(topic), b=getBirth();
@@ -2298,6 +2365,8 @@ function viewRoomNew(topic){
     '<h1 style="font-size:31px">'+esc(T.tagline)+'</h1>'+
     '<p class="lead" style="font-size:15px">단톡방에 링크를 던지면 각자 생일만 넣습니다. '+esc(T.lead)+'</p>'+
   '</section>'+
+
+  battleBox(topic)+
 
   '<section class="sec fade" style="margin-top:22px">'+
     '<div class="card" id="fw">'+
@@ -2703,11 +2772,11 @@ function menuHref(k){
 }
 /* 본문 상단 별자리 메뉴 — 여덟 개 별을 눌러 이동한다 */
 var NAVSKY=[
-  {k:'map',     t:'내 인연지도', x: 60, y: 42, r:6.4, badge:'추천'},
-  {k:'wealth',  t:'재물지도',   x:178, y: 28, r:6.0},
+  {k:'map',     t:'내 인연지도', x: 60, y: 42, r:6.4, badge:'추천', sub:'단톡방 내 편 찾기'},
+  {k:'wealth',  t:'재물지도',   x:178, y: 28, r:6.0, sub:'단톡방 돈그릇 배틀'},
   {k:'today',   t:'오늘의 운세', x:298, y: 44, r:6.0},
-  {k:'love',    t:'연애지도',   x:108, y:100, r:5.6},
-  {k:'work',    t:'일운지도',   x:232, y: 96, r:5.6},
+  {k:'love',    t:'연애지도',   x:108, y:100, r:5.6, sub:'단톡방 인기 배틀'},
+  {k:'work',    t:'일운지도',   x:232, y: 96, r:5.6, sub:'단톡방 출세 배틀'},
   {k:'tojeong', t:'토정비결',   x: 42, y:158, r:5.6, badge:'NEW'},
   {k:'saju',    t:'사주팔자',   x:166, y:158, r:4.4},
   {k:'life',    t:'분야별 풀이', x:294, y:150, r:4.4},
@@ -2755,6 +2824,7 @@ function buildNav(){
       (on?'<circle class="nvsring" cx="'+n.x+'" cy="'+n.y+'" r="'+(n.r+4.5)+'"/>':'')+
       '<circle class="nvsdot" cx="'+n.x+'" cy="'+n.y+'" r="'+n.r+'"/>'+
       '<text class="nvst" x="'+n.x+'" y="'+(n.y+16)+'" text-anchor="middle">'+esc(n.t)+'</text>'+
+      (n.sub?'<text class="nvss" x="'+n.x+'" y="'+(n.y+26.5)+'" text-anchor="middle">'+esc(n.sub)+'</text>':'')+
       '<circle class="nvshit" cx="'+n.x+'" cy="'+(n.y+5)+'" r="29"/></a>';
   });
   // ── 분야별 풀이에서 뻗어 나가는 아홉 갈래 꼬리 ──
@@ -2769,7 +2839,9 @@ function buildNav(){
   }).join('');
   g+=chain+tails;
   g+='</svg>';
-  box.innerHTML=g;
+  box.innerHTML=g+
+    '<p class="navnote"><b>지도</b>가 붙은 메뉴는 <b>단톡방에 링크를 던져 같이 겨루는 놀이</b>입니다. '+
+    '각자 생일만 넣으면 한 장의 지도에 순위가 그려집니다.</p>';
   box.addEventListener('click',function(e){
     var a=e.target.closest('[data-mk]');if(!a)return;
     if(a.getAttribute('data-mk')==='map'){e.preventDefault();tap();goMyMap();}
