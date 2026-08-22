@@ -17,3 +17,5 @@ enabled = true
 binding = "DB"
 database_name = "inbokdo"
 database_id = "3dc59d14-568e-4a4d-aaeb-d3bb18bb6df4"
+[vars]
+KAKAO_JS_KEY = "87934f695f3a266d054352c735fc8851"
