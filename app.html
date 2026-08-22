@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#080b14">
+<meta name="theme-color" content="#fbf7ec">
 <!--HEAD-->
 <link rel="preconnect" href="https://cdn.jsdelivr.net">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
@@ -12,11 +12,13 @@
 *,*::before,*::after{box-sizing:border-box}
 [hidden]{display:none!important}
 :root{
-  --ink:#080b14; --ink2:#0e1422; --ink3:#151d31;
-  --gold:#d9b45b; --gold2:#f2dfa5; --gold-dim:#8a7534;
-  --txt:#e9e5db; --dim:#8a92a6; --dim2:#5d6579;
-  --line:rgba(255,255,255,.09); --line2:rgba(255,255,255,.16);
-  --card:rgba(255,255,255,.035);
+  --bg:#fbf7ec; --bg2:#fffdf7; --paper:#ffffff;
+  --ink:#231f18; --ink2:#3f3930;
+  --gold:#c19a2e; --gold2:#a07c1c; --gold-dim:#a8873a; --gold-soft:#fdf4dc;
+  --txt:#231f18; --dim:#7a7365; --dim2:#a49b8a;
+  --line:rgba(60,48,16,.11); --line2:rgba(60,48,16,.19);
+  --card:#ffffff;
+  --sh:0 1px 2px rgba(70,56,20,.05),0 8px 26px rgba(70,56,20,.06);
   --e0:#4ea87a; --e1:#e2734a; --e2:#d0a94f; --e3:#9fb0c4; --e4:#4f86c6;
   --r:22px;
   --safe-b:env(safe-area-inset-bottom,0px);
@@ -26,7 +28,7 @@
 }
 html,body{margin:0;padding:0}
 body{
-  background:var(--ink); color:var(--txt);
+  background:var(--bg); color:var(--txt);
   font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Text','Pretendard Variable',Pretendard,system-ui,'Malgun Gothic',sans-serif;
   font-size:17px; line-height:1.6; -webkit-font-smoothing:antialiased;
   -moz-osx-font-smoothing:grayscale;
@@ -38,12 +40,10 @@ body{
 body::before{
   content:''; position:fixed; inset:0; z-index:-2; pointer-events:none;
   background:
-    radial-gradient(900px 520px at 50% -10%, rgba(217,180,91,.13), transparent 62%),
-    radial-gradient(700px 480px at 12% 22%, rgba(79,134,198,.10), transparent 60%),
-    radial-gradient(700px 520px at 88% 78%, rgba(120,80,160,.09), transparent 60%),
-    linear-gradient(180deg,#080b14 0%,#0a0f1c 40%,#080b14 100%);
+    radial-gradient(760px 420px at 50% -8%, rgba(217,180,91,.16), transparent 66%),
+    radial-gradient(620px 420px at 8% 30%, rgba(217,180,91,.07), transparent 62%),
+    linear-gradient(180deg,#fdfaf1 0%,#fbf7ec 42%,#f8f3e6 100%);
 }
-#stars{position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.55}
 .wrap{max-width:540px;margin:0 auto;padding:0 22px calc(120px + var(--safe-b))}
 a{color:inherit;text-decoration:none;-webkit-touch-callout:none}
 button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
@@ -51,69 +51,87 @@ input,select{font:inherit;color:inherit}
 
 /* ---------- 헤더 ---------- */
 header{position:sticky;top:0;z-index:40;
-  -webkit-backdrop-filter:saturate(180%) blur(22px);backdrop-filter:saturate(180%) blur(22px);
-  background:linear-gradient(180deg,rgba(16,13,6,.86),rgba(8,11,20,.80));
-  border-bottom:.5px solid rgba(217,180,91,.20);
+  -webkit-backdrop-filter:saturate(180%) blur(20px);backdrop-filter:saturate(180%) blur(20px);
+  background:rgba(253,250,242,.92);
+  border-bottom:1px solid rgba(150,120,40,.16);
   padding-top:var(--safe-t)}
-.hdr{max-width:540px;margin:0 auto;padding:16px 22px 15px;display:flex;align-items:center;gap:10px}
+.hdr{max-width:540px;margin:0 auto;padding:13px 22px 10px;display:flex;align-items:center;gap:10px}
 .logo{display:flex;align-items:center;gap:11px;font-weight:800;letter-spacing:-.02em}
-.logo .mk{width:34px;height:34px;flex:0 0 34px}
-.logo b{font-size:22px;letter-spacing:-.035em}
-.logo span{font-size:11.5px;color:var(--gold-dim);font-weight:600;letter-spacing:.16em;margin-left:2px}
-.menubtn{width:42px;height:42px;border-radius:13px;display:grid;place-items:center;
-  border:.5px solid rgba(217,180,91,.30);background:rgba(217,180,91,.09);transition:.2s var(--ease)}
-.menubtn:active{transform:scale(.93);background:rgba(217,180,91,.18)}
-.menubtn i{display:block;width:16px;height:1.6px;background:var(--gold2);border-radius:2px;position:relative}
-.menubtn i::before,.menubtn i::after{content:'';position:absolute;left:0;width:16px;height:1.6px;background:var(--gold2);border-radius:2px}
-.menubtn i::before{top:-5px}.menubtn i::after{top:5px}
+.logo .mk{width:32px;height:32px;flex:0 0 32px}
+.logo b{font-size:21px;letter-spacing:-.035em;color:#231f18}
+.logo span{font-size:11px;color:var(--gold-dim);font-weight:600;letter-spacing:.16em;margin-left:2px}
+.hdr .sp{flex:1}
+.ghost{border:1px solid rgba(60,48,16,.18);border-radius:999px;padding:7px 14px;font-size:13px;font-weight:600;
+  color:#5f5849;background:#fff;transition:.15s;white-space:nowrap}
+.ghost:hover{color:var(--gold2);border-color:rgba(193,154,46,.55)}
 
-/* 메뉴 시트 */
-.scrim{position:fixed;inset:0;z-index:60;background:rgba(4,6,12,.62);
-  -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
-  opacity:0;pointer-events:none;transition:opacity .3s var(--ease)}
-.scrim.on{opacity:1;pointer-events:auto}
-.sheet{position:fixed;left:0;right:0;bottom:0;z-index:61;
-  background:linear-gradient(180deg,#151122,#0c1018);
-  border-top:.5px solid rgba(217,180,91,.28);
-  border-radius:26px 26px 0 0;padding:10px 20px calc(24px + var(--safe-b));
-  transform:translateY(102%);transition:transform .42s var(--ease);
-  box-shadow:0 -20px 60px rgba(0,0,0,.5)}
-.sheet.on{transform:none}
-.sheet .grab{width:38px;height:4px;border-radius:99px;background:rgba(255,255,255,.22);margin:0 auto 16px}
-.sheet h4{margin:0 0 12px;font-size:13px;font-weight:600;letter-spacing:.12em;color:var(--gold-dim)}
-.mrow{display:flex;align-items:center;gap:13px;width:100%;padding:14px 14px;border-radius:16px;
-  background:rgba(255,255,255,.045);border:.5px solid var(--line);text-align:left;margin-bottom:8px;
-  transition:transform .3s var(--spring),background .2s}
-.mrow:active{transform:scale(.98);background:rgba(255,255,255,.08)}
-.mrow .ic{width:38px;height:38px;flex:0 0 38px;border-radius:12px;display:grid;place-items:center;font-size:17px}
-.mrow b{display:block;font-size:16px;font-weight:600;letter-spacing:-.025em}
-.mrow i{display:block;font-style:normal;font-size:12.5px;color:var(--dim);margin-top:1px}
-.mrow .go{color:var(--dim2);font-size:15px}
+/* 상단 고정 메뉴 */
+.nav{max-width:540px;margin:0 auto;padding:0 22px 11px;display:flex;gap:7px;
+  overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.nav::-webkit-scrollbar{display:none}
+.nv{flex:0 0 auto;display:inline-flex;align-items:center;gap:6px;padding:8px 13px;border-radius:999px;
+  font-size:13.5px;font-weight:600;letter-spacing:-.022em;color:#6b6455;white-space:nowrap;
+  background:#fff;border:1px solid rgba(60,48,16,.13);
+  box-shadow:0 1px 2px rgba(70,56,20,.04);
+  transition:transform .25s var(--spring),background .18s,color .18s,border-color .18s}
+.nv .i{font-size:12.5px;line-height:1}
+.nv:active{transform:scale(.95)}
+.nv:hover{border-color:rgba(193,154,46,.5);color:var(--gold2)}
+.nv.on{background:linear-gradient(180deg,#f3ddA0,#d8b85c);color:#3a2c07;border-color:transparent;
+  box-shadow:0 2px 10px rgba(190,150,50,.30)}
+.nv.on:hover{color:#3a2c07}
+
+/* ---------- 우주 패널 (별지도 전용) ---------- */
+.sky{position:relative;margin:0 -6px;padding:14px 12px 16px;border-radius:26px;overflow:hidden;isolation:isolate;
+  background:
+    radial-gradient(130% 95% at 50% -12%, rgba(217,180,91,.20), transparent 58%),
+    radial-gradient(90% 70% at 12% 88%, rgba(79,134,198,.16), transparent 62%),
+    linear-gradient(180deg,#111a2e 0%,#0b1120 46%,#080b14 100%);
+  border:1px solid rgba(217,180,91,.24);
+  box-shadow:0 16px 44px rgba(30,24,8,.22),inset 0 1px 0 rgba(255,255,255,.07)}
+.sky::before,.sky::after{content:'';position:absolute;inset:-10%;pointer-events:none;z-index:0}
+.sky::before{
+  background-image:
+    radial-gradient(1.3px 1.3px at 24px 32px,rgba(255,255,255,.95),transparent),
+    radial-gradient(1px 1px at 96px 74px,rgba(242,223,165,.95),transparent),
+    radial-gradient(1.5px 1.5px at 158px 126px,rgba(207,224,255,.85),transparent),
+    radial-gradient(1px 1px at 62px 168px,rgba(255,255,255,.75),transparent),
+    radial-gradient(1.2px 1.2px at 196px 44px,rgba(255,255,255,.7),transparent),
+    radial-gradient(1px 1px at 132px 196px,rgba(242,223,165,.7),transparent);
+  background-size:224px 210px;
+  animation:twk 4.6s ease-in-out infinite alternate}
+.sky::after{
+  background-image:
+    radial-gradient(1px 1px at 48px 18px,rgba(255,255,255,.8),transparent),
+    radial-gradient(1.4px 1.4px at 172px 88px,rgba(255,255,255,.7),transparent),
+    radial-gradient(1px 1px at 108px 148px,rgba(207,224,255,.65),transparent),
+    radial-gradient(1.1px 1.1px at 16px 118px,rgba(242,223,165,.6),transparent);
+  background-size:186px 172px;
+  animation:twk2 6.8s ease-in-out infinite alternate}
+@keyframes twk{from{opacity:.42}to{opacity:.95}}
+@keyframes twk2{from{opacity:.85}to{opacity:.35}}
+.sky>*{position:relative;z-index:1}
+@media(prefers-reduced-motion:reduce){.sky::before,.sky::after{animation:none}}
 
 /* 금빛 섹션 */
-.gold-sec{background:linear-gradient(160deg,rgba(217,180,91,.13),rgba(217,180,91,.03) 60%,transparent);
-  border:.5px solid rgba(217,180,91,.22);border-radius:24px;padding:24px 20px;
-  -webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px)}
+.gold-sec{background:linear-gradient(160deg,#fdf5dd,#fffdf7 62%,#fff);
+  border:1px solid rgba(193,154,46,.30);border-radius:24px;padding:24px 20px;
+  box-shadow:0 1px 2px rgba(70,56,20,.05),0 10px 30px rgba(160,124,28,.08)}
 .gold-sec h2{margin-bottom:6px}
-.rule{height:1px;background:linear-gradient(90deg,transparent,rgba(217,180,91,.45),transparent);margin:34px 0}
+.rule{height:1px;background:linear-gradient(90deg,transparent,rgba(193,154,46,.5),transparent);margin:34px 0}
 .statbar{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:18px}
-.statbox{background:rgba(255,255,255,.045);border:.5px solid var(--line);border-radius:16px;
-  padding:15px 12px;text-align:center}
+.statbox{background:#fff;border:1px solid var(--line);border-radius:16px;
+  padding:15px 12px;text-align:center;box-shadow:0 1px 2px rgba(70,56,20,.04)}
 .statbox b{display:block;font-size:25px;font-weight:700;letter-spacing:-.045em;color:var(--gold2);
   font-variant-numeric:tabular-nums;line-height:1.1}
 .statbox i{display:block;font-style:normal;font-size:12px;color:var(--dim);margin-top:5px;white-space:nowrap}
-.hdr .sp{flex:1}
-.ghost{border:1px solid var(--line2);border-radius:999px;padding:7px 14px;font-size:13px;font-weight:600;color:var(--dim);transition:.15s}
-.ghost:hover{color:var(--txt);border-color:var(--gold-dim)}
 
 /* ---------- 공통 ---------- */
-.eyebrow{font-size:12.5px;font-weight:600;letter-spacing:.14em;color:var(--gold-dim);text-transform:uppercase}
-h1{font-size:clamp(33px,9vw,46px);line-height:1.14;font-weight:700;letter-spacing:-.042em;margin:16px 0 0}
-h2{font-size:24px;font-weight:700;letter-spacing:-.032em;margin:0 0 14px}
+.eyebrow{font-size:12.5px;font-weight:700;letter-spacing:.14em;color:var(--gold-dim);text-transform:uppercase}
+h1{font-size:clamp(33px,9vw,46px);line-height:1.14;font-weight:700;letter-spacing:-.042em;margin:16px 0 0;color:#1d1a14}
+h2{font-size:24px;font-weight:700;letter-spacing:-.032em;margin:0 0 14px;color:#1d1a14}
 .lead{color:var(--dim);font-size:16px;margin:18px 0 0;line-height:1.66;letter-spacing:-.018em}
-.card{background:var(--card);border:.5px solid var(--line);border-radius:var(--r);padding:20px;
-  -webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);
-  box-shadow:inset 0 .5px 0 rgba(255,255,255,.07)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:20px;box-shadow:var(--sh)}
 .sec{margin-top:52px}
 .muted{color:var(--dim)}
 .tiny{font-size:12.5px;line-height:1.6;color:var(--dim2)}
@@ -122,41 +140,41 @@ h2{font-size:24px;font-weight:700;letter-spacing:-.032em;margin:0 0 14px}
 hr.d{border:0;border-top:1px solid var(--line);margin:20px 0}
 
 .btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:54px;
-  padding:16px 22px;border-radius:16px;font-weight:600;font-size:17px;letter-spacing:-.022em;
-  background:linear-gradient(180deg,#f0d590,#cda549);color:#1d1607;
-  box-shadow:0 6px 22px rgba(217,180,91,.26),inset 0 1px 0 rgba(255,255,255,.35);
+  padding:16px 22px;border-radius:16px;font-weight:700;font-size:17px;letter-spacing:-.022em;
+  background:linear-gradient(180deg,#f0d590,#cda549);color:#33260a;
+  box-shadow:0 6px 20px rgba(190,150,50,.28),inset 0 1px 0 rgba(255,255,255,.5);
   transition:transform .32s var(--spring),box-shadow .3s var(--ease),opacity .2s}
 .btn:active{transform:scale(.965)}
-.btn:disabled{opacity:.4;pointer-events:none;box-shadow:none}
-.btn.sec2{background:rgba(255,255,255,.07);border:.5px solid var(--line2);color:var(--txt);
-  box-shadow:inset 0 .5px 0 rgba(255,255,255,.09);font-weight:600;
-  -webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px)}
-.btn.sec2:active{background:rgba(255,255,255,.11)}
+.btn:disabled{opacity:.45;pointer-events:none;box-shadow:none}
+.btn.sec2{background:#fff;border:1px solid var(--line2);color:#332e24;
+  box-shadow:0 1px 2px rgba(70,56,20,.05);font-weight:600}
+.btn.sec2:active{background:#faf6ea}
+.btn.dark{background:#1d1a14;color:#fdf7e6;box-shadow:0 6px 20px rgba(30,24,8,.22)}
 
 /* ---------- 폼 ---------- */
 .field{margin-top:22px}
 .field>label{display:block;font-size:13px;font-weight:600;color:var(--dim);margin-bottom:9px;letter-spacing:-.01em}
-.inp{width:100%;min-height:52px;padding:15px 16px;background:rgba(255,255,255,.055);border:.5px solid var(--line2);
-  border-radius:14px;outline:none;transition:.2s var(--ease);font-size:17px;letter-spacing:-.02em}
-.inp:focus{border-color:rgba(217,180,91,.55);background:rgba(217,180,91,.07);box-shadow:0 0 0 4px rgba(217,180,91,.10)}
+.inp{width:100%;min-height:52px;padding:15px 16px;background:#fff;border:1px solid var(--line2);
+  border-radius:14px;outline:none;transition:.2s var(--ease);font-size:17px;letter-spacing:-.02em;color:#231f18}
+.inp:focus{border-color:rgba(193,154,46,.7);background:#fffdf5;box-shadow:0 0 0 4px rgba(193,154,46,.14)}
 .inp::placeholder{color:var(--dim2)}
-select.inp{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='7' viewBox='0 0 11 7'%3E%3Cpath d='M1 1l4.5 4.5L10 1' stroke='%238a92a6' stroke-width='1.6' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+select.inp{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='7' viewBox='0 0 11 7'%3E%3Cpath d='M1 1l4.5 4.5L10 1' stroke='%23a49b8a' stroke-width='1.6' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
   background-repeat:no-repeat;background-position:right 14px center;padding-right:36px}
-select.inp option{background:#151d31;color:#e9e5db}
+select.inp option{background:#fff;color:#231f18}
 .row{display:flex;gap:8px}
 .row>*{flex:1;min-width:0}
-.seg{display:flex;background:rgba(255,255,255,.07);border-radius:14px;padding:3px;gap:3px;position:relative}
-.seg button{flex:1;min-height:44px;padding:10px 8px;border-radius:11px;font-size:15px;font-weight:600;color:var(--dim);
+.seg{display:flex;background:#f2ede0;border-radius:14px;padding:3px;gap:3px;position:relative;border:1px solid var(--line)}
+.seg button{flex:1;min-height:44px;padding:10px 8px;border-radius:11px;font-size:15px;font-weight:600;color:#6b6455;
   transition:color .2s,background .28s var(--ease),transform .3s var(--spring)}
-.seg button[aria-pressed=true]{background:linear-gradient(180deg,#f0d590,#cda549);color:#1d1607;
-  box-shadow:0 2px 8px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.35)}
+.seg button[aria-pressed=true]{background:linear-gradient(180deg,#f0d590,#cda549);color:#33260a;
+  box-shadow:0 2px 7px rgba(150,115,30,.22),inset 0 1px 0 rgba(255,255,255,.5)}
 .seg button:active{transform:scale(.96)}
 .chk{display:flex;align-items:center;gap:9px;font-size:14px;color:var(--dim);cursor:pointer;user-select:none;padding:4px 0}
 .chk{min-height:44px}
-.chk input{appearance:none;width:22px;height:22px;flex:0 0 22px;border:1.2px solid var(--line2);border-radius:7px;background:rgba(255,255,255,.06);position:relative;transition:.24s var(--spring)}
+.chk input{appearance:none;width:22px;height:22px;flex:0 0 22px;border:1.4px solid var(--line2);border-radius:7px;background:#fff;position:relative;transition:.24s var(--spring)}
 .chk input:checked{background:linear-gradient(135deg,#e8c876,#c99f42);border-color:transparent}
-.chk input:checked::after{content:'';position:absolute;left:7.5px;top:3px;width:5px;height:11px;border:solid #1d1607;border-width:0 2.4px 2.4px 0;transform:rotate(42deg)}
-.err{color:#ff9b8a;font-size:13.5px;margin-top:12px;min-height:1px}
+.chk input:checked::after{content:'';position:absolute;left:7.5px;top:3px;width:5px;height:11px;border:solid #33260a;border-width:0 2.4px 2.4px 0;transform:rotate(42deg)}
+.err{color:#b4342a;font-size:13.5px;margin-top:12px;min-height:1px}
 .hint{font-size:12.5px;color:var(--dim2);margin-top:7px;line-height:1.55}
 details.adv{margin-top:16px;border-top:1px solid var(--line);padding-top:14px}
 details.adv summary{font-size:13.5px;color:var(--dim);cursor:pointer;list-style:none;font-weight:600}
@@ -165,32 +183,35 @@ details.adv summary::before{content:'＋ ';color:var(--gold-dim)}
 details.adv[open] summary::before{content:'－ '}
 
 /* ---------- 별지도 ---------- */
-.mapbox{position:relative;margin:0 -4px}
+.mapbox{position:relative;margin:0 -2px}
 .mapbox svg{display:block;width:100%;height:auto;overflow:visible}
 .star{cursor:pointer}
 .star circle.hit{fill:transparent}
 .dirlabel{font-size:12px;font-weight:700;letter-spacing:.08em;paint-order:stroke;stroke:rgba(6,9,16,.85);stroke-width:3px;stroke-linejoin:round}
 .ringlabel{font-size:9.5px;font-weight:600;letter-spacing:-.01em;fill:#8a92a6;opacity:.85;paint-order:stroke;stroke:rgba(6,9,16,.92);stroke-width:3px;stroke-linejoin:round}
-.maplg{margin-top:9px;display:flex;flex-direction:column;gap:7px;align-items:center}
+.maplg{margin-top:6px;display:flex;flex-direction:column;gap:7px;align-items:center}
 .mlrow{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
-.mlx{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;color:#a8b0c2;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.09);border-radius:999px;padding:3px 9px 3px 7px;letter-spacing:-.02em;white-space:nowrap}
+.mlx{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;color:#c6cddb;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.13);border-radius:999px;padding:3px 9px 3px 7px;letter-spacing:-.02em;white-space:nowrap}
 .mlx i{width:7px;height:7px;border-radius:50%;display:block;flex:0 0 7px}
-.mlrow2{font-size:11.5px;color:#5d6579;letter-spacing:-.02em;text-align:center}
+.mlrow2{font-size:11.5px;color:#8a92a6;letter-spacing:-.02em;text-align:center}
 .namelabel{font-size:11px;font-weight:600;fill:rgba(240,237,230,.92);
   paint-order:stroke;stroke:rgba(6,9,16,.9);stroke-width:3px;stroke-linejoin:round}
 .namelabel.on{fill:#f7e6ae}
+.skycap{margin:9px 4px 0;font-size:11.5px;line-height:1.6;color:#9aa3b6;text-align:center}
+.skycap b{color:#f0e0b0}
 
 /* ---------- 리스트 ---------- */
 .plist{display:flex;flex-direction:column;gap:8px;margin-top:14px}
-.prow{display:flex;align-items:center;gap:13px;padding:13px 14px;background:var(--card);min-height:62px;
-  border:.5px solid var(--line);border-radius:17px;cursor:pointer;text-align:left;width:100%;
-  transition:transform .3s var(--spring),background .2s;
-  -webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px)}
-.prow:active{transform:scale(.985);background:rgba(255,255,255,.07)}
+.prow{display:flex;align-items:center;gap:13px;padding:13px 14px;background:#fff;min-height:62px;
+  border:1px solid var(--line);border-radius:17px;cursor:pointer;text-align:left;width:100%;
+  box-shadow:0 1px 2px rgba(70,56,20,.04);
+  transition:transform .3s var(--spring),background .2s,box-shadow .2s}
+.prow:active{transform:scale(.985);background:#fdfaf2}
+.prow:hover{box-shadow:0 2px 10px rgba(70,56,20,.08)}
 .prow .rk{width:22px;text-align:center;font-size:13px;font-weight:800;color:var(--dim2);flex:0 0 22px}
 .prow .rk.top{color:var(--gold2)}
 .av{width:40px;height:40px;flex:0 0 40px;border-radius:13px;display:grid;place-items:center;
-  font-size:17px;font-weight:600;border:.5px solid rgba(255,255,255,.14);
+  font-size:17px;font-weight:700;border:1px solid rgba(60,48,16,.10);
   line-height:1.15;text-align:center;padding:2px}
 .prow .nm{flex:1;min-width:0}
 .prow .nm b{display:block;font-size:16px;font-weight:600;letter-spacing:-.022em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -200,25 +221,25 @@ details.adv[open] summary::before{content:'－ '}
 /* ---------- 결과 ---------- */
 .scorebig{font-size:88px;font-weight:700;letter-spacing:-.055em;line-height:1;margin:6px 0 0;
   font-variant-numeric:tabular-nums}
-.scorebig small{font-size:24px;font-weight:600;opacity:.42;margin-left:3px;letter-spacing:-.03em}
+.scorebig small{font-size:24px;font-weight:600;opacity:.45;margin-left:3px;letter-spacing:-.03em}
 .band{display:inline-block;padding:5px 13px;border-radius:999px;font-size:12.5px;font-weight:800;letter-spacing:-.01em;border:1px solid}
-.tone-gold{color:#f2dfa5;border-color:rgba(217,180,91,.45);background:rgba(217,180,91,.1)}
-.tone-green{color:#8fd6ac;border-color:rgba(78,168,122,.4);background:rgba(78,168,122,.1)}
-.tone-blue{color:#93bdea;border-color:rgba(79,134,198,.4);background:rgba(79,134,198,.1)}
-.tone-gray{color:#b3bccd;border-color:var(--line2);background:rgba(255,255,255,.05)}
-.tone-amber{color:#e8c07a;border-color:rgba(210,160,70,.4);background:rgba(210,160,70,.1)}
-.tone-red{color:#f0998c;border-color:rgba(200,90,80,.4);background:rgba(200,90,80,.1)}
-.typecard{border-radius:var(--r);padding:22px;border:.5px solid var(--line);position:relative;overflow:hidden;
-  -webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);box-shadow:inset 0 .5px 0 rgba(255,255,255,.07)}
-.typecard::before{content:'';position:absolute;inset:0;opacity:.13;background:radial-gradient(120% 90% at 0% 0%,var(--c),transparent 65%)}
+.tone-gold{color:#8a6a10;border-color:rgba(193,154,46,.5);background:#fdf4da}
+.tone-green{color:#2b7350;border-color:rgba(43,115,80,.3);background:#eaf7f0}
+.tone-blue{color:#2a5c92;border-color:rgba(42,92,146,.28);background:#eaf2fb}
+.tone-gray{color:#5f5849;border-color:var(--line2);background:#f5f1e7}
+.tone-amber{color:#8e5d17;border-color:rgba(142,93,23,.3);background:#fdf0dc}
+.tone-red{color:#a2372a;border-color:rgba(162,55,42,.28);background:#fdece8}
+.typecard{border-radius:var(--r);padding:22px;border:1px solid var(--line);position:relative;overflow:hidden;
+  background:#fff;box-shadow:var(--sh)}
+.typecard::before{content:'';position:absolute;inset:0;opacity:.10;background:radial-gradient(120% 90% at 0% 0%,var(--c),transparent 66%)}
 .typecard>*{position:relative}
 .typecard .lbl{font-size:11.5px;font-weight:800;letter-spacing:.13em;color:var(--dim)}
 .typecard h3{margin:7px 0 0;font-size:26px;font-weight:700;letter-spacing:-.04em}
-.typecard p{margin:11px 0 0;font-size:15.5px;line-height:1.66;color:#cdd3e0;letter-spacing:-.018em}
+.typecard p{margin:11px 0 0;font-size:15.5px;line-height:1.66;color:#4a4438;letter-spacing:-.018em}
 .whyline{font-size:13px;color:var(--dim);margin-top:4px;letter-spacing:-.015em;line-height:1.5}
 .whyline::before{content:'— '}
 .chip{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:8px;font-size:12px;font-weight:700;
-  background:rgba(255,255,255,.06);border:1px solid var(--line);color:var(--dim)}
+  background:#faf6ea;border:1px solid var(--line);color:#6b6455}
 .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
 .note{display:flex;gap:10px;padding:11px 0;border-bottom:1px solid var(--line)}
 .note:last-child{border-bottom:0}
@@ -226,59 +247,59 @@ details.adv[open] summary::before{content:'－ '}
 .note b{display:block;font-size:13.5px;font-weight:700}
 .note span{font-size:13px;color:var(--dim);line-height:1.6}
 .pillars{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-top:12px}
-.pil{background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:11px;padding:9px 4px;text-align:center}
+.pil{background:#faf6ea;border:1px solid var(--line);border-radius:11px;padding:9px 4px;text-align:center}
 .pil i{display:block;font-style:normal;font-size:10.5px;color:var(--dim2);font-weight:700;letter-spacing:.06em}
 .pil b{display:block;font-size:19px;font-weight:700;letter-spacing:.02em;margin-top:3px}
 .pil s{display:block;text-decoration:none;font-size:11px;color:var(--dim);margin-top:1px}
 .bars{margin-top:12px;display:flex;flex-direction:column;gap:7px}
 .bar{display:flex;align-items:center;gap:9px;font-size:12.5px}
 .bar .bn{flex:0 0 40px;color:var(--dim);font-weight:600}
-.bar .bt{flex:1;height:7px;border-radius:99px;background:rgba(255,255,255,.07);overflow:hidden}
+.bar .bt{flex:1;height:7px;border-radius:99px;background:#efe9db;overflow:hidden}
 .bar .bt i{display:block;height:100%;border-radius:99px}
 .bar .bv{flex:0 0 38px;text-align:right;color:var(--dim2);font-variant-numeric:tabular-nums}
 
 /* ---------- 공유 ---------- */
-.sharebox{background:linear-gradient(155deg,rgba(217,180,91,.14),rgba(217,180,91,.03));
-  border:.5px solid rgba(217,180,91,.26);border-radius:var(--r);padding:22px;
-  -webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px)}
+.sharebox{background:linear-gradient(155deg,#fdf4da,#fffdf7 65%);
+  border:1px solid rgba(193,154,46,.32);border-radius:var(--r);padding:22px;
+  box-shadow:0 1px 2px rgba(70,56,20,.05),0 10px 30px rgba(160,124,28,.09)}
 .linkrow{display:flex;gap:8px;margin-top:12px}
-.linkrow input{flex:1;min-width:0;padding:12px 13px;font-size:13.5px;background:rgba(0,0,0,.3);
-  border:1px solid var(--line2);border-radius:11px;outline:none;color:var(--dim)}
+.linkrow input{flex:1;min-width:0;padding:12px 13px;font-size:13.5px;background:#fff;
+  border:1px solid var(--line2);border-radius:11px;outline:none;color:#5f5849}
 .linkrow button{flex:0 0 auto;padding:12px 17px;border-radius:11px;font-weight:800;font-size:14px;
-  background:linear-gradient(135deg,#e8c876,#c99f42);color:#20180a}
+  background:linear-gradient(135deg,#e8c876,#c99f42);color:#33260a}
 .dock{position:fixed;left:0;right:0;bottom:0;z-index:45;padding:12px 22px calc(14px + var(--safe-b));
-  -webkit-backdrop-filter:saturate(180%) blur(24px);backdrop-filter:saturate(180%) blur(24px);
-  background:linear-gradient(180deg,rgba(8,11,20,0),rgba(8,11,20,.86) 32%);
+  -webkit-backdrop-filter:saturate(180%) blur(22px);backdrop-filter:saturate(180%) blur(22px);
+  background:linear-gradient(180deg,rgba(251,247,236,0),rgba(251,247,236,.94) 34%);
   transform:translateY(115%);transition:transform .42s var(--ease);pointer-events:none}
 .dock.on{transform:none;pointer-events:auto}
 .dock .in{max-width:540px;margin:0 auto}
 .toast{position:fixed;left:50%;bottom:calc(26px + var(--safe-b));transform:translateX(-50%) translateY(20px);
-  background:#1c2437;border:1px solid var(--line2);border-radius:12px;padding:12px 20px;font-size:14px;font-weight:600;
-  opacity:0;pointer-events:none;transition:.22s;z-index:100;box-shadow:0 10px 40px rgba(0,0,0,.5)}
+  background:#28231a;color:#fdf7e6;border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:12px 20px;font-size:14px;font-weight:600;
+  opacity:0;pointer-events:none;transition:.22s;z-index:100;box-shadow:0 10px 34px rgba(40,32,10,.28)}
 .toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
 
 .cap{display:flex;align-items:center;gap:11px;margin-top:18px}
-.cap .bt{flex:1;height:6px;border-radius:99px;background:rgba(255,255,255,.09);overflow:hidden}
+.cap .bt{flex:1;height:6px;border-radius:99px;background:#efe9db;overflow:hidden}
 .cap .bt i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#cda549,#f0d590);transition:width .8s var(--ease)}
 .cap .bt.full i{background:linear-gradient(90deg,#c05353,#e08a6a)}
 .cap b{font-size:13px;font-weight:600;color:var(--dim);font-variant-numeric:tabular-nums;letter-spacing:-.01em}
-.upsell{background:linear-gradient(155deg,rgba(217,180,91,.16),rgba(217,180,91,.04));
-  border:.5px solid rgba(217,180,91,.3);border-radius:var(--r);padding:22px;
-  -webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px)}
+.upsell{background:linear-gradient(155deg,#fdf2d4,#fffdf7 65%);
+  border:1px solid rgba(193,154,46,.34);border-radius:var(--r);padding:22px;
+  box-shadow:0 1px 2px rgba(70,56,20,.05),0 10px 30px rgba(160,124,28,.10)}
 .upsell .px{display:flex;align-items:baseline;gap:6px;margin-top:12px}
-.upsell .px b{font-size:30px;font-weight:700;letter-spacing:-.04em;color:#f2dfa5}
+.upsell .px b{font-size:30px;font-weight:700;letter-spacing:-.04em;color:var(--gold2)}
 .upsell ul{margin:14px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:8px}
-.upsell li{font-size:14.5px;color:#cdd3e0;display:flex;gap:9px;letter-spacing:-.018em}
-.upsell li::before{content:'✓';color:#f2dfa5;font-weight:700;flex:0 0 14px}
+.upsell li{font-size:14.5px;color:#4a4438;display:flex;gap:9px;letter-spacing:-.018em}
+.upsell li::before{content:'✓';color:var(--gold2);font-weight:700;flex:0 0 14px}
 .sso{display:flex;flex-direction:column;gap:9px;margin-top:16px}
 .sso button{display:flex;align-items:center;justify-content:center;gap:9px;width:100%;min-height:54px;
-  border-radius:16px;font-weight:600;font-size:16.5px;letter-spacing:-.022em;
+  border-radius:16px;font-weight:700;font-size:16.5px;letter-spacing:-.022em;
   transition:transform .3s var(--spring),filter .2s}
-.sso button:active{transform:scale(.965);filter:brightness(.94)}
+.sso button:active{transform:scale(.965);filter:brightness(.95)}
 .sso svg{width:19px;height:19px;flex:0 0 19px}
 .me{display:flex;align-items:center;gap:8px}
-.me img{width:26px;height:26px;border-radius:50%;object-fit:cover;border:.5px solid var(--line2)}
-.skel{background:linear-gradient(90deg,rgba(255,255,255,.04),rgba(255,255,255,.09),rgba(255,255,255,.04));
+.me img{width:26px;height:26px;border-radius:50%;object-fit:cover;border:1px solid var(--line2)}
+.skel{background:linear-gradient(90deg,#f1ece0,#f8f4ea,#f1ece0);
   background-size:200% 100%;animation:sh 1.3s infinite;border-radius:10px}
 @keyframes sh{0%{background-position:200% 0}100%{background-position:-200% 0}}
 .fade{animation:fade .62s var(--ease) both}
@@ -287,14 +308,13 @@ details.adv[open] summary::before{content:'－ '}
 .rv.armed.in{opacity:1;transform:none}
 @media(prefers-reduced-motion:reduce){.fade,.rv{animation:none!important;opacity:1!important;transform:none!important;transition:none!important}}
 @media print{.rv{opacity:1!important;transform:none!important}.dock{display:none}}
-.spin{width:17px;height:17px;border:2px solid rgba(32,24,10,.28);border-top-color:#20180a;border-radius:50%;animation:sp .7s linear infinite}
+.spin{width:17px;height:17px;border:2px solid rgba(51,38,10,.28);border-top-color:#33260a;border-radius:50%;animation:sp .7s linear infinite}
 @keyframes sp{to{transform:rotate(360deg)}}
 footer{margin-top:56px;padding-top:22px;border-top:1px solid var(--line);color:var(--dim2);font-size:12.5px;line-height:1.75}
 @media(min-width:600px){ .wrap{padding-bottom:90px} }
 </style>
 </head>
 <body>
-<canvas id="stars"></canvas>
 <header>
   <div class="hdr">
     <a class="logo" href="/" aria-label="인연지도 홈">
@@ -310,15 +330,9 @@ footer{margin-top:56px;padding-top:22px;border-top:1px solid var(--line);color:v
     </a>
     <div class="sp"></div>
     <button class="ghost" id="navBtn" hidden>내 지도</button>
-    <button class="menubtn" id="menuBtn" aria-label="메뉴 열기"><i></i></button>
   </div>
+  <nav class="nav" id="nav" aria-label="주요 메뉴"></nav>
 </header>
-<div class="scrim" id="scrim"></div>
-<div class="sheet" id="sheet" role="dialog" aria-label="메뉴">
-  <div class="grab"></div>
-  <h4>인연지도</h4>
-  <div id="menuList"></div>
-</div>
 
 <main class="wrap" id="app"></main>
 <div class="dock" id="dock"><div class="in"></div></div>
@@ -341,15 +355,15 @@ var ELEM=['목','화','토','금','수'], ELEM_H=['木','火','土','金','水']
 var ECOL=['#4ea87a','#e2734a','#d0a94f','#9fb0c4','#4f86c6'];
 /* 주고받음 5자리 — 화면 각도(0=위, 시계방향) */
 var AXES={
-  'in'  :{key:'in'  ,name:'나를 채워주는 자리',short:'나를 채워줌',sipsin:'인성',angle:0  ,col:'#7ec9a2',
+  'in'  :{key:'in'  ,name:'나를 채워주는 자리',short:'나를 채워줌',sipsin:'인성',angle:0  ,col:'#7ec9a2',lcol:'#2f855f',
           desc:'나를 살려주는 기운입니다. 받는 쪽이라 편하지만, 익숙해지면 기대게 됩니다.'},
-  'gwan':{key:'gwan',name:'나를 세우는 자리'  ,short:'나를 세움'  ,sipsin:'관성',angle:65 ,col:'#8fa8c9',
+  'gwan':{key:'gwan',name:'나를 세우는 자리'  ,short:'나를 세움'  ,sipsin:'관성',angle:65 ,col:'#8fa8c9',lcol:'#3c6ca6',
           desc:'나를 누르고 다잡는 기운입니다. 편하진 않아도 이 사람 앞에서 자세가 잡힙니다.'},
-  'sik' :{key:'sik' ,name:'내가 채워주는 자리',short:'내가 채워줌',sipsin:'식상',angle:150,col:'#e29a68',
+  'sik' :{key:'sik' ,name:'내가 채워주는 자리',short:'내가 채워줌',sipsin:'식상',angle:150,col:'#e29a68',lcol:'#bd6c31',
           desc:'내가 내어주는 기운입니다. 주는 만큼 내가 풀리는 관계이기도 합니다.'},
-  'jae' :{key:'jae' ,name:'내가 이끄는 자리'  ,short:'내가 이끎'  ,sipsin:'재성',angle:215,col:'#d9b45b',
+  'jae' :{key:'jae' ,name:'내가 이끄는 자리'  ,short:'내가 이끎'  ,sipsin:'재성',angle:215,col:'#d9b45b',lcol:'#a07c1c',
           desc:'내가 다스리고 굴리는 기운입니다. 같이 일을 벌이기 좋은 자리입니다.'},
-  'bi'  :{key:'bi'  ,name:'나란한 자리'      ,short:'나란함'    ,sipsin:'비겁',angle:275,col:'#9aa3b8',
+  'bi'  :{key:'bi'  ,name:'나란한 자리'      ,short:'나란함'    ,sipsin:'비겁',angle:275,col:'#9aa3b8',lcol:'#5c6579',
           desc:'나와 같은 결입니다. 주고받는 것 없이 옆에 서 있는 사이입니다.'}
 };
 var AXIS_ORDER=['in','gwan','sik','jae','bi'];
@@ -491,27 +505,7 @@ function charBy(k){for(var i=0;i<CHARS.length;i++)if(CHARS[i].key===k)return CHA
 function gz(p){return p?STEM_H[p[0]]+BR_H[p[1]]:'—';}
 function gzk(p){return p?STEM[p[0]]+BR[p[1]]:'시간 모름';}
 
-/* ===== 배경 별 ===== */
-(function(){
-  var c=document.getElementById('stars'),x=c.getContext('2d'),pts=[],raf;
-  function init(){
-    c.width=innerWidth*devicePixelRatio;c.height=innerHeight*devicePixelRatio;
-    c.style.width=innerWidth+'px';c.style.height=innerHeight+'px';
-    pts=[];var n=Math.min(120,Math.round(innerWidth*innerHeight/12000));
-    for(var i=0;i<n;i++)pts.push({x:Math.random()*c.width,y:Math.random()*c.height,
-      r:(Math.random()*1.1+.3)*devicePixelRatio,p:Math.random()*6.28,s:Math.random()*.9+.3});
-  }
-  function draw(t){
-    x.clearRect(0,0,c.width,c.height);
-    for(var i=0;i<pts.length;i++){var p=pts[i];
-      var a=.28+.42*Math.abs(Math.sin(t/2600*p.s+p.p));
-      x.globalAlpha=a;x.fillStyle=i%7===0?'#f2dfa5':'#cfe0ff';
-      x.beginPath();x.arc(p.x,p.y,p.r,0,6.284);x.fill();}
-    raf=requestAnimationFrame(draw);
-  }
-  init();raf=requestAnimationFrame(draw);
-  var to;addEventListener('resize',function(){clearTimeout(to);to=setTimeout(init,220)});
-})();
+/* 배경 별은 .sky 패널 안에서 CSS로 반짝입니다 */
 
 /* ===== 폼 ===== */
 function formHTML(o){
@@ -812,8 +806,8 @@ function viewHome(){
   '</section>'+
 
   '<section class="sec rv">'+
-    '<div class="mapbox" id="demo"></div>'+mapLegend()+
-    '<p class="tiny center" style="margin-top:2px">자리는 <b>주고받음</b>으로 정해집니다. 나를 채워주는 사람은 위쪽, 내가 채워주는 사람은 아래쪽. 점수가 높을수록 안쪽으로 들어오고, 같은 오행끼리는 선으로 이어집니다.</p>'+
+    '<div class="sky"><div class="mapbox" id="demo"></div>'+mapLegend()+'</div>'+
+    '<p class="tiny center" style="margin-top:11px">자리는 <b class="gold">주고받음</b>으로 정해집니다. 나를 채워주는 사람은 위쪽, 내가 채워주는 사람은 아래쪽. 점수가 높을수록 안쪽으로 들어오고, 같은 오행끼리는 선으로 이어집니다.</p>'+
   '</section>'+
 
   '<section class="sec rv">'+
@@ -829,7 +823,7 @@ function viewHome(){
   '<section class="sec rv">'+
     '<h2>어떻게 계산하나요</h2>'+
     '<div class="card">'+
-      '<p style="margin:0;font-size:14.5px;line-height:1.8;color:#cdd3e0">'+
+      '<p style="margin:0;font-size:14.5px;line-height:1.8;color:#4a4438">'+
       '재미로 뽑는 랜덤 점수가 아닙니다. 생년월일시를 <b class="gold">사주 여덟 글자</b>로 세운 뒤, '+
       '두 사람의 일간(日干) 사이 십신 관계, 지지의 합·충·형·해, 천을귀인 같은 신살, '+
       '그리고 서로 부족한 오행을 얼마나 채워주는지를 따져 점수를 냅니다.</p>'+
@@ -875,12 +869,12 @@ function viewHome(){
   '</section>'+
 
   '<footer>'+
-    '<b style="color:#8a92a6">인연지도 因緣地圖</b><br>'+
+    '<b style="color:#7a7365">인연지도 因緣地圖</b><br>'+
     '사주 명리는 사람을 이해하는 오래된 언어이지 정답지가 아닙니다. 여기 나온 결과로 사람을 재단하지 마세요. '+
     '실제 관계는 결국 주고받은 말과 시간으로 만들어집니다.<br><br>'+
     '입력한 생년월일은 궁합 계산에만 쓰이며, 다른 참여자에게는 절대 보이지 않습니다.<br><br>'+
-    '<a href="/terms" style="color:#8a92a6;text-decoration:underline">이용약관</a> · '+
-    '<a href="/privacy" style="color:#8a92a6;text-decoration:underline">개인정보처리방침</a>'+
+    '<a href="/terms" style="color:#7a7365;text-decoration:underline">이용약관</a> · '+
+    '<a href="/privacy" style="color:#7a7365;text-decoration:underline">개인정보처리방침</a>'+
   '</footer>'));
 
   el('go').onclick=el('go2').onclick=function(){tap();location.hash='';viewCreate();};
@@ -929,7 +923,7 @@ function viewHome(){
 }
 function step(n,t,d){
   return '<div style="display:flex;gap:13px;align-items:flex-start">'+
-    '<div style="flex:0 0 26px;height:26px;border-radius:9px;background:rgba(217,180,91,.15);color:#f2dfa5;'+
+    '<div style="flex:0 0 26px;height:26px;border-radius:9px;background:rgba(217,180,91,.20);color:#a07c1c;'+
     'display:grid;place-items:center;font-size:13px;font-weight:800">'+n+'</div>'+
     '<div><b style="font-size:15px">'+esc(t)+'</b>'+
     '<div style="font-size:13.5px;color:var(--dim);margin-top:2px;line-height:1.6">'+esc(d)+'</div></div></div>';
@@ -947,7 +941,7 @@ function viewCreate(){
       '그 링크를 받은 친구가 자기 생일을 넣을 때마다 내 지도에 별이 하나씩 찍힙니다. '+
       '친구에게는 이름만 보이고 생년월일은 보이지 않습니다.</p>'+
     (!ME&&PROVIDERS.length
-      ? '<div class="card" style="margin-top:22px;border-color:rgba(217,180,91,.26);background:linear-gradient(155deg,rgba(217,180,91,.1),rgba(255,255,255,.03))">'+
+      ? '<div class="card" style="margin-top:22px;border-color:rgba(217,180,91,.26);background:linear-gradient(155deg,rgba(217,180,91,.14),rgba(255,255,255,.6))">'+
         '<b style="font-size:16px;letter-spacing:-.03em">먼저 로그인하면 지도가 계정에 저장됩니다</b>'+
         '<div class="tiny" style="margin-top:6px">로그인 없이 만들어도 되지만, 이 브라우저에서만 찾을 수 있어요.</div>'+
         ssoBtns('/')+'</div>'
@@ -998,13 +992,13 @@ function constBox(j){
   var h2='';
   if(top){
     var tc=charBy(top.charKey),tt=TYPES[top.typeIn];
-    h2='<div class="card" style="margin-top:10px;background:linear-gradient(155deg,rgba(217,180,91,.13),rgba(255,255,255,.03));border-color:rgba(217,180,91,.24)">'+
+    h2='<div class="card" style="margin-top:10px;background:linear-gradient(155deg,rgba(217,180,91,.17),rgba(255,255,255,.6));border-color:rgba(217,180,91,.24)">'+
       '<div class="eyebrow" style="color:#c9a227">내 1번 인연</div>'+
       '<div style="display:flex;align-items:center;gap:13px;margin-top:11px">'+
         '<div class="av" style="width:48px;height:48px;flex:0 0 48px;background:'+tc.color+'22;color:'+tc.color+';font-size:21px">'+esc(tc.han)+'</div>'+
         '<div style="flex:1;min-width:0"><b style="font-size:19px;letter-spacing:-.03em">'+esc(top.name)+'</b>'+
         '<div class="tiny" style="color:var(--dim)">'+esc(tt.name)+' · '+esc(tc.name)+'</div></div>'+
-        '<div class="sc" style="font-size:24px;color:#f2dfa5">'+top.score+'</div>'+
+        '<div class="sc" style="font-size:24px;color:#a07c1c">'+top.score+'</div>'+
       '</div>'+
       '<button class="btn sec2" id="brag" style="margin-top:14px">'+esc(top.name)+'님에게 알려주기</button>'+
     '</div>';
@@ -1013,11 +1007,11 @@ function constBox(j){
     '<div style="display:flex;align-items:baseline;gap:9px">'+
       '<b style="font-size:22px;font-weight:700;letter-spacing:-.035em">'+esc(k.name)+'</b>'+
       '<span class="chip" style="flex:0 0 auto">'+esc(k.tier)+'</span></div>'+
-    '<p style="margin:8px 0 0;font-size:14.5px;color:#cdd3e0;line-height:1.66">'+esc(k.desc)+'.'+
+    '<p style="margin:8px 0 0;font-size:14.5px;color:#4a4438;line-height:1.66">'+esc(k.desc)+'.'+
       (k.gwiin?' 그중 <b class="gold">천을귀인이 '+k.gwiin+'명</b> 있습니다.':'')+'</p>'+
     '<div class="chips">'+
       (k.complete
-        ? '<span class="chip" style="color:#f2dfa5;border-color:rgba(217,180,91,.45)">★ 다섯 자리 완성</span>'
+        ? '<span class="chip" style="color:#a07c1c;border-color:rgba(217,180,91,.45)">★ 다섯 자리 완성</span>'
         : '<span class="chip">자리 '+k.have+'/5</span>'+
           (k.missing.length&&k.missing.length<=3?'<span class="chip">아직 빈 자리 · '+esc(k.missing.join(', '))+'</span>':''))+
     '</div>'+
@@ -1031,7 +1025,7 @@ function capBar(j){
   return '<div class="cap"><span class="bt'+(j.full?' full':'')+'"><i style="width:'+pct+'%"></i></span>'+
     '<b>'+j.count+' / '+lim+'명</b></div>'+
     (j.full
-      ? '<div class="tiny" style="margin-top:7px;color:#e8c07a">자리가 다 찼어요. 아래에서 자리를 늘려보세요.</div>'
+      ? '<div class="tiny" style="margin-top:7px;color:#8e5d17">자리가 다 찼어요. 아래에서 자리를 늘려보세요.</div>'
       : '<div class="tiny" style="margin-top:7px">'+(lim-j.count)+'자리 남았어요.</div>');
 }
 function growBox(j){
@@ -1041,22 +1035,22 @@ function growBox(j){
     '<div class="eyebrow" style="color:#c9a227">자리 늘리기</div>'+
     '<b style="display:block;font-size:21px;font-weight:700;letter-spacing:-.035em;margin-top:8px">'+
       (maxed?'늘릴 수 있는 만큼 다 채웠어요':'하루에 두 개까지 늘릴 수 있어요')+'</b>'+
-    '<p style="margin:9px 0 0;font-size:14.5px;color:#cdd3e0;line-height:1.66">'+
+    '<p style="margin:9px 0 0;font-size:14.5px;color:#4a4438;line-height:1.66">'+
       (maxed
         ? '30명까지 다 채웠습니다. 이제 친구를 초대해서 늘려보세요.'
         : '지금 정원은 <b class="gold">'+lim+'명</b>. 출석 1개 + 공유 1개, 최대 30명까지 늘릴 수 있어요.')+'</p>'+
     (maxed?'':'<div class="chips" style="margin-top:12px">'+
-      '<span class="chip"'+(done?' style="color:#8fd6ac;border-color:rgba(78,168,122,.4)"':'')+'>'+(done?'✓ 오늘 출석 완료':'출석 +1')+'</span>'+
-      '<span class="chip"'+(shared?' style="color:#8fd6ac;border-color:rgba(78,168,122,.4)"':'')+'>'+(shared?'✓ 오늘 공유 완료':'공유 +1')+'</span>'+
+      '<span class="chip"'+(done?' style="color:#2b7350;border-color:rgba(43,115,80,.34)"':'')+'>'+(done?'✓ 오늘 출석 완료':'출석 +1')+'</span>'+
+      '<span class="chip"'+(shared?' style="color:#2b7350;border-color:rgba(43,115,80,.34)"':'')+'>'+(shared?'✓ 오늘 공유 완료':'공유 +1')+'</span>'+
       '<span class="chip">초대 성공 +2</span></div>')+
-    (j.streak>1?'<div class="chips" style="margin-top:11px"><span class="chip" style="color:#f2dfa5;border-color:rgba(217,180,91,.4)">🔥 '+j.streak+'일 연속</span>'+
+    (j.streak>1?'<div class="chips" style="margin-top:11px"><span class="chip" style="color:#a07c1c;border-color:rgba(217,180,91,.4)">🔥 '+j.streak+'일 연속</span>'+
       (j.invites?'<span class="chip">초대 '+j.invites+'명 · +'+(j.invites*2)+'자리</span>':'')+'</div>':
      (j.invites?'<div class="chips" style="margin-top:11px"><span class="chip">초대 '+j.invites+'명 · +'+(j.invites*2)+'자리</span></div>':''))+
     (maxed?'':'<button class="btn'+(done?' sec2':'')+'" id="chk" style="margin-top:16px"'+(done?' disabled':'')+'>'+
       (done?'오늘 출석 완료 · 내일 또 오세요':'출석하고 자리 1개 늘리기')+'</button>')+
-    '<div class="tiny" style="margin-top:12px;padding-top:11px;border-top:1px solid rgba(255,255,255,.09);line-height:1.65">'+
-      '<b style="color:#cdd3e0">공유 버튼을 누르면 하루 1개</b>가 바로 늘고, '+
-      '친구가 내 링크로 들어와 <b style="color:#cdd3e0">자기 인연지도를 만들면</b> 2개가 더 늘어납니다.</div>'+
+    '<div class="tiny" style="margin-top:12px;padding-top:11px;border-top:1px solid rgba(60,48,16,.11);line-height:1.65">'+
+      '<b style="color:#4a4438">공유 버튼을 누르면 하루 1개</b>가 바로 늘고, '+
+      '친구가 내 링크로 들어와 <b style="color:#4a4438">자기 인연지도를 만들면</b> 2개가 더 늘어납니다.</div>'+
   '</div>';
 }
 // 로그인한 상태에서 브라우저에만 있던 지도를 자동으로 계정에 붙인다
@@ -1090,7 +1084,7 @@ function upsellBox(j){
     '<div class="eyebrow" style="color:#c9a227">자리가 다 찼어요</div>'+
     '<b style="display:block;font-size:21px;font-weight:700;letter-spacing:-.035em;margin-top:8px">'+
       '별을 더 받고 싶다면</b>'+
-    '<p style="margin:9px 0 0;font-size:14.5px;color:#cdd3e0;line-height:1.66">'+
+    '<p style="margin:9px 0 0;font-size:14.5px;color:#4a4438;line-height:1.66">'+
       '무료로 '+(j.limit||10)+'명까지 받았습니다. 한 번 후원하면 이 지도는 계속 열려 있습니다.</p>'+
     '<ul><li>참여 인원 300명까지</li><li>지도 영구 보관</li><li>새 참여자 알림</li></ul>'+
     '<button class="btn" id="unlock" style="margin-top:16px">후원하고 계속 받기</button>'+
@@ -1122,10 +1116,10 @@ function shareBox(code,ownerName){
     '<button class="btn sec2" id="grp" style="margin-top:9px">단톡방에 통째로 보내기</button>'+
     '<div class="tiny" style="margin-top:11px;line-height:1.65">단톡방에 보내면 문구까지 같이 나갑니다. '+
       '한 명씩 설득하는 것보다 방에 한 번 던지는 쪽이 훨씬 빨리 찹니다.</div>'+
-    '<div style="margin-top:16px;padding-top:15px;border-top:1px solid rgba(255,255,255,.12)">'+
+    '<div style="margin-top:16px;padding-top:15px;border-top:1px solid rgba(60,48,16,.13)">'+
       '<b style="display:block;font-size:15px;letter-spacing:-.03em">인연지도 자체를 알리고 싶다면</b>'+
       '<div class="tiny" style="margin-top:5px;line-height:1.65">'+
-        '내 지도가 아니라 <b style="color:#cdd3e0">인연지도 홈</b> 주소가 나갑니다. 받는 사람은 각자 자기 지도를 만들게 됩니다.</div>'+
+        '내 지도가 아니라 <b style="color:#4a4438">인연지도 홈</b> 주소가 나갑니다. 받는 사람은 각자 자기 지도를 만들게 됩니다.</div>'+
       '<button class="btn sec2" id="sit" style="margin-top:11px">인연지도 알려주기</button>'+
     '</div>'+
   '</div>';
@@ -1206,15 +1200,15 @@ function renderOwner(j){
     capBar(j)+
   '</section>'+
   '<section class="sec rv" style="margin-top:30px">'+constBox(j)+'</section>'+
-  '<section class="sec fade" style="margin-top:20px"><div class="mapbox" id="map"></div>'+mapLegend()+
+  '<section class="sec fade" style="margin-top:20px"><div class="sky"><div class="mapbox" id="map"></div>'+mapLegend()+'</div>'+
     '<div id="selBox"></div></section>'+
   '<section class="sec rv">'+shareBox(j.code,j.ownerName)+'</section>'+
   '<section class="sec rv">'+growBox(j)+'</section>'+
   (j.saved===false&&PROVIDERS.length
-    ? '<section class="sec rv"><div class="card" style="border-color:rgba(217,180,91,.28);background:linear-gradient(155deg,rgba(217,180,91,.12),rgba(255,255,255,.03))">'+
+    ? '<section class="sec rv"><div class="card" style="border-color:rgba(217,180,91,.28);background:linear-gradient(155deg,rgba(217,180,91,.16),rgba(255,255,255,.6))">'+
       '<div class="eyebrow" style="color:#c9a227">아직 저장 안 됨</div>'+
       '<b style="display:block;font-size:19px;font-weight:700;letter-spacing:-.035em;margin-top:8px">이 지도는 이 브라우저에만 있어요</b>'+
-      '<p style="margin:8px 0 0;font-size:14.5px;color:#cdd3e0;line-height:1.66">'+
+      '<p style="margin:8px 0 0;font-size:14.5px;color:#4a4438;line-height:1.66">'+
       '기록을 지우거나 폰을 바꾸면 다시 찾을 수 없습니다. 로그인해두면 안전하게 남습니다.</p>'+
       ssoBtns('/m/'+j.code)+'</div></section>'
     : '')+
@@ -1249,7 +1243,7 @@ function renderOwner(j){
       return '<button class="prow" data-id="'+p.id+'">'+
         '<span class="rk'+(i<3?' top':'')+'">'+(i+1)+'</span>'+
         '<span class="av" style="background:'+c.color+'22;color:'+c.color+'">'+esc(c.han)+'</span>'+
-        '<span class="nm"><b>'+esc(p.name)+(p.cheoneul?' <span style="color:#f2dfa5">★</span>':'')+'</b>'+
+        '<span class="nm"><b>'+esc(p.name)+(p.cheoneul?' <span style="color:#a07c1c">★</span>':'')+'</b>'+
         '<i>'+esc(t.name)+' · '+esc(c.name)+'</i></span>'+
         '<span class="sc" style="color:'+scColor(b.tone)+'">'+p.score+'</span></button>';
     }).join('')+'</div>';
@@ -1264,7 +1258,7 @@ function renderOwner(j){
   window.scrollTo(0,0);
 }
 function scColor(tone){
-  return {gold:'#f2dfa5',green:'#8fd6ac',blue:'#93bdea',gray:'#b3bccd',amber:'#e8c07a',red:'#f0998c'}[tone];
+  return {gold:'#a07c1c',green:'#2b7350',blue:'#2a5c92',gray:'#5f5849',amber:'#8e5d17',red:'#a2372a'}[tone];
 }
 function bindStars(pts){
   var box=el('map');if(!box)return;
@@ -1292,11 +1286,11 @@ function selectStar(id){
     '<div class="lbl tiny" style="letter-spacing:.13em;font-weight:800">이 사람은 나에게</div>'+
     '<b style="font-size:16px;color:'+ti.color+'">'+esc(ti.name)+'</b>'+
     '<div class="whyline">'+esc(ti.why)+'</div>'+
-    '<p style="margin:5px 0 0;font-size:13.5px;color:#cdd3e0;line-height:1.7">'+esc(ti.in)+'</p>'+
+    '<p style="margin:5px 0 0;font-size:13.5px;color:#4a4438;line-height:1.7">'+esc(ti.in)+'</p>'+
     '<div class="lbl tiny" style="letter-spacing:.13em;font-weight:800;margin-top:14px">나는 이 사람에게</div>'+
     '<b style="font-size:16px;color:'+to.color+'">'+esc(to.name)+'</b>'+
     '<div class="whyline">'+esc(to.why)+'</div>'+
-    '<p style="margin:5px 0 0;font-size:13.5px;color:#cdd3e0;line-height:1.7">'+esc(to.out)+'</p>'+
+    '<p style="margin:5px 0 0;font-size:13.5px;color:#4a4438;line-height:1.7">'+esc(to.out)+'</p>'+
     '<div class="tiny" style="margin-top:13px;padding-top:11px;border-top:1px solid var(--line)">💡 '+esc(ti.how)+'</div>'+
   '</div>';
   box.scrollIntoView({behavior:'smooth',block:'nearest'});
@@ -1308,7 +1302,7 @@ function sajuCard(s,ch){
     '<div style="display:flex;align-items:center;gap:12px">'+
     '<div class="av" style="width:44px;height:44px;flex:0 0 44px;background:'+ch.color+'22;color:'+ch.color+';font-size:19px">'+esc(ch.han)+'</div>'+
     '<div><b style="font-size:16px">'+esc(ch.name)+'</b><div class="tiny" style="color:var(--dim)">'+esc(ch.tag)+'</div></div></div>'+
-    '<p style="margin:12px 0 0;font-size:13.5px;color:#cdd3e0;line-height:1.7">'+esc(ch.desc)+'</p>'+
+    '<p style="margin:12px 0 0;font-size:13.5px;color:#4a4438;line-height:1.7">'+esc(ch.desc)+'</p>'+
     '<div class="pillars">';
   keys.forEach(function(k,i){
     var p=P[k];
@@ -1438,8 +1432,8 @@ function renderVisitorFull(j){
     '<p class="lead">조금 늦었네요. 대신 <b>내 인연지도</b>를 만들어서 '+esc(j.ownerName)+'님을 초대해보는 건 어때요?</p>'+
     '<button class="btn" id="mk" style="margin-top:26px">내 인연지도 만들기</button>'+
   '</section>'+
-  '<section class="sec rv"><div class="mapbox" id="map"></div>'+mapLegend()+
-    '<p class="tiny center" style="margin-top:-2px">이미 자리를 잡은 사람들입니다.</p></section>'));
+  '<section class="sec rv"><div class="sky"><div class="mapbox" id="map"></div>'+mapLegend()+'</div>'+
+    '<p class="tiny center" style="margin-top:11px">이미 자리를 잡은 사람들입니다.</p></section>'));
   el('map').innerHTML=starMap(j.entries,j.ownerChar,{});
   el('mk').onclick=function(){tap();goCreate(j.code);};
   setDock('<button class="btn">내 인연지도 만들기</button>',function(){goCreate(j.code);},'#mk');
@@ -1461,11 +1455,11 @@ function renderVisitor(j){
       '<div class="av" style="width:46px;height:46px;flex:0 0 46px;background:'+c.color+'22;color:'+c.color+';font-size:20px">'+esc(c.han)+'</div>'+
       '<div style="flex:1;min-width:0"><b style="font-size:16px">'+esc(j.ownerName)+'님은 '+esc(c.name)+'</b>'+
       '<div class="tiny" style="color:var(--dim)">'+esc(c.tag)+'</div></div>'+
-      '<div style="text-align:right"><div style="font-size:19px;font-weight:800;color:#f2dfa5">'+j.count+'</div><div class="tiny">명 참여</div></div>'+
+      '<div style="text-align:right"><div style="font-size:19px;font-weight:800;color:#a07c1c">'+j.count+'</div><div class="tiny">명 참여</div></div>'+
     '</div>'+
   '</section>'+
-  '<section class="sec fade"><div class="mapbox" id="map"></div>'+mapLegend()+
-    '<p class="tiny center" style="margin-top:-2px">이미 자리를 잡은 사람들입니다. 이름만 보이고 생년월일은 아무에게도 보이지 않아요.</p></section>'+
+  '<section class="sec fade"><div class="sky"><div class="mapbox" id="map"></div>'+mapLegend()+'</div>'+
+    '<p class="tiny center" style="margin-top:11px">이미 자리를 잡은 사람들입니다. 이름만 보이고 생년월일은 아무에게도 보이지 않아요.</p></section>'+
   '<section class="sec fade"><div class="card" id="fw">'+
     formHTML({cta:'내 별 남기기',nameLabel:'뭐라고 부를까요',namePh:'예: 지민, 동아리 지민'})+'</div></section>'+
   '<section class="sec fade"><button class="btn sec2" id="own">나도 내 인연지도 만들기</button></section>'+
@@ -1521,38 +1515,38 @@ function renderResult(r,code){
     '<p class="tiny" style="margin-top:12px">참여자 '+r.total+'명 중 <b class="gold">'+r.rank+'위</b>'+
       (r.total>2?' · 상위 '+pct+'%':'')+'</p>'+
     (r.rank===1&&r.total>=3
-      ? '<div class="card" style="margin-top:18px;background:linear-gradient(155deg,rgba(217,180,91,.16),rgba(255,255,255,.03));border-color:rgba(217,180,91,.3)">'+
+      ? '<div class="card" style="margin-top:18px;background:linear-gradient(155deg,rgba(217,180,91,.16),rgba(255,255,255,.6));border-color:rgba(217,180,91,.3)">'+
         '<b style="font-size:17px;letter-spacing:-.03em">지금 '+esc(r.ownerName)+'님의 <span class="gold">1번 인연</span>입니다</b>'+
         '<div class="tiny" style="margin-top:6px;color:var(--dim)">'+r.total+'명 중에서 가장 기운이 잘 맞는 사람이에요.</div></div>'
       : '')+
   '</section>'+
 
   '<section class="sec fade" style="margin-top:26px">'+
-    '<div class="typecard" style="--c:'+to.color+';background:rgba(255,255,255,.035)">'+
+    '<div class="typecard" style="--c:'+to.color+';background:#fff">'+
       '<div class="lbl">나는 '+esc(r.ownerName)+'님에게</div>'+
       '<h3 style="color:'+to.color+'">'+esc(to.name)+'</h3>'+
       '<div class="whyline">'+esc(to.why)+'</div>'+
       '<p>'+esc(to.out)+'</p>'+
     '</div>'+
-    '<div class="typecard" style="--c:'+ti.color+';background:rgba(255,255,255,.035);margin-top:10px">'+
+    '<div class="typecard" style="--c:'+ti.color+';background:#fff;margin-top:10px">'+
       '<div class="lbl">'+esc(r.ownerName)+'님은 나에게</div>'+
       '<h3 style="color:'+ti.color+'">'+esc(ti.name)+'</h3>'+
       '<div class="whyline">'+esc(ti.why)+'</div>'+
       '<p>'+esc(ti.in)+'</p>'+
     '</div>'+
-    '<div class="card" style="margin-top:10px"><div class="tiny" style="color:#cdd3e0;font-size:13.5px">💡 '+esc(ti.how)+'</div></div>'+
+    '<div class="card" style="margin-top:10px"><div class="tiny" style="color:#4a4438;font-size:13.5px">💡 '+esc(ti.how)+'</div></div>'+
   '</section>'+
 
   '<section class="sec rv">'+
     '<h2>'+esc(r.ownerName)+'님과 이어진 자리</h2>'+
-    '<div class="card" style="margin:-4px 0 12px;border-color:'+AX.col+'44;background:linear-gradient(155deg,'+AX.col+'1f,rgba(255,255,255,.03))">'+
-      '<div class="eyebrow" style="color:'+AX.col+'">'+esc(r.ownerName)+'님의 지도에서 내 자리</div>'+
+    '<div class="card" style="margin:-4px 0 12px;border-color:'+AX.lcol+'40;background:linear-gradient(155deg,'+AX.lcol+'14,#fff 62%)">'+
+      '<div class="eyebrow" style="color:'+AX.lcol+'">'+esc(r.ownerName)+'님의 지도에서 내 자리</div>'+
       '<b style="display:block;font-size:19px;font-weight:700;letter-spacing:-.035em;margin-top:7px">'+esc(AX.name)+'</b>'+
-      '<p style="margin:7px 0 0;font-size:14px;color:#cdd3e0;line-height:1.66">'+esc(AX.desc)+'</p>'+
+      '<p style="margin:7px 0 0;font-size:14px;color:#4a4438;line-height:1.66">'+esc(AX.desc)+'</p>'+
       '<div class="tiny" style="margin-top:9px;color:var(--dim)">십신으로는 '+esc(AX.sipsin)+' · 거리로는 <b class="gold">'+esc(RINGS[ringOf(res.score)].name)+'</b></div>'+
     '</div>'+
     '<p class="tiny" style="margin:0 0 12px">가운데가 '+esc(r.ownerName)+'님, 금색 원이 나입니다. 기운이 잘 맞을수록 안쪽에 자리를 잡습니다.</p>'+
-    '<div class="mapbox" id="rmap"><div class="skel" style="height:300px"></div></div>'+mapLegend()+
+    '<div class="sky"><div class="mapbox" id="rmap"><div class="skel" style="height:300px;opacity:.14"></div></div>'+mapLegend()+'</div>'+
   '</section>'+
 
   '<section class="sec rv">'+
@@ -1564,7 +1558,7 @@ function renderResult(r,code){
     '</div>'+
     '<div class="chips" style="margin-top:10px">'+
       '<span class="chip">일간 관계 '+esc(res.sipsinOut)+'</span>'+
-      (res.cheoneul?'<span class="chip" style="color:#f2dfa5;border-color:rgba(217,180,91,.4)">★ 천을귀인</span>':'')+
+      (res.cheoneul?'<span class="chip" style="color:#a07c1c;border-color:rgba(217,180,91,.4)">★ 천을귀인</span>':'')+
       (res.ganHap?'<span class="chip">천간합</span>':'')+
       (res.ganChung?'<span class="chip">천간충</span>':'')+
       res.branchRels.map(function(x){return '<span class="chip">지지 '+esc(x.label)+' '+esc(x.pairs.join(' '))+'</span>';}).join('')+
@@ -1622,7 +1616,7 @@ function renderVisitorMapOnly(code){
       '<div class="eyebrow">'+esc(j.ownerName)+'님의 인연지도</div>'+
       '<h1 style="font-size:27px">지금까지 '+j.count+'명이<br>별을 남겼습니다</h1>'+
     '</section>'+
-    '<section class="sec fade"><div class="mapbox" id="map"></div>'+mapLegend()+'<div id="selBox"></div></section>'+
+    '<section class="sec fade"><div class="sky"><div class="mapbox" id="map"></div>'+mapLegend()+'</div><div id="selBox"></div></section>'+
     '<section class="sec rv">'+shareBox(code,j.ownerName)+'</section>'+
     '<section class="sec fade"><button class="btn" id="mk">나도 내 인연지도 만들기</button></section>'));
     el('map').innerHTML=starMap(j.entries,j.ownerChar,{});
@@ -1696,7 +1690,7 @@ var MENU=[
   {k:'saju',  ic:'四', c:'#9aa7b8', t:'내 사주팔자', d:'여덟 글자와 오행 분포를 봅니다', go:function(){location.href='/saju'}},
   {k:'life',  ic:'◈', c:'#4ea87a', t:'분야별 풀이', d:'건강 · 재물 · 일 · 사람', go:function(){location.href='/life'}},
   {k:'map',   ic:'✦', c:'#d9b45b', t:'내 인연지도', d:'내 사람들의 별자리', go:function(){goMyMap()}},
-  {k:'about', ic:'?', c:'#7a8b99', t:'어떻게 계산하나요', d:'우리가 쓴 명리 방법 공개', go:function(){location.href='/about'}}
+  {k:'about', ic:'?', c:'#7a8b99', t:'계산 방법', d:'우리가 쓴 명리 방법 공개', go:function(){location.href='/about'}}
 ];
 function goMyMap(){
   var mine=store('inbokdo_mine')||{};
@@ -1705,28 +1699,27 @@ function goMyMap(){
   codes.sort(function(a,c){return mine[c].at-mine[a].at});
   location.href='/m/'+codes[0];
 }
-function openMenu(){
-  var list=el('menuList');
-  list.innerHTML=MENU.map(function(m,i){
-    return '<button class="mrow" data-mi="'+i+'">'+
-      '<span class="ic" style="background:'+m.c+'22;color:'+m.c+'">'+m.ic+'</span>'+
-      '<span style="flex:1;min-width:0"><b>'+esc(m.t)+'</b><i>'+esc(m.d)+'</i></span>'+
-      '<span class="go">›</span></button>';
-  }).join('');
-  el('scrim').classList.add('on');
-  el('sheet').classList.add('on');
+function menuHref(k){
+  return k==='today'?'/today':k==='saju'?'/saju':k==='life'?'/life':k==='about'?'/about':'#';
 }
-function closeMenu(){
-  el('scrim').classList.remove('on');
-  el('sheet').classList.remove('on');
+function buildNav(){
+  var nav=el('nav');if(!nav)return;
+  var cur=BOOT.view||'home';
+  if(cur==='map'){ var mn=store('inbokdo_mine')||{}; if(!mn[BOOT.code])cur=''; }
+  nav.innerHTML='<a class="nv'+(cur==='home'?' on':'')+'" href="/"><span class="i">★</span>홈</a>'+
+    MENU.map(function(m){
+      return '<a class="nv'+(cur===m.k?' on':'')+'" href="'+menuHref(m.k)+'" data-mk="'+m.k+'">'+
+        '<span class="i" style="color:'+m.c+'">'+m.ic+'</span>'+esc(m.t)+'</a>';
+    }).join('');
+  nav.addEventListener('click',function(e){
+    var a=e.target.closest('[data-mk]');if(!a)return;
+    if(a.dataset.mk==='map'){e.preventDefault();tap();goMyMap();}
+  });
+  var on=nav.querySelector('.nv.on');
+  if(on&&on.offsetLeft>90)nav.scrollLeft=on.offsetLeft-70;
 }
-el('menuBtn').onclick=function(){tap();openMenu();};
-el('scrim').onclick=closeMenu;
-el('menuList').addEventListener('click',function(e){
-  var b=e.target.closest('[data-mi]');if(!b)return;
-  tap();closeMenu();MENU[Number(b.dataset.mi)].go();
-});
-document.addEventListener('keydown',function(e){if(e.key==='Escape')closeMenu();});
+function openMenu(){}
+function closeMenu(){}
 
 /* ===== 내 생년월일 기억 ===== */
 function saveBirth(name,birth){ store('inbokdo_birth',{name:name,birth:birth}); }
@@ -1744,8 +1737,8 @@ function viewLogin(next){
       '출석으로 모은 자리도 함께 따라옵니다.</p>'+
     '<div class="card" style="margin-top:26px">'+ssoBtns(next)+
       '<div class="tiny" style="margin-top:14px;line-height:1.65">'+
-      '로그인하면 <a href="/terms" style="color:#8a92a6;text-decoration:underline">이용약관</a>과 '+
-      '<a href="/privacy" style="color:#8a92a6;text-decoration:underline">개인정보처리방침</a>에 동의하는 것으로 봅니다. '+
+      '로그인하면 <a href="/terms" style="color:#7a7365;text-decoration:underline">이용약관</a>과 '+
+      '<a href="/privacy" style="color:#7a7365;text-decoration:underline">개인정보처리방침</a>에 동의하는 것으로 봅니다. '+
       '닉네임과 프로필 사진만 받아오고, 그 외 정보는 가져오지 않습니다.</div>'+
     '</div>'+
     '<button class="btn sec2" id="skip" style="margin-top:14px">로그인 없이 둘러보기</button>'+
@@ -1832,13 +1825,13 @@ function renderToday(j,b){
   '<section class="sec rv"><h2>오늘 챙기면 좋은 것</h2>'+
     '<div class="card" style="display:flex;gap:12px">'+
       '<div style="flex:1;text-align:center"><div class="tiny">색</div>'+
-        '<b style="display:block;font-size:15.5px;margin-top:4px;color:#f2dfa5;letter-spacing:-.03em">'+esc(t.lucky.color)+'</b></div>'+
+        '<b style="display:block;font-size:15.5px;margin-top:4px;color:#a07c1c;letter-spacing:-.03em">'+esc(t.lucky.color)+'</b></div>'+
       '<div style="width:1px;background:var(--line)"></div>'+
       '<div style="flex:1;text-align:center"><div class="tiny">방향</div>'+
-        '<b style="display:block;font-size:15.5px;margin-top:4px;color:#f2dfa5;letter-spacing:-.03em">'+esc(t.lucky.dir)+'</b></div>'+
+        '<b style="display:block;font-size:15.5px;margin-top:4px;color:#a07c1c;letter-spacing:-.03em">'+esc(t.lucky.dir)+'</b></div>'+
       '<div style="width:1px;background:var(--line)"></div>'+
       '<div style="flex:1;text-align:center"><div class="tiny">기운</div>'+
-        '<b style="display:block;font-size:15.5px;margin-top:4px;color:#f2dfa5;letter-spacing:-.03em">'+esc(t.lucky.elem)+'</b></div>'+
+        '<b style="display:block;font-size:15.5px;margin-top:4px;color:#a07c1c;letter-spacing:-.03em">'+esc(t.lucky.elem)+'</b></div>'+
     '</div>'+
     '<p class="tiny" style="margin-top:9px">내 사주에서 가장 얇은 기운을 채우는 쪽입니다.</p>'+
   '</section>'+
@@ -1862,7 +1855,7 @@ function renderSaju(j,b){
   '<section class="sec rv"><div class="gold-sec">'+
     '<div class="eyebrow" style="color:#c9a227">기운의 세기</div>'+
     '<b style="display:block;font-size:21px;font-weight:700;letter-spacing:-.035em;margin-top:8px">'+esc(ba.strength)+'</b>'+
-    '<p style="margin:8px 0 0;font-size:14.5px;color:#cdd3e0;line-height:1.66">'+
+    '<p style="margin:8px 0 0;font-size:14.5px;color:#4a4438;line-height:1.66">'+
       (ba.strength==='신강'?'나를 밀어주는 기운이 두텁습니다. 스스로 밀어붙이는 힘이 있는 대신, 남 말이 잘 안 들어올 수 있습니다.'
        :ba.strength==='신약'?'나를 밀어주는 기운이 얇습니다. 혼자보다 사람을 끼고 가는 쪽이 훨씬 유리합니다.'
        :'한쪽으로 크게 치우치지 않은 편입니다. 상황에 따라 모양이 달라지는 유연한 구조입니다.')+'</p>'+
@@ -1872,7 +1865,7 @@ function renderSaju(j,b){
   '</div></section>'+
   '<div class="rule"></div>'+
   pageFoot('saju')+
-  '<footer>절기 기준으로 년·월주를, 율리우스일 기준으로 일주를, 오자둔으로 시주를 세웠습니다. 자세한 방법은 <a href="/about" style="color:#8a92a6;text-decoration:underline">계산 방법</a>에서 볼 수 있습니다.</footer>'));
+  '<footer>절기 기준으로 년·월주를, 율리우스일 기준으로 일주를, 오자둔으로 시주를 세웠습니다. 자세한 방법은 <a href="/about" style="color:#7a7365;text-decoration:underline">계산 방법</a>에서 볼 수 있습니다.</footer>'));
   reveal(app);window.scrollTo(0,0);
 }
 
@@ -1890,7 +1883,7 @@ function renderLife(j,b){
   '<section class="sec" style="margin-top:22px">'+
     j.areas.areas.map(function(a,i){
       var c=cols[a.key]||'#d9b45b';
-      return '<div class="typecard'+(i?' rv':'')+'" style="--c:'+c+';background:rgba(255,255,255,.035);margin-top:'+(i?10:0)+'px">'+
+      return '<div class="typecard'+(i?' rv':'')+'" style="--c:'+c+';background:#fff;margin-top:'+(i?10:0)+'px">'+
         '<div class="lbl" style="color:'+c+'">'+a.icon+' '+esc(a.title)+'</div>'+
         '<h3 style="font-size:20px;margin-top:6px">'+esc(a.lead)+'</h3>'+
         '<p>'+esc(a.text)+'</p></div>';
@@ -1956,20 +1949,20 @@ function viewAbout(){
     '<div class="gold-sec rv" style="margin-top:16px">'+
       '<div class="eyebrow" style="color:#c9a227">솔직하게</div>'+
       '<b style="display:block;font-size:19px;font-weight:700;letter-spacing:-.035em;margin-top:7px">점수표는 고전에 없습니다</b>'+
-      '<p style="margin:9px 0 0;font-size:14.5px;color:#cdd3e0;line-height:1.7">'+
+      '<p style="margin:9px 0 0;font-size:14.5px;color:#4a4438;line-height:1.7">'+
         '팔자를 세우는 규칙은 전통 그대로이고 검증도 가능합니다. 하지만 <b>정인은 +12점, 충은 −11점</b> 같은 배점은 '+
         '전통 이론을 저희가 숫자로 옮긴 해석입니다. 어느 고서에 적힌 숫자가 아닙니다.</p>'+
-      '<p style="margin:12px 0 0;font-size:14.5px;color:#cdd3e0;line-height:1.7">'+
+      '<p style="margin:12px 0 0;font-size:14.5px;color:#4a4438;line-height:1.7">'+
         '관계 유형 이름(호랑이 선생, 밥친구)과 천간 캐릭터 이름(한낮의 해, 큰 산)도 저희가 지었습니다. '+
         '물상(物象) 비유는 명리학에서 흔히 쓰지만, 그 문구는 저희 글입니다.</p>'+
-      '<p style="margin:12px 0 0;font-size:14.5px;color:#cdd3e0;line-height:1.7">'+
+      '<p style="margin:12px 0 0;font-size:14.5px;color:#4a4438;line-height:1.7">'+
         '<b class="gold">사주로 사람을 판단하지 마세요.</b> 관계를 한 번 돌아보는 계기 정도로만 써주시면 좋겠습니다.</p>'+
     '</div>'+
   '</section>'+
   '<div class="rule"></div>'+
   pageFoot('about')+
-  '<footer><a href="/terms" style="color:#8a92a6;text-decoration:underline">이용약관</a> · '+
-  '<a href="/privacy" style="color:#8a92a6;text-decoration:underline">개인정보처리방침</a></footer>'));
+  '<footer><a href="/terms" style="color:#7a7365;text-decoration:underline">이용약관</a> · '+
+  '<a href="/privacy" style="color:#7a7365;text-decoration:underline">개인정보처리방침</a></footer>'));
   reveal(app);window.scrollTo(0,0);
 }
 
@@ -2003,6 +1996,7 @@ function viewMine(){
     window.scrollTo(0,0);
   });
 }
+buildNav();
 Promise.all([loadMeta(),loadMe()]).then(function(){
   if(BOOT.view==='login')viewLogin();
   else if(BOOT.view==='mine')viewMine();
