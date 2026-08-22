@@ -778,10 +778,15 @@ export default {
     const url = new URL(request.url);
 
     // 옛 주소 → 새 주소 자동 이동.
-    // REDIRECT_TO 환경변수가 있는 워커에서만 동작한다. (없으면 평소대로)
-    // 예) REDIRECT_TO = https://unsejido.koneup.workers.dev
-    if (env.REDIRECT_TO) {
-      const to = String(env.REDIRECT_TO).replace(/\/+$/, '');
+    // 같은 코드가 옛 워커(inbokdo-app)와 새 워커(unsejido) 양쪽에 올라가므로
+    // 호스트 이름으로 스스로 판단한다. REDIRECT_TO 환경변수로 덮어쓸 수 있다.
+    const CANON_HOST = 'unsejido.koneup.workers.dev';
+    const autoRedirect = !env.NO_REDIRECT
+      && url.hostname.endsWith('.workers.dev')
+      && url.hostname !== CANON_HOST;
+    const REDIR = env.REDIRECT_TO || (autoRedirect ? 'https://' + CANON_HOST : '');
+    if (REDIR) {
+      const to = String(REDIR).replace(/\/+$/, '');
       if (!url.href.startsWith(to + '/') && url.origin !== to) {
         const dest = to + url.pathname + url.search;
         const keep = request.method === 'GET' || request.method === 'HEAD';
