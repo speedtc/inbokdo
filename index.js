@@ -2,6 +2,7 @@
 import { computeSaju } from './saju.js';
 import { analyze, TYPES, CHARACTERS, scoreBand, AXES, AXIS_ORDER } from './compat.js';
 import { TOPICS, isTopic, topicsPayload } from './topics.js';
+import { tojeong } from './tojeong.js';
 import { leapMonthOf, lunarMonthLength } from './astro.js';
 import APP_HTML from './app.html';
 import OG_PNG from './og.png';
@@ -435,6 +436,21 @@ async function handleApi(request, env, url) {
     } catch (e) { return bad(e.message || '계산 실패'); }
   }
 
+  // 토정비결
+  if (path === '/api/tojeong' && request.method === 'POST') {
+    const body = await request.json().catch(() => null);
+    if (!body) return bad('요청을 읽을 수 없습니다.');
+    const err = validBirth(body.birth);
+    if (err) return bad(err);
+    const nowY = todayKST().y;
+    let year = parseInt(body.year, 10);
+    if (!Number.isFinite(year) || year < 1950 || year > nowY + 1) year = nowY;
+    try {
+      const s2 = computeSaju(normBirth(body.birth));
+      return json({ char: charPayload(s2.dayStem), saju: sajuPayload(s2), result: tojeong(normBirth(body.birth), year), thisYear: nowY });
+    } catch (e) { return bad(e.message || '계산 실패'); }
+  }
+
   /* ══════════ 재물지도 (분야별 방) ══════════ */
 
   function roomEntryRow(r) {
@@ -704,6 +720,7 @@ export default {
       '/saju': { view: 'saju', title: '내 사주팔자 · 스피드 운세지도', desc: '생년월일시를 여덟 글자로 세우고 오행 분포까지 보여드립니다. 무료입니다.' },
       '/life': { view: 'life', title: '분야별 풀이 · 스피드 운세지도', desc: '건강·재물·일·사람. 내 원국을 네 갈래로 나눠 풀어드립니다. 무료입니다.' },
       '/about': { view: 'about', title: '어떻게 계산하나요 · 스피드 운세지도', desc: '스피드 운세지도가 쓰는 명리학 방법과 천문 계산을 그대로 공개합니다.' },
+      '/tojeong': { view: 'tojeong', title: '토정비결 · 스피드 운세지도', desc: '올해 나의 토정비결을 무료로 봅니다. 괘는 전통 작괘법 그대로 뽑고, 풀이는 우리가 직접 썼습니다.' },
       '/my': { view: 'profile', title: '내 사주 · 스피드 운세지도', desc: '생년월일을 한 번만 넣으면 오늘의 운세·사주팔자·분야별 풀이가 바로 열립니다.' },
       '/wealth': { view: 'roomNew', topic: 'wealth', title: '재물지도 · 스피드 운세지도', desc: '단톡방 사람들의 재물 사주를 한 장의 지도에 모읍니다. 가운데가 財, 안쪽에 있을수록 재물 그릇이 큰 사람입니다. 무료입니다.' },
       '/love': { view: 'roomNew', topic: 'love', title: '연애지도 · 스피드 운세지도', desc: '단톡방에서 누구에게 인연이 먼저 오는지 사주로 봅니다. 애인 유무는 묻지 않습니다. 무료입니다.' },

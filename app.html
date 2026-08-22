@@ -68,6 +68,25 @@ header{position:sticky;top:0;z-index:40;
 .ghost:hover{color:var(--gold2);border-color:rgba(193,154,46,.55)}
 
 /* 별자리 메뉴 */
+/* 토정비결 */
+.gwae{position:relative;border-radius:24px;padding:26px 22px 24px;text-align:center;overflow:hidden;
+  background:radial-gradient(120% 90% at 50% -10%,rgba(217,180,91,.22),transparent 62%),
+    linear-gradient(180deg,#131a2c,#0a0f1c 60%);
+  border:1px solid rgba(217,180,91,.30);box-shadow:0 14px 40px rgba(30,24,8,.2)}
+.gwnum{font-size:12px;font-weight:800;letter-spacing:.24em;color:#8a7c5c}
+.gwname{margin-top:9px;font-size:23px;font-weight:700;letter-spacing:-.03em;color:#f2dfa5}
+.gwverse{margin-top:16px;padding-top:15px;border-top:1px solid rgba(217,180,91,.22);
+  display:flex;flex-direction:column;gap:7px}
+.gwverse div{font-size:14.5px;line-height:1.65;color:#dfe4ee;letter-spacing:-.02em}
+.gwverse div:nth-child(odd){color:#c1c9d8}
+.mlist{display:flex;flex-direction:column;gap:7px}
+.mrow2{display:grid;grid-template-columns:40px 36px auto;gap:3px 9px;align-items:baseline;
+  background:#fff;border:1px solid var(--line);border-radius:14px;padding:11px 13px;
+  box-shadow:0 1px 2px rgba(70,56,20,.04)}
+.mrow2 .mm{font-size:14px;font-weight:800;letter-spacing:-.03em;color:#231f18}
+.mrow2 .mgz{font-size:12.5px;color:var(--dim2)}
+.mrow2 .mtag{font-size:12px;font-weight:700}
+.mrow2 .mtx{grid-column:1/-1;font-size:13.5px;line-height:1.6;color:#4a4438;margin-top:3px}
 .navsky{max-width:540px;margin:0 auto;padding:14px 20px 2px;position:relative}
 .navsky::before{content:'';position:absolute;inset:0;pointer-events:none;
   background:radial-gradient(58% 68% at 50% 38%,rgba(217,180,91,.13),transparent 70%)}
@@ -799,6 +818,9 @@ var PAGE_SHARE={
   work:{path:'/work', label:'일운지도', line:'우리 방에서 누가 제일 크게 될까',
     t:'일운지도 · 스피드 운세지도',
     d:'누가 크게 쓰일 사람인지 사주로 봐요. 직업도 연봉도 안 물어봄. 무료.', cta:'일운지도 만들기'},
+  tojeong:{path:'/tojeong', label:'토정비결', line:'토정비결도 돈 안 내고 봅니다',
+    t:'토정비결 · 스피드 운세지도',
+    d:'올해 내 괘를 무료로 뽑아요. 괘는 전통 작괘법 그대로. 가입도 결제도 없음.', cta:'내 토정비결 보기'},
   home:{path:'/', label:'운세지도', line:'모든 메뉴가 무료입니다',
     t:'스피드 운세지도',
     d:'사주팔자 · 오늘의 운세 · 인연지도 · 재물지도, 모든 메뉴가 무료입니다.', cta:'인연지도 열기'}
@@ -1734,6 +1756,82 @@ function renderVisitorMapOnly(code){
   });
 }
 
+/* ═════════ 토정비결 ═════════ */
+function viewTojeong(){
+  var b=getBirth();
+  if(!b||!b.birth) return askBirth({
+    eyebrow:'토정비결',
+    title:'먼저 생년월일을<br>알려주세요',
+    lead:'한 번만 넣으면 이 기기에 저장돼서 <b>모든 메뉴가 그대로 열립니다.</b> 서버에 따로 저장하지 않습니다.',
+    cta:'토정비결 보기',
+    done:function(){viewTojeong();}
+  });
+  app.innerHTML='<div class="skel" style="height:40px;width:55%;margin-top:34px"></div>'+
+    '<div class="skel" style="height:260px;margin-top:20px"></div>';
+  api('/api/tojeong',{method:'POST',body:JSON.stringify({birth:b.birth})})
+    .then(function(j){ renderTojeong(j,b); })
+    .catch(function(e){
+      app.innerHTML='<section class="center" style="padding-top:60px"><h1 style="font-size:24px">'+esc(e.message)+'</h1>'+
+        '<button class="btn" style="margin-top:20px" onclick="location.href=\'/\'">홈으로</button></section>';
+    });
+}
+function renderTojeong(j,b){
+  var r=j.result, ch=charBy(j.char.key);
+  app.innerHTML='';
+  app.appendChild(h(
+  '<section class="fade" style="padding-top:30px">'+
+    '<div class="eyebrow">'+r.year+'년 토정비결 · '+esc(r.taese)+'년</div>'+
+    '<h1 style="font-size:31px">'+esc(r.head)+'</h1>'+
+    '<p class="lead" style="font-size:15px">'+esc(b.name||'내')+'님 · 세는나이 '+r.age+'세 · '+
+      '음력 '+r.lunar.m+'월 '+r.lunar.d+'일'+(r.lunar.leap?' (윤달)':'')+'</p>'+
+  '</section>'+
+
+  '<section class="sec fade" style="margin-top:22px">'+
+    '<div class="gwae">'+
+      '<div class="gwnum">第 '+r.gwae.num+' 卦</div>'+
+      '<div class="gwname">'+esc(r.name)+'</div>'+
+      '<div class="gwverse">'+r.verse.map(function(v){return '<div>'+esc(v)+'</div>';}).join('')+'</div>'+
+    '</div>'+
+  '</section>'+
+
+  '<section class="sec fade" style="margin-top:18px">'+
+    '<div class="card"><h2 style="font-size:19px">올 한 해</h2>'+
+      '<p style="margin:0;font-size:15px;line-height:1.8;color:#4a4438">'+esc(r.body)+'</p>'+
+      '<hr class="d">'+
+      '<div class="note"><div class="ic">◈</div><div><b>때</b><span>'+esc(r.when)+'</span></div></div>'+
+      '<div class="note"><div class="ic">◈</div><div><b>이 해의 결</b><span>'+esc(r.cross)+'</span></div></div>'+
+      '<div class="note"><div class="ic">◈</div><div><b>새겨둘 것</b><span>'+esc(r.advice)+'</span></div></div>'+
+    '</div>'+
+  '</section>'+
+
+  '<section class="sec rv">'+
+    '<h2>달마다 어떤가</h2>'+
+    '<p class="tiny" style="margin:-8px 0 12px">그 달의 월건(月建)과 내 일간을 견줘 냈습니다.</p>'+
+    '<div class="mlist">'+r.months.map(function(m){
+      return '<div class="mrow2"><span class="mm">'+m.m+'월</span>'+
+        '<span class="mgz">'+esc(m.gz)+'</span>'+
+        '<span class="mtag" style="color:'+scColor(m.tone)+'">'+esc(m.sipsin)+'</span>'+
+        '<span class="mtx">'+esc(m.text)+'</span></div>';
+    }).join('')+'</div>'+
+  '</section>'+
+
+  '<section class="sec rv"><div class="card">'+
+    '<div class="eyebrow" style="color:#c9a227">솔직하게</div>'+
+    '<b style="display:block;font-size:17px;font-weight:700;margin-top:7px;letter-spacing:-.03em">괘는 전통, 문장은 우리 글입니다</b>'+
+    '<p style="margin:8px 0 0;font-size:14px;color:#4a4438;line-height:1.7">'+
+      '상괘·중괘·하괘를 뽑는 방법은 전통 작괘법 그대로입니다. 다만 <b>괘사 문장은 저희가 직접 썼습니다.</b> '+
+      '시중 책이나 사이트의 번역문을 옮겨 쓰지 않았습니다. 계산 방법은 '+
+      '<a href="/about" style="color:#a07c1c;text-decoration:underline">계산 방법</a> 페이지에 공개해 두었습니다.</p>'+
+  '</div></section>'+
+
+  '<section class="sec fade"><h2>내 사주</h2>'+sajuCard(j.saju,ch)+'</section>'+
+  '<section class="sec rv">'+pageShareBox('tojeong')+'</section>'+
+  '<section class="sec rv">'+adBox()+'</section>'+
+  pageFoot('tojeong')+
+  '<footer>토정비결은 한 해의 결을 보는 옛 방식입니다. 재미와 참고로만 봐주세요.</footer>'));
+  reveal(app);window.scrollTo(0,0);
+}
+
 /* ═════════ 분야별 지도 (재물 · 연애 · 일) ═════════ */
 var ROOM=null, WSEL=null;
 function TP(k){ return (TOPICS&&TOPICS[k])||(TOPICS&&TOPICS.wealth); }
@@ -2106,6 +2204,7 @@ function updateNav(){
 /* ===== 메뉴 ===== */
 var MENU=[
   {k:'today', ic:'☀', c:'#e8a33b', t:'오늘의 운세', d:'오늘 일진과 내 사주를 견줍니다', go:function(){location.href='/today'}},
+  {k:'tojeong',ic:'卦', c:'#b8746e', t:'토정비결', d:'올해 내 괘를 뽑습니다', go:function(){location.href='/tojeong'}},
   {k:'saju',  ic:'四', c:'#9aa7b8', t:'내 사주팔자', d:'여덟 글자와 오행 분포를 봅니다', go:function(){location.href='/saju'}},
   {k:'life',  ic:'◈', c:'#4ea87a', t:'분야별 풀이', d:'건강 · 재물 · 일 · 사람', go:function(){location.href='/life'}},
   {k:'map',   ic:'✦', c:'#d9b45b', t:'내 인연지도', d:'내 사람들의 별자리', go:function(){goMyMap()}},
@@ -2123,22 +2222,23 @@ function goMyMap(){
   location.href='/m/'+codes[0];
 }
 function menuHref(k){
-  return k==='today'?'/today':k==='saju'?'/saju':k==='life'?'/life':k==='about'?'/about':k==='profile'?'/my':k==='wealth'?'/wealth':k==='love'?'/love':k==='work'?'/work':'#';
+  return k==='today'?'/today':k==='saju'?'/saju':k==='life'?'/life':k==='about'?'/about':k==='profile'?'/my':k==='wealth'?'/wealth':k==='love'?'/love':k==='work'?'/work':k==='tojeong'?'/tojeong':'#';
 }
 /* 본문 상단 별자리 메뉴 — 여덟 개 별을 눌러 이동한다 */
 var NAVSKY=[
-  {k:'map',     t:'내 인연지도', x: 60, y: 44, r:6.4, badge:'추천'},
-  {k:'wealth',  t:'재물지도',   x:176, y: 30, r:6.0},
+  {k:'map',     t:'내 인연지도', x: 60, y: 42, r:6.4, badge:'추천'},
+  {k:'wealth',  t:'재물지도',   x:178, y: 28, r:6.0},
   {k:'today',   t:'오늘의 운세', x:298, y: 44, r:6.0},
-  {k:'love',    t:'연애지도',   x:110, y:104, r:5.6},
-  {k:'work',    t:'일운지도',   x:232, y: 98, r:5.6},
-  {k:'saju',    t:'사주팔자',   x: 40, y:154, r:4.4},
-  {k:'life',    t:'분야별 풀이', x:170, y:162, r:4.4},
-  {k:'about',   t:'계산 방법',  x:308, y:152, r:3.9},
-  {k:'profile', t:'내 사주',    x:250, y:200, r:3.9},
-  {k:'home',    t:'홈',        x: 96, y:212, r:3.9}
+  {k:'love',    t:'연애지도',   x:108, y:100, r:5.6},
+  {k:'work',    t:'일운지도',   x:232, y: 96, r:5.6},
+  {k:'tojeong', t:'토정비결',   x: 42, y:158, r:5.6, badge:'NEW'},
+  {k:'saju',    t:'사주팔자',   x:166, y:158, r:4.4},
+  {k:'life',    t:'분야별 풀이', x:294, y:150, r:4.4},
+  {k:'profile', t:'내 사주',    x:104, y:212, r:3.9},
+  {k:'about',   t:'계산 방법',  x:236, y:212, r:3.9},
+  {k:'home',    t:'홈',        x: 30, y:104, r:3.9}
 ];
-var NAVLINE=[[0,1],[1,2],[0,3],[3,4],[4,1],[3,5],[3,6],[4,6],[4,7],[7,8],[6,8],[5,9],[6,9]];
+var NAVLINE=[[0,1],[1,2],[0,3],[3,4],[4,1],[2,4],[3,6],[4,7],[5,6],[6,7],[5,8],[8,6],[6,9],[9,7],[10,0],[10,5]];
 function buildNav(){
   var box=el('navsky');if(!box)return;
   var cur=BOOT.view||'home';
@@ -2147,7 +2247,7 @@ function buildNav(){
   if(cur==='roomNew')cur=(BOOT.topic||'wealth');
 
   var P={};NAVSKY.forEach(function(n){P[n.k]=n;});
-  var g='<svg viewBox="0 0 360 232" role="navigation" aria-label="주요 메뉴">';
+  var g='<svg viewBox="0 0 360 240" role="navigation" aria-label="주요 메뉴">';
   NAVLINE.forEach(function(L){
     var a=NAVSKY[L[0]],b=NAVSKY[L[1]];
     g+='<line class="nvsline" x1="'+a.x+'" y1="'+a.y+'" x2="'+b.x+'" y2="'+b.y+'"/>';
@@ -2524,6 +2624,19 @@ function viewAbout(){
       ['금액은 묻지 않습니다','연봉·자산 같은 숫자는 입력받지 않습니다. 거리는 오직 사주로만 정해집니다.']
     ],'재물운은 타고난 그릇을 보는 것이지 지금 통장 잔고가 아닙니다. 투자 판단의 근거로 쓰지 마세요.')+
 
+    blk('6','토정비결은 이렇게 뽑습니다',[
+      ['작괘는 전통 그대로','세는나이와 그 해 태세, 태어난 달의 월건과 그 음력 달의 일수, 태어난 날의 일진과 음력 생일을 써서 상괘(8) · 중괘(6) · 하괘(3)를 뽑습니다. 8×6×3 = <b>144괘</b>입니다.'],
+      ['쓴 식','상괘 = (태세수+나이)를 8로 나눈 나머지, 중괘 = (월건수+월대소)를 6으로, 하괘 = (일진수+음력 생일)을 3으로 나눈 나머지. 나머지가 0이면 각각 8·6·3으로 봅니다.'],
+      ['괘사는 우리 글','<b>144괘의 문장은 저희가 직접 썼습니다.</b> 시중 책이나 사이트의 번역문을 옮겨 쓰지 않았습니다. 상괘의 물상(하늘·못·불·우레·바람·물·산·땅), 중괘의 때, 하괘의 맺음을 엮어 문장을 만듭니다.'],
+      ['월별 운세','전통 월괘사 대신, 그 달의 월건(月建)과 내 일간의 십신 관계로 냅니다. 사람마다 열두 달이 다르게 나옵니다.']
+    ],'토정비결은 조선 후기부터 널리 읽힌 방식입니다. 사주 명리와는 계산 체계가 다릅니다.')+
+
+    blk('7','연애·일운 지도에서 성별을 안 묻는 이유',[
+      ['전통은 남녀를 나눕니다','명리에서 남자의 처는 재성, 여자의 남편은 관성으로 봅니다. 원래는 성별에 따라 보는 자리가 다릅니다.'],
+      ['그래도 안 묻습니다','성별을 입력받는 순간 참여 문턱이 올라가고, 저희가 들고 있어야 할 개인정보도 늘어납니다. 그래서 <b>재성과 관성을 합쳐 배우자성</b>으로 보는 성별 중립 방식을 씁니다.'],
+      ['대신 이런 걸 봅니다','배우자궁인 일지(日支)의 상태, 도화살과 홍염살, 지지의 합과 충, 표현력(식상)을 함께 봅니다.']
+    ],'성별을 나눠 보는 전통 방식보다 정밀도가 조금 떨어집니다. 이 점을 감추지 않겠습니다.')+
+
     '<div class="gold-sec rv" style="margin-top:16px">'+
       '<div class="eyebrow" style="color:#c9a227">솔직하게</div>'+
       '<b style="display:block;font-size:19px;font-weight:700;letter-spacing:-.035em;margin-top:7px">점수표는 고전에 없습니다</b>'+
@@ -2583,6 +2696,7 @@ Promise.all([loadMeta(),loadMe()]).then(function(){
   else if(BOOT.view==='mine')viewMine();
   else if(BOOT.view==='about')viewAbout();
   else if(BOOT.view==='profile')viewProfile();
+  else if(BOOT.view==='tojeong')viewTojeong();
   else if(BOOT.view==='roomNew')viewRoomNew(BOOT.topic||'wealth');
   else if(BOOT.view==='room')viewRoom(BOOT.code);
   else if(BOOT.view==='today'||BOOT.view==='saju'||BOOT.view==='life')fortunePage(BOOT.view);
