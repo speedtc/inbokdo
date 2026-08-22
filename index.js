@@ -1,7 +1,7 @@
 // index.js — 인연지도 Cloudflare Worker
 import { computeSaju } from './saju.js';
-import { analyze, TYPES, CHARACTERS, scoreBand, AXES, AXIS_ORDER } from './compat.js';
-import { TOPICS, isTopic, topicsPayload } from './topics.js';
+import { analyze, relDeep, TYPES, CHARACTERS, scoreBand, AXES, AXIS_ORDER } from './compat.js';
+import { TOPICS, isTopic, topicsPayload, topicYear, topicActions } from './topics.js';
 import { tojeong } from './tojeong.js';
 import { deepSaju, extendDeep } from './deep.js';
 import { leapMonthOf, lunarMonthLength } from './astro.js';
@@ -375,6 +375,7 @@ async function handleApi(request, env, url) {
       ownerChar: charPayload(row.day_stem),
       me: { name, char: charPayload(B.dayStem), saju: sajuPayload(B) },
       result: res,
+      deep: relDeep(A, B, res),
       rank: rank.r, total,
     });
   }
@@ -391,12 +392,17 @@ async function handleApi(request, env, url) {
       `SELECT COUNT(*) + 1 AS r FROM entries WHERE code = ? AND (score > ? OR (score = ? AND id < ?))`
     ).bind(code, row.score, row.score, row.id).first();
     const total = await db.prepare(`SELECT COUNT(*) AS n FROM entries WHERE code = ?`).bind(code).first();
+    const mapRow = await db.prepare(`SELECT saju_json FROM maps WHERE code = ?`).bind(code).first();
+    const resJ = JSON.parse(row.result_json);
+    let deep = null;
+    try { deep = relDeep(JSON.parse(mapRow.saju_json), JSON.parse(row.saju_json), resJ); } catch (e) { deep = null; }
     return json({
       entryId: row.id, token,
       ownerName: map.owner_name,
       ownerChar: charPayload(map.day_stem),
       me: { name: row.name, char: charPayload(row.day_stem), saju: sajuPayload(JSON.parse(row.saju_json)) },
-      result: JSON.parse(row.result_json),
+      result: resJ,
+      deep,
       rank: rank.r, total: total.n,
     });
   }
@@ -609,6 +615,8 @@ async function handleApi(request, env, url) {
       entryId: id, entryToken: token,
       me: { name, char: charPayload(saju.dayStem), saju: sajuPayload(saju) },
       result: res, rank: rank.r, total: cnt.n + 1,
+      year: topicYear(saju, topic, todayKST().y),
+      actions: topicActions(topic, res.band),
     });
   }
 
@@ -629,6 +637,8 @@ async function handleApi(request, env, url) {
       entryId: row.id, entryToken: token,
       me: { name: row.name, char: charPayload(row.day_stem), saju: sajuPayload(JSON.parse(row.saju_json)) },
       result: JSON.parse(row.result_json), rank: rank.r, total: total.n,
+      year: topicYear(JSON.parse(row.saju_json), (room && isTopic(room.topic)) ? room.topic : 'wealth', todayKST().y),
+      actions: topicActions((room && isTopic(room.topic)) ? room.topic : 'wealth', JSON.parse(row.result_json).band),
     });
   }
 
