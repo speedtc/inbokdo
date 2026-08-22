@@ -776,6 +776,22 @@ function renderPage(meta) {
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
+
+    // 옛 주소 → 새 주소 자동 이동.
+    // REDIRECT_TO 환경변수가 있는 워커에서만 동작한다. (없으면 평소대로)
+    // 예) REDIRECT_TO = https://unsejido.koneup.workers.dev
+    if (env.REDIRECT_TO) {
+      const to = String(env.REDIRECT_TO).replace(/\/+$/, '');
+      if (!url.href.startsWith(to + '/') && url.origin !== to) {
+        const dest = to + url.pathname + url.search;
+        const keep = request.method === 'GET' || request.method === 'HEAD';
+        return new Response(null, {
+          status: keep ? 301 : 308,
+          headers: { location: dest, 'cache-control': 'no-store' },
+        });
+      }
+    }
+
     const origin = url.origin;
 
     if (url.pathname.startsWith('/auth/')) {
