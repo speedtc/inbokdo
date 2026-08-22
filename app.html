@@ -69,6 +69,23 @@ header{position:sticky;top:0;z-index:40;
 .nav{position:relative;max-width:540px;margin:0 auto;padding:0 22px 11px;display:flex;gap:7px;
   overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
 .nav::-webkit-scrollbar{display:none}
+/* 상단 내 사주 + 방문 통계 */
+.subbar{border-bottom:1px solid rgba(150,120,40,.13);background:linear-gradient(180deg,rgba(255,253,247,.9),rgba(251,247,236,.6))}
+.sbin{max-width:540px;margin:0 auto;padding:8px 22px;display:flex;align-items:center;gap:10px}
+.biochip{display:inline-flex;align-items:center;gap:7px;padding:4px 11px 4px 5px;border-radius:999px;
+  font-size:12.5px;font-weight:600;letter-spacing:-.02em;color:#5f5849;white-space:nowrap;max-width:62%;
+  background:#fff;border:1px solid rgba(60,48,16,.13);box-shadow:0 1px 2px rgba(70,56,20,.04);
+  transition:transform .25s var(--spring),border-color .18s}
+.biochip:active{transform:scale(.96)}
+.biochip .bh{width:21px;height:21px;flex:0 0 21px;border-radius:7px;display:grid;place-items:center;
+  font-size:11.5px;font-weight:700;line-height:1}
+.biochip .bn{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.biochip .bg{color:var(--dim2);font-weight:500;font-size:11.5px}
+.biochip.empty{border-color:rgba(193,154,46,.5);background:linear-gradient(180deg,#fdf6e2,#fffdf7);color:#8a6a10;
+  padding:5px 13px;font-weight:700}
+.hstat{margin-left:auto;display:flex;gap:11px;font-size:11.5px;color:var(--dim2);letter-spacing:-.02em;white-space:nowrap}
+.hstat b{font-weight:700;color:var(--gold2);font-variant-numeric:tabular-nums}
+@media(max-width:379px){ .logo span{display:none} .hstat{gap:8px} }
 .nv{flex:0 0 auto;display:inline-flex;align-items:center;gap:6px;padding:8px 13px;border-radius:999px;
   font-size:13.5px;font-weight:600;letter-spacing:-.022em;color:#6b6455;white-space:nowrap;
   background:#fff;border:1px solid rgba(60,48,16,.13);
@@ -333,6 +350,10 @@ footer{margin-top:56px;padding-top:22px;border-top:1px solid var(--line);color:v
   </div>
   <nav class="nav" id="nav" aria-label="주요 메뉴"></nav>
 </header>
+<div class="subbar"><div class="sbin">
+  <button class="biochip" id="bioBtn" type="button"></button>
+  <div class="hstat" id="hstat"><span>오늘 <b>—</b></span><span>누적 <b>—</b></span></div>
+</div></div>
 
 <main class="wrap" id="app"></main>
 <div class="dock" id="dock"><div class="in"></div></div>
@@ -951,7 +972,7 @@ function viewCreate(){
   bindSso(app);
   bindForm(el('fw'),function(data,done){
     if(REF)data.ref=REF;
-    saveBirth(data.name,data.birth);
+    saveBirth(data.name,data.birth);paintBio();
     api('/api/maps',{method:'POST',body:JSON.stringify(data)}).then(function(j){
       try{sessionStorage.removeItem('inbokdo_ref')}catch(e){}
       var mine=store('inbokdo_mine')||{};
@@ -1474,7 +1495,7 @@ function renderVisitor(j){
   },'#fw');
   reveal(app);
   bindForm(el('fw'),function(data,done){
-    saveBirth(data.name,data.birth);
+    saveBirth(data.name,data.birth);paintBio();
     api('/api/maps/'+j.code+'/join',{method:'POST',body:JSON.stringify(data)}).then(function(r){
       var jd=store('inbokdo_joined')||{};
       jd[j.code]={id:r.entryId,token:r.token,name:data.name};
@@ -1690,7 +1711,8 @@ var MENU=[
   {k:'saju',  ic:'四', c:'#9aa7b8', t:'내 사주팔자', d:'여덟 글자와 오행 분포를 봅니다', go:function(){location.href='/saju'}},
   {k:'life',  ic:'◈', c:'#4ea87a', t:'분야별 풀이', d:'건강 · 재물 · 일 · 사람', go:function(){location.href='/life'}},
   {k:'map',   ic:'✦', c:'#d9b45b', t:'내 인연지도', d:'내 사람들의 별자리', go:function(){goMyMap()}},
-  {k:'about', ic:'?', c:'#7a8b99', t:'계산 방법', d:'우리가 쓴 명리 방법 공개', go:function(){location.href='/about'}}
+  {k:'about', ic:'?', c:'#7a8b99', t:'계산 방법', d:'우리가 쓴 명리 방법 공개', go:function(){location.href='/about'}},
+  {k:'profile', ic:'●', c:'#c19a2e', t:'내 사주', d:'한 번만 넣으면 계속 쓰입니다', go:function(){location.href='/my'}}
 ];
 function goMyMap(){
   var mine=store('inbokdo_mine')||{};
@@ -1700,7 +1722,7 @@ function goMyMap(){
   location.href='/m/'+codes[0];
 }
 function menuHref(k){
-  return k==='today'?'/today':k==='saju'?'/saju':k==='life'?'/life':k==='about'?'/about':'#';
+  return k==='today'?'/today':k==='saju'?'/saju':k==='life'?'/life':k==='about'?'/about':k==='profile'?'/my':'#';
 }
 function buildNav(){
   var nav=el('nav');if(!nav)return;
@@ -1726,6 +1748,94 @@ function closeMenu(){}
 
 /* ===== 내 생년월일 기억 ===== */
 function saveBirth(name,birth){ store('inbokdo_birth',{name:name,birth:birth}); }
+function clearBirth(){ try{localStorage.removeItem('inbokdo_birth')}catch(e){} }
+function birthText(b){
+  if(!b||!b.birth)return '';
+  var d=b.birth;
+  return d.y+'.'+d.m+'.'+d.d+(d.lunar?' 음력':'')+(d.unknownTime?' · 시간 모름':' · '+String(d.hour).padStart(2,'0')+':'+String(d.minute||0).padStart(2,'0'));
+}
+/* 상단 내 사주 칩 */
+function paintBio(){
+  var el2=el('bioBtn');if(!el2)return;
+  var b=getBirth();
+  if(!b||!b.birth){
+    el2.className='biochip empty';
+    el2.innerHTML='＋ 내 사주 등록 (한 번만)';
+    el2.onclick=function(){tap();viewProfile();history.pushState({},'','/my');};
+    return;
+  }
+  el2.className='biochip';
+  var c=b.charKey?charBy(b.charKey):null;
+  el2.innerHTML='<span class="bh" style="background:'+((c&&c.color)||'#c19a2e')+'1f;color:'+((c&&c.color)||'#a07c1c')+'">'+
+      esc((c&&c.han)||'★')+'</span>'+
+    '<span class="bn">'+esc(b.name||'내 사주')+'</span>'+
+    '<span class="bg">'+esc(b.birth.y)+'</span>';
+  el2.onclick=function(){tap();viewProfile();history.pushState({},'','/my');};
+}
+/* 상단 방문 통계 */
+function paintStat(){
+  var box=el('hstat');if(!box)return;
+  api('/api/stats').then(function(st){
+    var n=function(v){return Number(v||0).toLocaleString('ko-KR')};
+    box.innerHTML='<span>오늘 <b>'+n(st.today)+'</b></span><span>누적 <b>'+n(st.total)+'</b></span>';
+  }).catch(function(){});
+}
+/* 내 사주 화면 */
+function viewProfile(){
+  setDock(null);
+  var b=getBirth();
+  app.innerHTML='';
+  var head='<section class="fade" style="padding-top:30px">'+
+    '<div class="eyebrow">내 사주</div>'+
+    '<h1 style="font-size:30px">'+(b&&b.birth?'등록되어 있습니다':'한 번만<br>넣으면 끝입니다')+'</h1>'+
+    '<p class="lead" style="font-size:15px">'+
+      (b&&b.birth
+        ? '이 생년월일로 <b>오늘의 운세 · 내 사주팔자 · 분야별 풀이</b>가 바로 열립니다. 이 기기에만 저장되고 서버에는 남기지 않습니다.'
+        : '한 번 넣어두면 <b>오늘의 운세 · 내 사주팔자 · 분야별 풀이</b>를 매번 다시 입력하지 않아도 됩니다. 이 기기에만 저장되고 서버에는 남기지 않습니다.')+
+    '</p>'+
+  '</section>';
+  var body='';
+  if(b&&b.birth){
+    body+='<section class="sec fade" style="margin-top:24px">'+
+      '<div class="card" id="pcard"><div class="skel" style="height:120px"></div></div>'+
+      '<div class="plist" style="margin-top:14px">'+
+        '<a class="prow" href="/today"><span class="av" style="background:#e8a33b22;color:#e8a33b">☀</span>'+
+          '<span class="nm"><b>오늘의 운세</b><i>오늘 일진과 내 사주를 견줍니다</i></span><span class="tiny">›</span></a>'+
+        '<a class="prow" href="/saju"><span class="av" style="background:#9aa7b822;color:#7a8b99">四</span>'+
+          '<span class="nm"><b>내 사주팔자</b><i>여덟 글자와 오행 분포</i></span><span class="tiny">›</span></a>'+
+        '<a class="prow" href="/life"><span class="av" style="background:#4ea87a22;color:#4ea87a">◈</span>'+
+          '<span class="nm"><b>분야별 풀이</b><i>건강 · 재물 · 일 · 사람</i></span><span class="tiny">›</span></a>'+
+      '</div>'+
+      '<button class="btn sec2" id="chg" style="margin-top:18px">생년월일 바꾸기</button>'+
+      '<button class="btn sec2" id="del" style="margin-top:9px">이 기기에서 지우기</button>'+
+    '</section>';
+  }
+  body+='<section class="sec '+(b&&b.birth?'rv':'fade')+'" id="formSec"'+(b&&b.birth?' hidden':'')+'>'+
+    (b&&b.birth?'<h2>생년월일 바꾸기</h2>':'')+
+    '<div class="card" id="fw">'+formHTML({cta:b&&b.birth?'바꾸기':'등록하고 시작하기'})+'</div>'+
+  '</section>';
+  app.appendChild(h(head+body+
+    '<footer>생년월일은 이 브라우저에만 저장됩니다. 지도에 참여할 때를 빼면 서버로 보내지 않습니다.</footer>'));
+
+  if(b&&b.birth){
+    api('/api/fortune',{method:'POST',body:JSON.stringify({birth:b.birth})}).then(function(j){
+      var c=charBy(j.char.key);
+      if(!b.charKey){ var nb=getBirth()||{}; nb.charKey=j.char.key; store('inbokdo_birth',nb); paintBio(); }
+      var wrap=el('pcard');if(!wrap)return;
+      wrap.outerHTML='<div id="pcard">'+
+        '<div class="tiny" style="margin:0 0 8px 2px">'+esc(b.name||'나')+'님 · '+esc(birthText(b))+'</div>'+
+        sajuCard(j.saju,c)+'</div>';
+    }).catch(function(){ var box=el('pcard'); if(box)box.innerHTML='<div class="tiny">사주를 불러오지 못했습니다.</div>'; });
+    el('chg').onclick=function(){tap();var f=el('formSec');f.hidden=false;f.scrollIntoView({behavior:'smooth',block:'center'});};
+    el('del').onclick=function(){tap();clearBirth();paintBio();viewProfile();};
+  }
+  bindForm(el('fw'),function(data,done){
+    saveBirth(data.name,data.birth);paintBio();
+    if(done)done();
+    location.href='/today';
+  });
+  window.scrollTo(0,0);
+}
 function getBirth(){ return store('inbokdo_birth'); }
 
 /* ===== 화면: 로그인 ===== */
@@ -1763,7 +1873,7 @@ function askBirth(opt){
     '<div class="card" style="margin-top:22px" id="fw">'+formHTML({cta:opt.cta||'보기'})+'</div>'+
   '</section>'));
   bindForm(el('fw'),function(data,done){
-    saveBirth(data.name,data.birth);
+    saveBirth(data.name,data.birth);paintBio();
     opt.done(data);
   });
   window.scrollTo(0,0);
@@ -1781,6 +1891,7 @@ function fortunePage(view){
     '<div class="skel" style="height:240px;margin-top:20px"></div>';
   api('/api/fortune',{method:'POST',body:JSON.stringify({birth:b.birth})})
     .then(function(j){
+      if(j.char&&b.charKey!==j.char.key){ b.charKey=j.char.key; store('inbokdo_birth',b); paintBio(); }
       if(view==='today')renderToday(j,b);
       else if(view==='saju')renderSaju(j,b);
       else renderLife(j,b);
@@ -1999,11 +2110,13 @@ function viewMine(){
     window.scrollTo(0,0);
   });
 }
-buildNav();
+buildNav();paintStat();
 Promise.all([loadMeta(),loadMe()]).then(function(){
+  paintBio();
   if(BOOT.view==='login')viewLogin();
   else if(BOOT.view==='mine')viewMine();
   else if(BOOT.view==='about')viewAbout();
+  else if(BOOT.view==='profile')viewProfile();
   else if(BOOT.view==='today'||BOOT.view==='saju'||BOOT.view==='life')fortunePage(BOOT.view);
   else if(BOOT.view==='map')viewMap(BOOT.code);
   else if(BOOT.view==='notfound'){

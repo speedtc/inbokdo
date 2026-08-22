@@ -1,5 +1,5 @@
 // legal.js — 이용약관 / 개인정보처리방침
-// CONTACT_EMAIL 환경변수로 문의처를 바꿀 수 있습니다.
+// 문의는 카카오톡 오픈채팅. CONTACT_KAKAO 환경변수로 바꿀 수 있습니다.
 
 const SHELL = (title, body) => `<!DOCTYPE html>
 <html lang="ko"><head>
@@ -34,7 +34,8 @@ footer{margin-top:56px;padding-top:20px;border-top:1px solid rgba(255,255,255,.0
 <footer>인연지도 因緣地圖</footer></div></body></html>`;
 
 export function privacyPage(env) {
-  const email = env.CONTACT_EMAIL || '(문의 이메일을 설정해 주세요)';
+  const kakao = env.CONTACT_KAKAO || 'https://open.kakao.com/me/speedtc';
+  const contact = `<a href="${kakao}" target="_blank" rel="noopener">카카오톡 오픈채팅으로 문의하기</a>`;
   const updated = env.POLICY_DATE || '2026-08-20';
   return SHELL('개인정보처리방침', `
 <h1>개인정보처리방침</h1>
@@ -91,13 +92,15 @@ export function privacyPage(env) {
 <p>로그인 상태 유지를 위해 필수 쿠키만 사용하며, 광고나 행태정보 수집 목적의 쿠키는 사용하지 않습니다.</p>
 
 <h2>10. 개인정보 보호책임자</h2>
-<p>문의: ${email}</p>
+<p>후원·광고 문의 및 프로그램 사용 문의는 아래로 주세요.</p>
+<p>${contact}</p>
 <p class="date">본 방침이 변경되는 경우 서비스 내 공지를 통해 알려드립니다.</p>
 `);
 }
 
 export function termsPage(env) {
-  const email = env.CONTACT_EMAIL || '(문의 이메일을 설정해 주세요)';
+  const kakao = env.CONTACT_KAKAO || 'https://open.kakao.com/me/speedtc';
+  const contact = `<a href="${kakao}" target="_blank" rel="noopener">카카오톡 오픈채팅으로 문의하기</a>`;
   const updated = env.POLICY_DATE || '2026-08-20';
   return SHELL('이용약관', `
 <h1>이용약관</h1>
@@ -141,6 +144,7 @@ export function termsPage(env) {
 <p>이 약관은 대한민국 법령에 따라 해석되며, 분쟁이 발생한 경우 민사소송법상의 관할 법원에 제소합니다.</p>
 
 <h2>제9조 (문의)</h2>
-<p>${email}</p>
+<p>후원·광고 문의 및 프로그램 사용 문의는 아래로 주세요.</p>
+<p>${contact}</p>
 `);
 }

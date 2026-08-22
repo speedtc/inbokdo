@@ -620,6 +620,7 @@ export default {
       '/saju': { view: 'saju', title: '내 사주팔자 · 인연지도', desc: '생년월일시를 여덟 글자로 세우고 오행 분포까지 보여드립니다.' },
       '/life': { view: 'life', title: '분야별 풀이 · 인연지도', desc: '건강·재물·일·사람. 내 원국을 네 갈래로 나눠 풀어드립니다.' },
       '/about': { view: 'about', title: '어떻게 계산하나요 · 인연지도', desc: '인연지도가 쓰는 명리학 방법과 천문 계산을 그대로 공개합니다.' },
+      '/my': { view: 'profile', title: '내 사주 · 인연지도', desc: '생년월일을 한 번만 넣으면 오늘의 운세·사주팔자·분야별 풀이가 바로 열립니다.' },
     };
     if (PAGES[url.pathname]) {
       const pg = PAGES[url.pathname];
