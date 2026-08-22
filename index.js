@@ -1,6 +1,6 @@
 // index.js — 인연지도 Cloudflare Worker
 import { computeSaju } from './saju.js';
-import { analyze, TYPES, CHARACTERS, scoreBand } from './compat.js';
+import { analyze, TYPES, CHARACTERS, scoreBand, AXES, AXIS_ORDER } from './compat.js';
 import { leapMonthOf, lunarMonthLength } from './astro.js';
 import APP_HTML from './app.html';
 import OG_PNG from './og.png';
@@ -157,6 +157,19 @@ function limitOf(row) {
   return Number.isFinite(n) && n > 0 ? Math.min(n, HARD_CAP) : FREE_LIMIT;
 }
 
+// 옛 데이터에는 axis 가 없어 십신 이름에서 되살린다
+const SIPSIN_KO_AXIS = {
+  '비견': 'bi', '겁재': 'bi', '식신': 'sik', '상관': 'sik',
+  '편재': 'jae', '정재': 'jae', '편관': 'gwan', '정관': 'gwan',
+  '편인': 'in', '정인': 'in',
+};
+function axisOf(res, dir) {
+  const direct = dir === 'in' ? res.axisIn : res.axisOut;
+  if (direct) return direct;
+  const ko = dir === 'in' ? res.sipsinIn : res.sipsinOut;
+  return SIPSIN_KO_AXIS[ko] || 'bi';
+}
+
 function entryRow(r) {
   const res = JSON.parse(r.result_json);
   return {
@@ -165,6 +178,8 @@ function entryRow(r) {
     score: r.score,
     typeIn: res.typeIn,
     typeOut: res.typeOut,
+    axisIn: axisOf(res, 'in'),
+    axisOut: axisOf(res, 'out'),
     charKey: CHARACTERS[r.day_stem].key,
     elem: CHARACTERS[r.day_stem].elem,
     cheoneul: !!res.cheoneul,
@@ -525,7 +540,7 @@ async function handleApi(request, env, url) {
 
   // 메타데이터
   if (path === '/api/meta') {
-    return new Response(JSON.stringify({ types: TYPES, characters: CHARACTERS }), {
+    return new Response(JSON.stringify({ types: TYPES, characters: CHARACTERS, axes: AXES, axisOrder: AXIS_ORDER }), {
       headers: { 'content-type': 'application/json; charset=utf-8', 'cache-control': 'public, max-age=3600' },
     });
   }

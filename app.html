@@ -170,6 +170,12 @@ details.adv[open] summary::before{content:'－ '}
 .star{cursor:pointer}
 .star circle.hit{fill:transparent}
 .dirlabel{font-size:12px;font-weight:700;letter-spacing:.08em;paint-order:stroke;stroke:rgba(6,9,16,.85);stroke-width:3px;stroke-linejoin:round}
+.ringlabel{font-size:9.5px;font-weight:600;letter-spacing:-.01em;fill:#8a92a6;opacity:.85;paint-order:stroke;stroke:rgba(6,9,16,.92);stroke-width:3px;stroke-linejoin:round}
+.maplg{margin-top:9px;display:flex;flex-direction:column;gap:7px;align-items:center}
+.mlrow{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
+.mlx{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;color:#a8b0c2;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.09);border-radius:999px;padding:3px 9px 3px 7px;letter-spacing:-.02em;white-space:nowrap}
+.mlx i{width:7px;height:7px;border-radius:50%;display:block;flex:0 0 7px}
+.mlrow2{font-size:11.5px;color:#5d6579;letter-spacing:-.02em;text-align:center}
 .namelabel{font-size:11px;font-weight:600;fill:rgba(240,237,230,.92);
   paint-order:stroke;stroke:rgba(6,9,16,.9);stroke-width:3px;stroke-linejoin:round}
 .namelabel.on{fill:#f7e6ae}
@@ -333,6 +339,34 @@ var BR=['자','축','인','묘','진','사','오','미','신','유','술','해']
 var BR_H=['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
 var ELEM=['목','화','토','금','수'], ELEM_H=['木','火','土','金','水'];
 var ECOL=['#4ea87a','#e2734a','#d0a94f','#9fb0c4','#4f86c6'];
+/* 주고받음 5자리 — 화면 각도(0=위, 시계방향) */
+var AXES={
+  'in'  :{key:'in'  ,name:'나를 채워주는 자리',short:'나를 채워줌',sipsin:'인성',angle:0  ,col:'#7ec9a2',
+          desc:'나를 살려주는 기운입니다. 받는 쪽이라 편하지만, 익숙해지면 기대게 됩니다.'},
+  'gwan':{key:'gwan',name:'나를 세우는 자리'  ,short:'나를 세움'  ,sipsin:'관성',angle:65 ,col:'#8fa8c9',
+          desc:'나를 누르고 다잡는 기운입니다. 편하진 않아도 이 사람 앞에서 자세가 잡힙니다.'},
+  'sik' :{key:'sik' ,name:'내가 채워주는 자리',short:'내가 채워줌',sipsin:'식상',angle:150,col:'#e29a68',
+          desc:'내가 내어주는 기운입니다. 주는 만큼 내가 풀리는 관계이기도 합니다.'},
+  'jae' :{key:'jae' ,name:'내가 이끄는 자리'  ,short:'내가 이끎'  ,sipsin:'재성',angle:215,col:'#d9b45b',
+          desc:'내가 다스리고 굴리는 기운입니다. 같이 일을 벌이기 좋은 자리입니다.'},
+  'bi'  :{key:'bi'  ,name:'나란한 자리'      ,short:'나란함'    ,sipsin:'비겁',angle:275,col:'#9aa3b8',
+          desc:'나와 같은 결입니다. 주고받는 것 없이 옆에 서 있는 사이입니다.'}
+};
+var AXIS_ORDER=['in','gwan','sik','jae','bi'];
+var SIPSIN_AX={'비견':'bi','겁재':'bi','식신':'sik','상관':'sik','편재':'jae','정재':'jae',
+               '편관':'gwan','정관':'gwan','편인':'in','정인':'in'};
+function axKey(k,ko){return (k&&AXES[k])?k:(SIPSIN_AX[ko]||'bi');}
+function axOf(o){return axKey(o&&o.axisIn,o&&o.sipsinIn);}
+/* 동심원 이름 (안쪽부터) */
+var RINGS=[{r:74,name:'속사람'},{r:108,name:'곁사람'},{r:138,name:'아는 사람'},{r:162,name:'스쳐가는 사람'}];
+function radiusOf(sc){
+  var B=[[80,100,40,74],[66,80,74,108],[52,66,108,138],[0,52,138,162]];
+  for(var i=0;i<B.length;i++){var b=B[i];
+    if(sc>=b[0]){var t=(Math.min(sc,b[1])-b[0])/(b[1]-b[0]);return b[3]-(b[3]-b[2])*t;}
+  }
+  return 162;
+}
+function ringOf(sc){return sc>=80?0:sc>=66?1:sc>=52?2:3;}
 var HOURS=[
  ['모름','태어난 시간을 몰라요'],
  [23,'자시 子 · 23:00~00:59'],[1,'축시 丑 · 01:00~02:59'],[3,'인시 寅 · 03:00~04:59'],
@@ -434,10 +468,10 @@ function constellation(j){
     : n>=3?{name:'작은 별자리',desc:'이제 선이 이어집니다'}
     : n>=1?{name:'씨앗 별자리',desc:'첫 별이 떴습니다'}
     : {name:'아직 빈 하늘',desc:'첫 별을 기다리는 중'};
-  var elems={};(j.entries||[]).forEach(function(e){elems[e.elem]=1});
-  var have=Object.keys(elems).length;
+  var zone={};(j.entries||[]).forEach(function(e){zone[axOf(e)]=(zone[axOf(e)]||0)+1;});
+  var have=Object.keys(zone).length;
   var missing=[];
-  for(var i=0;i<5;i++) if(!elems[i]) missing.push(ELEM_H[i]+' '+ELEM[i]);
+  AXIS_ORDER.forEach(function(k){if(!zone[k])missing.push(AXES[k].short);});
   return {
     name: j.ownerName+'자리',
     tier: tier.name, desc: tier.desc,
@@ -561,23 +595,17 @@ function bindForm(root,onSubmit){
 }
 
 /* ===== 별지도 ===== */
-var EANG=[90,180,null,270,0]; // 목 화 토 금 수 (화면 각도, 0=위, 시계방향)
 function layout(entries){
-  var by={};entries.forEach(function(e){(by[e.elem]=by[e.elem]||[]).push(e);});
+  var by={};entries.forEach(function(e){var k=axOf(e);(by[k]=by[k]||[]).push(e);});
   var out=[];
-  Object.keys(by).forEach(function(k){
-    var e=Number(k),list=by[k],n=list.length;
+  AXIS_ORDER.forEach(function(k){
+    var list=by[k];if(!list||!list.length)return;
+    list=list.slice().sort(function(a,b){return b.score-a.score});
+    var n=list.length,base=AXES[k].angle;
+    var span=Math.min(58,Math.max(16,n*13));
     list.forEach(function(it,i){
-      var ang;
-      if(e===2){
-        var g=Math.floor(i/4);
-        ang=45+(i%4)*90+(g%2?1:-1)*Math.ceil(g/2)*13;
-      }else{
-        var span=Math.min(72,Math.max(18,n*15));
-        ang=EANG[e]+(n===1?0:(i/(n-1)-.5)*span);
-      }
-      var r=158-((it.score-8)/91)*94;   // 62 ~ 158
-      out.push(Object.assign({},it,{ang:ang,r:r}));
+      var ang=base+(n===1?0:(i/(n-1)-.5)*span);
+      out.push(Object.assign({},it,{ax:k,ang:ang,r:radiusOf(it.score)}));
     });
   });
   // 겹침 완화: 가까운 별끼리 접선 방향으로 밀어낸다
@@ -592,7 +620,7 @@ function layout(entries){
       var da=push/Math.max(A.r,26)*57.3, db=push/Math.max(B.r,26)*57.3;
       var dir=((B.ang-A.ang+540)%360-180)>=0?1:-1;
       A.ang-=da*dir; B.ang+=db*dir;
-      if(d<3){A.r=Math.max(58,A.r-3);B.r=Math.min(160,B.r+3);}
+      if(d<3){A.r=Math.max(40,A.r-3);B.r=Math.min(164,B.r+3);}
       moved=true;
     }
     if(!moved)break;
@@ -600,18 +628,39 @@ function layout(entries){
   out.forEach(function(o){var q=pos(o);o.x=q.x;o.y=q.y;});
   return out;
 }
+/* 같은 오행끼리 선을 이어 별자리 모양을 만든다 (최소 신장 트리) */
+function constLines(pts){
+  var by={};pts.forEach(function(p){(by[p.elem]=by[p.elem]||[]).push(p);});
+  var lines=[];
+  Object.keys(by).forEach(function(k){
+    var g=by[k];if(g.length<2)return;
+    var used=[g[0]],rest=g.slice(1);
+    while(rest.length){
+      var bi=0,bj=0,bd=1e9;
+      for(var i=0;i<used.length;i++)for(var j=0;j<rest.length;j++){
+        var dx=used[i].x-rest[j].x,dy=used[i].y-rest[j].y,d=dx*dx+dy*dy;
+        if(d<bd){bd=d;bi=i;bj=j;}
+      }
+      lines.push({a:used[bi],b:rest[bj],elem:Number(k)});
+      used.push(rest[bj]);rest.splice(bj,1);
+    }
+  });
+  return lines;
+}
 function pos(o){
   var rad=(o.ang-90)*Math.PI/180;
   return {x:180+Math.cos(rad)*o.r, y:180+Math.sin(rad)*o.r};
 }
 // 이름표 자리 잡기 (겹치면 반대편, 그래도 겹치면 생략)
-function placeLabels(pts,limit){
-  var boxes=[{x:180,y:198,w:70,h:16}]; // 중심 라벨 영역
+function placeLabels(pts,limit,reserved,meId){
+  var boxes=[{x:180,y:198,w:74,h:18}]; // 중심 라벨 영역
+  (reserved||[]).forEach(function(b){boxes.push(b)});
   var sorted=pts.slice().sort(function(a,b){return b.score-a.score});
   var out={};
   sorted.forEach(function(p,idx){
     if(limit && idx>=limit) return;
-    var w=Math.max(18,p.name.length*8.4+3),h=12;
+    var nlen=p.name.length+(meId===p.id?3:0);
+    var w=Math.max(18,nlen*8.4+3),h=12;
     var rr=p.score>=82?7:4.4;
     var cands=[{x:p.x,y:p.y+rr+10},{x:p.x,y:p.y-rr-4},
                {x:p.x+w/2+rr+4,y:p.y+4},{x:p.x-w/2-rr-4,y:p.y+4}];
@@ -626,10 +675,61 @@ function placeLabels(pts,limit){
   });
   return out;
 }
+/* 동심원 이름을 별과 겹치지 않는 방향에 놓는다 */
+function placeRings(pts){
+  var ax=AXIS_ORDER.map(function(k){
+    var rad=(AXES[k].angle-90)*Math.PI/180;
+    return {x:180+Math.cos(rad)*172, y:180+Math.sin(rad)*172, hw:AXES[k].short.length*5.8+6};
+  });
+  var placed=[],out=[];
+  function gap(x,y,hw,arr,extra){
+    var d=1e9;
+    arr.forEach(function(q){
+      var qh=(q.hw||0)+(extra||0);
+      var dx=Math.max(0,Math.abs((q.x!=null?q.x:0)-x)-hw-qh);
+      var dy=Math.max(0,Math.abs(q.y-y)-9);
+      d=Math.min(d,Math.sqrt(dx*dx+dy*dy));
+    });
+    return d;
+  }
+  RINGS.forEach(function(g){
+    var rr=g.r-9,hw=g.name.length*4.9+5,best=null,bs=-1;
+    for(var a=0;a<360;a+=4){
+      var rad=(a-90)*Math.PI/180;
+      var x=180+Math.cos(rad)*rr, y=180+Math.sin(rad)*rr;
+      if(x-hw<-18||x+hw>358||y<16||y>350)continue;
+      var d=Math.min(
+        gap(x,y,hw,pts,6),
+        gap(x,y,hw,ax,4),
+        gap(x,y,hw,[{x:180,y:203,hw:38}],2),
+        placed.length?gap(x,y,hw,placed,6):1e9
+      );
+      if(d>bs){bs=d;best={x:x,y:y,hw:hw,name:g.name};}
+    }
+    if(best){placed.push(best);out.push(best);}
+  });
+  return out;
+}
+function mapLegend(){
+  return '<div class="maplg">'+
+    '<div class="mlrow">'+AXIS_ORDER.map(function(k){var A=AXES[k];
+      return '<span class="mlx"><i style="background:'+A.col+'"></i>'+A.short+'</span>';}).join('')+'</div>'+
+    '<div class="mlrow2">안쪽부터 '+RINGS.map(function(g){return g.name}).join(' → ')+'</div>'+
+  '</div>';
+}
 function starMap(entries,owner,opt){
   opt=opt||{};
   var pts=layout(entries);
-  var labels=placeLabels(pts, pts.length>34?14:0);
+  var reserved=[];
+  AXIS_ORDER.forEach(function(k){
+    var A=AXES[k],rad=(A.angle-90)*Math.PI/180,R=172;
+    reserved.push({x:180+Math.cos(rad)*R, y:180+Math.sin(rad)*R, w:A.short.length*11+8, h:18});
+  });
+  var ringLabels=placeRings(pts);
+  ringLabels.forEach(function(g){
+    reserved.push({x:g.x, y:g.y, w:g.hw*2+6, h:15});
+  });
+  var labels=placeLabels(pts, pts.length>34?14:0, reserved, opt.me);
   if(opt.sel!=null&&!labels[opt.sel]){
     var sp=pts.filter(function(x){return x.id===opt.sel})[0];
     if(sp)labels[opt.sel]={x:sp.x,y:sp.y-11};
@@ -639,28 +739,33 @@ function starMap(entries,owner,opt){
      '<radialGradient id="og"><stop offset="0%" stop-color="#fff8e0"/><stop offset="45%" stop-color="#f2dfa5"/><stop offset="100%" stop-color="#d9b45b" stop-opacity="0"/></radialGradient>'+
      '<filter id="gl" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="2.6" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>'+
      '</defs>';
-  // 동심원
-  [158,118,80,44].forEach(function(r,i){
-    s+='<circle cx="180" cy="180" r="'+r+'" fill="none" stroke="rgba(255,255,255,'+(0.09-i*0.012)+')" stroke-width="1"'+(i===0?' stroke-dasharray="2 4"':'')+'/>';
+  // 동심원 + 거리 이름
+  RINGS.forEach(function(g,i){
+    s+='<circle cx="180" cy="180" r="'+g.r+'" fill="none" stroke="rgba(255,255,255,'+(0.10-i*0.014).toFixed(3)+')" stroke-width="1"'+(i===RINGS.length-1?' stroke-dasharray="2 4"':'')+'/>';
   });
-  // 방위선
-  [0,90,180,270].forEach(function(a){
-    var rad=(a-90)*Math.PI/180;
-    s+='<line x1="180" y1="180" x2="'+(180+Math.cos(rad)*158)+'" y2="'+(180+Math.sin(rad)*158)+'" stroke="rgba(255,255,255,.055)" stroke-width="1"/>';
+  // 자리 구분선
+  AXIS_ORDER.forEach(function(k){
+    var rad=(AXES[k].angle-90+ (AXES[k].angle===0?0:0))*Math.PI/180;
+    s+='<line x1="180" y1="180" x2="'+(180+Math.cos(rad)*162).toFixed(1)+'" y2="'+(180+Math.sin(rad)*162).toFixed(1)+'" stroke="rgba(255,255,255,.05)" stroke-width="1"/>';
   });
-  // 오행 방위 라벨
-  [[0,'水 북',4],[90,'木 동',0],[180,'火 남',1],[270,'金 서',3]].forEach(function(d){
-    var rad=(d[0]-90)*Math.PI/180,R=178;
-    s+='<text class="dirlabel" x="'+(180+Math.cos(rad)*R)+'" y="'+(180+Math.sin(rad)*R+3)+'" text-anchor="middle" fill="'+ECOL[d[2]]+'" opacity=".7">'+d[1]+'</text>';
+  // 다섯 자리 이름
+  AXIS_ORDER.forEach(function(k){
+    var A=AXES[k],rad=(A.angle-90)*Math.PI/180,R=172;
+    var x=180+Math.cos(rad)*R, y=180+Math.sin(rad)*R;
+    s+='<text class="dirlabel" x="'+x.toFixed(1)+'" y="'+(y+3.5).toFixed(1)+'" text-anchor="middle" fill="'+A.col+'" opacity=".95">'+A.short+'</text>';
   });
-  [45,135,225,315].forEach(function(a){
-    var rad=(a-90)*Math.PI/180,R=172;
-    s+='<text class="dirlabel" x="'+(180+Math.cos(rad)*R)+'" y="'+(180+Math.sin(rad)*R+3)+'" text-anchor="middle" fill="'+ECOL[2]+'" opacity=".38">土</text>';
+  // 거리 이름 (별과 겹치지 않는 방향에 자동 배치)
+  ringLabels.forEach(function(g){
+    s+='<text class="ringlabel" x="'+g.x.toFixed(1)+'" y="'+(g.y+3).toFixed(1)+'" text-anchor="middle">'+g.name+'</text>';
   });
-  // 연결선
+  // 같은 오행끼리 잇는 별자리 선
+  constLines(pts).forEach(function(L){
+    s+='<line x1="'+L.a.x.toFixed(1)+'" y1="'+L.a.y.toFixed(1)+'" x2="'+L.b.x.toFixed(1)+'" y2="'+L.b.y.toFixed(1)+'" stroke="'+ECOL[L.elem]+'" stroke-opacity=".34" stroke-width="1"/>';
+  });
+  // 중심에서 뻗는 선
   pts.forEach(function(p){
     var isMe=(opt.me===p.id);
-    s+='<line x1="180" y1="180" x2="'+p.x.toFixed(1)+'" y2="'+p.y.toFixed(1)+'" stroke="'+(isMe?'#f2dfa5':ECOL[p.elem])+'" stroke-opacity="'+(isMe?0.95:(0.10+p.score/420)).toFixed(3)+'" stroke-width="'+(isMe?2.2:(p.score>=80?1.4:1))+'"'+(isMe?' stroke-dasharray="3 2.5"':'')+'/>';
+    s+='<line x1="180" y1="180" x2="'+p.x.toFixed(1)+'" y2="'+p.y.toFixed(1)+'" stroke="'+(isMe?'#f2dfa5':AXES[p.ax].col)+'" stroke-opacity="'+(isMe?0.95:(0.07+p.score/700)).toFixed(3)+'" stroke-width="'+(isMe?2.2:1)+'"'+(isMe?' stroke-dasharray="3 2.5"':'')+'/>';
   });
   // 중심(주인)
   s+='<circle cx="180" cy="180" r="26" fill="url(#og)" opacity=".5"/>';
@@ -707,8 +812,8 @@ function viewHome(){
   '</section>'+
 
   '<section class="sec rv">'+
-    '<div class="mapbox" id="demo"></div>'+
-    '<p class="tiny center" style="margin-top:-4px">참여자는 자기 일간(日干)의 오행 방위에 자리를 잡고, 기운이 잘 맞을수록 나에게 가까이 옵니다.</p>'+
+    '<div class="mapbox" id="demo"></div>'+mapLegend()+
+    '<p class="tiny center" style="margin-top:2px">자리는 <b>주고받음</b>으로 정해집니다. 나를 채워주는 사람은 위쪽, 내가 채워주는 사람은 아래쪽. 점수가 높을수록 안쪽으로 들어오고, 같은 오행끼리는 선으로 이어집니다.</p>'+
   '</section>'+
 
   '<section class="sec rv">'+
@@ -792,10 +897,10 @@ function viewHome(){
 
   // 데모 지도
   var demo=[
-    {id:1,name:'현우',score:91,elem:0,cheoneul:true},{id:2,name:'지민',score:74,elem:1,cheoneul:false},
-    {id:3,name:'수아',score:62,elem:4,cheoneul:false},{id:4,name:'태호',score:83,elem:3,cheoneul:false},
-    {id:5,name:'은지',score:55,elem:2,cheoneul:false},{id:6,name:'준서',score:69,elem:0,cheoneul:false},
-    {id:7,name:'서연',score:47,elem:1,cheoneul:false},{id:8,name:'민재',score:78,elem:4,cheoneul:false}
+    {id:1,name:'현우',score:91,elem:0,axisIn:'in',cheoneul:true},{id:2,name:'지민',score:74,elem:1,axisIn:'sik',cheoneul:false},
+    {id:3,name:'수아',score:62,elem:4,axisIn:'gwan',cheoneul:false},{id:4,name:'태호',score:83,elem:3,axisIn:'jae',cheoneul:false},
+    {id:5,name:'은지',score:55,elem:2,axisIn:'bi',cheoneul:false},{id:6,name:'준서',score:69,elem:0,axisIn:'in',cheoneul:false},
+    {id:7,name:'서연',score:47,elem:1,axisIn:'sik',cheoneul:false},{id:8,name:'민재',score:78,elem:4,axisIn:'jae',cheoneul:false}
   ];
   el('demo').innerHTML=starMap(demo,{han:'丙',name:'나'},{});
 
@@ -912,11 +1017,13 @@ function constBox(j){
       (k.gwiin?' 그중 <b class="gold">천을귀인이 '+k.gwiin+'명</b> 있습니다.':'')+'</p>'+
     '<div class="chips">'+
       (k.complete
-        ? '<span class="chip" style="color:#f2dfa5;border-color:rgba(217,180,91,.45)">★ 오행 완성</span>'
-        : '<span class="chip">오행 '+k.have+'/5</span>'+
-          (k.missing.length&&k.missing.length<=3?'<span class="chip">아직 없는 기운 · '+esc(k.missing.join(', '))+'</span>':''))+
+        ? '<span class="chip" style="color:#f2dfa5;border-color:rgba(217,180,91,.45)">★ 다섯 자리 완성</span>'
+        : '<span class="chip">자리 '+k.have+'/5</span>'+
+          (k.missing.length&&k.missing.length<=3?'<span class="chip">아직 빈 자리 · '+esc(k.missing.join(', '))+'</span>':''))+
     '</div>'+
-    (k.complete?'':'<div class="tiny" style="margin-top:11px">다섯 방위가 다 차면 별자리가 완성됩니다.</div>')+
+    (k.complete
+      ? '<div class="tiny" style="margin-top:11px">주는 사람, 받는 사람, 나란한 사람이 모두 있습니다. 한쪽으로 기울지 않은 인복입니다.</div>'
+      : '<div class="tiny" style="margin-top:11px">주고받음의 다섯 자리가 다 차면 별자리가 완성됩니다.</div>')+
   '</div>'+h2;
 }
 function capBar(j){
@@ -1099,7 +1206,7 @@ function renderOwner(j){
     capBar(j)+
   '</section>'+
   '<section class="sec rv" style="margin-top:30px">'+constBox(j)+'</section>'+
-  '<section class="sec fade" style="margin-top:20px"><div class="mapbox" id="map"></div>'+
+  '<section class="sec fade" style="margin-top:20px"><div class="mapbox" id="map"></div>'+mapLegend()+
     '<div id="selBox"></div></section>'+
   '<section class="sec rv">'+shareBox(j.code,j.ownerName)+'</section>'+
   '<section class="sec rv">'+growBox(j)+'</section>'+
@@ -1226,7 +1333,7 @@ function drawCard(r){
   var W=1080,H=1350,c=document.createElement('canvas');
   c.width=W;c.height=H;var x=c.getContext('2d');
   var res=r.result,b=band(res.score);
-  var ti=TYPES[res.typeIn],to=TYPES[res.typeOut];
+  var to=TYPES[res.typeIn],ti=TYPES[res.typeOut]; // 방문자 관점 (to: 내가 상대에게 / ti: 상대가 나에게)
   var cme=charBy(res.charB),cow=charBy(res.charA);
   var SC={gold:'#f2dfa5',green:'#8fd6ac',blue:'#93bdea',gray:'#c3ccdd',amber:'#e8c07a',red:'#f0998c'}[b.tone];
   var F="-apple-system,BlinkMacSystemFont,'Pretendard Variable',Pretendard,'Apple SD Gothic Neo','Malgun Gothic',sans-serif";
@@ -1331,7 +1438,7 @@ function renderVisitorFull(j){
     '<p class="lead">조금 늦었네요. 대신 <b>내 인연지도</b>를 만들어서 '+esc(j.ownerName)+'님을 초대해보는 건 어때요?</p>'+
     '<button class="btn" id="mk" style="margin-top:26px">내 인연지도 만들기</button>'+
   '</section>'+
-  '<section class="sec rv"><div class="mapbox" id="map"></div>'+
+  '<section class="sec rv"><div class="mapbox" id="map"></div>'+mapLegend()+
     '<p class="tiny center" style="margin-top:-2px">이미 자리를 잡은 사람들입니다.</p></section>'));
   el('map').innerHTML=starMap(j.entries,j.ownerChar,{});
   el('mk').onclick=function(){tap();goCreate(j.code);};
@@ -1357,7 +1464,7 @@ function renderVisitor(j){
       '<div style="text-align:right"><div style="font-size:19px;font-weight:800;color:#f2dfa5">'+j.count+'</div><div class="tiny">명 참여</div></div>'+
     '</div>'+
   '</section>'+
-  '<section class="sec fade"><div class="mapbox" id="map"></div>'+
+  '<section class="sec fade"><div class="mapbox" id="map"></div>'+mapLegend()+
     '<p class="tiny center" style="margin-top:-2px">이미 자리를 잡은 사람들입니다. 이름만 보이고 생년월일은 아무에게도 보이지 않아요.</p></section>'+
   '<section class="sec fade"><div class="card" id="fw">'+
     formHTML({cta:'내 별 남기기',nameLabel:'뭐라고 부를까요',namePh:'예: 지민, 동아리 지민'})+'</div></section>'+
@@ -1400,7 +1507,8 @@ function showResultFor(code,id,token){
 
 function renderResult(r,code){
   var res=r.result,b=band(res.score);
-  var ti=TYPES[res.typeIn],to=TYPES[res.typeOut];
+  var to=TYPES[res.typeIn],ti=TYPES[res.typeOut]; // 방문자 관점 (to: 내가 상대에게 / ti: 상대가 나에게)
+  var AX=AXES[axKey(res.axisIn,res.sipsinIn)];
   var cme=charBy(res.charB),cow=charBy(res.charA);
   var pct=r.total>1?Math.round((1-(r.rank-1)/r.total)*100):100;
 
@@ -1437,8 +1545,14 @@ function renderResult(r,code){
 
   '<section class="sec rv">'+
     '<h2>'+esc(r.ownerName)+'님과 이어진 자리</h2>'+
-    '<p class="tiny" style="margin:-8px 0 12px">가운데가 '+esc(r.ownerName)+'님, 금색 원이 나입니다. 기운이 잘 맞을수록 안쪽에 자리를 잡습니다.</p>'+
-    '<div class="mapbox" id="rmap"><div class="skel" style="height:300px"></div></div>'+
+    '<div class="card" style="margin:-4px 0 12px;border-color:'+AX.col+'44;background:linear-gradient(155deg,'+AX.col+'1f,rgba(255,255,255,.03))">'+
+      '<div class="eyebrow" style="color:'+AX.col+'">'+esc(r.ownerName)+'님의 지도에서 내 자리</div>'+
+      '<b style="display:block;font-size:19px;font-weight:700;letter-spacing:-.035em;margin-top:7px">'+esc(AX.name)+'</b>'+
+      '<p style="margin:7px 0 0;font-size:14px;color:#cdd3e0;line-height:1.66">'+esc(AX.desc)+'</p>'+
+      '<div class="tiny" style="margin-top:9px;color:var(--dim)">십신으로는 '+esc(AX.sipsin)+' · 거리로는 <b class="gold">'+esc(RINGS[ringOf(res.score)].name)+'</b></div>'+
+    '</div>'+
+    '<p class="tiny" style="margin:0 0 12px">가운데가 '+esc(r.ownerName)+'님, 금색 원이 나입니다. 기운이 잘 맞을수록 안쪽에 자리를 잡습니다.</p>'+
+    '<div class="mapbox" id="rmap"><div class="skel" style="height:300px"></div></div>'+mapLegend()+
   '</section>'+
 
   '<section class="sec rv">'+
@@ -1508,7 +1622,7 @@ function renderVisitorMapOnly(code){
       '<div class="eyebrow">'+esc(j.ownerName)+'님의 인연지도</div>'+
       '<h1 style="font-size:27px">지금까지 '+j.count+'명이<br>별을 남겼습니다</h1>'+
     '</section>'+
-    '<section class="sec fade"><div class="mapbox" id="map"></div><div id="selBox"></div></section>'+
+    '<section class="sec fade"><div class="mapbox" id="map"></div>'+mapLegend()+'<div id="selBox"></div></section>'+
     '<section class="sec rv">'+shareBox(code,j.ownerName)+'</section>'+
     '<section class="sec fade"><button class="btn" id="mk">나도 내 인연지도 만들기</button></section>'));
     el('map').innerHTML=starMap(j.entries,j.ownerChar,{});
@@ -1831,6 +1945,13 @@ function viewAbout(){
       ['천을귀인(天乙貴人)','상대의 지지에 내 천을귀인이 들어 있으면 특별한 자리로 봅니다.'],
       ['오행 보완','내게 얇은 기운을 상대가 채워주는 정도를 점수에 넣습니다. 지장간까지 가중치로 반영합니다.']
     ])+
+
+    blk('4','지도는 이렇게 그립니다',[
+      ['자리 — 주고받음','별의 방향은 그 사람이 나에게 <b>주는 쪽</b>인지 <b>받는 쪽</b>인지로 정합니다. 십신을 다섯 갈래로 묶어 인성(나를 채워줌)·관성(나를 세움)·식상(내가 채워줌)·재성(내가 이끎)·비겁(나란함)에 놓습니다.'],
+      ['거리 — 궁합 점수','점수가 높을수록 가운데로 들어옵니다. 안쪽부터 속사람 · 곁사람 · 아는 사람 · 스쳐가는 사람 네 겹입니다.'],
+      ['선 — 같은 오행','일간의 오행이 같은 사람끼리 선을 잇습니다. 사람이 늘수록 실제 별자리 모양이 잡힙니다.'],
+      ['다섯 자리 완성','주는 사람과 받는 사람이 골고루 있으면 별자리가 완성됩니다. 한쪽으로만 몰려 있다면 관계가 기울어 있다는 뜻입니다.']
+    ],'같은 사람이라도 지도 주인이 누구냐에 따라 자리가 달라집니다. 관계는 방향이 있기 때문입니다.')+
 
     '<div class="gold-sec rv" style="margin-top:16px">'+
       '<div class="eyebrow" style="color:#c9a227">솔직하게</div>'+

@@ -142,6 +142,24 @@ export const TYPES = {
 const SIPSIN_TO_TYPE = ['bigyeon', 'geopjae', 'siksin', 'sanggwan', 'pyeonjae', 'jeongjae',
   'pyeongwan', 'jeonggwan', 'pyeonin', 'jeongin'];
 
+// 십신 → 지도 축(다섯 자리). 위로 갈수록 나에게 주는 쪽, 아래로 갈수록 내가 주는 쪽
+// 비견 겁재 식신 상관 편재 정재 편관 정관 편인 정인
+const SIPSIN_TO_AXIS = ['bi', 'bi', 'sik', 'sik', 'jae', 'jae', 'gwan', 'gwan', 'in', 'in'];
+
+export const AXES = {
+  in:   { key: 'in',   name: '나를 채워주는 자리', short: '나를 채워줌', sipsin: '인성',
+          desc: '나를 살려주는 기운입니다. 받는 쪽이라 편하지만, 익숙해지면 기대게 됩니다.', angle: 0 },
+  gwan: { key: 'gwan', name: '나를 세우는 자리',   short: '나를 세움',   sipsin: '관성',
+          desc: '나를 누르고 다잡는 기운입니다. 편하진 않아도 이 사람 앞에서 자세가 잡힙니다.', angle: 65 },
+  sik:  { key: 'sik',  name: '내가 채워주는 자리', short: '내가 채워줌', sipsin: '식상',
+          desc: '내가 내어주는 기운입니다. 주는 만큼 내가 풀리는 관계이기도 합니다.', angle: 150 },
+  jae:  { key: 'jae',  name: '내가 이끄는 자리',   short: '내가 이끎',   sipsin: '재성',
+          desc: '내가 다스리고 굴리는 기운입니다. 같이 일을 벌이기 좋은 자리입니다.', angle: 215 },
+  bi:   { key: 'bi',   name: '나란한 자리',       short: '나란함',     sipsin: '비겁',
+          desc: '나와 같은 결입니다. 주고받는 것 없이 옆에 서 있는 사이입니다.', angle: 275 },
+};
+export const AXIS_ORDER = ['in', 'gwan', 'bi', 'sik', 'jae'];
+
 const SIPSIN_SCORE = [6, 2, 9, 3, 6, 9, 2, 8, 7, 12];
 
 function branchPairs(A, B) {
@@ -244,6 +262,7 @@ export function analyze(A, B) {
   return {
     score,
     typeIn, typeOut,
+    axisIn: SIPSIN_TO_AXIS[sinAB], axisOut: SIPSIN_TO_AXIS[sinBA],
     sipsinIn: SIPSIN[sinAB], sipsinOut: SIPSIN[sinBA],
     charA: CHARACTERS[A.dayStem].key,
     charB: CHARACTERS[B.dayStem].key,
