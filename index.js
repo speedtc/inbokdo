@@ -546,6 +546,8 @@ async function handleApi(request, env, url) {
       entryId: ins.meta.last_row_id, entryToken,
       me: { name, char: charPayload(saju.dayStem), saju: sajuPayload(saju) },
       result: res, rank: 1, total: 1,
+      year: topicYear(saju, topic, todayKST().y),
+      actions: topicActions(topic, res.band),
     });
   }
 
