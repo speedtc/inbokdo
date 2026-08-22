@@ -107,6 +107,13 @@ header{position:sticky;top:0;z-index:40;
 .navnote{position:relative;margin:10px auto 0;max-width:420px;text-align:center;
   font-size:11.8px;line-height:1.6;letter-spacing:-.03em;color:var(--dim);word-break:keep-all}
 .navnote b{color:#a07c1c;font-weight:700}
+.whobar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:14px;
+  padding:9px 13px;border-radius:13px;background:#fff;border:1px solid var(--line)}
+.whobar .w1{flex:1;min-width:0;font-size:12.5px;letter-spacing:-.03em;color:var(--dim);word-break:keep-all}
+.whobar .w1 b{color:var(--ink);font-weight:700}
+.whobar .w2{flex:0 0 auto;font-size:12px;font-weight:800;letter-spacing:-.03em;color:#a07c1c;
+  text-decoration:none;background:var(--gold-soft);border-radius:999px;padding:5px 10px}
+.whobar .w2:active{transform:scale(.97)}
 .btlbox{border-radius:20px;padding:16px 17px 15px;border:1px solid rgba(193,154,46,.34);
   background:linear-gradient(155deg,rgba(217,180,91,.16),#fffdf7 62%);box-shadow:var(--sh)}
 .btag{display:inline-block;font-size:11px;font-weight:800;letter-spacing:.02em;color:#fffaf0;
@@ -155,6 +162,8 @@ header{position:sticky;top:0;z-index:40;
   font-size:11.5px;font-weight:700;line-height:1}
 .biochip .bn{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .biochip .bg{color:var(--dim2);font-weight:500;font-size:11.5px}
+.biochip .bx{flex:0 0 auto;font-size:10px;font-weight:800;letter-spacing:-.03em;color:#a07c1c;
+  background:var(--gold-soft);border-radius:999px;padding:2px 7px}
 .biochip.empty{border-color:rgba(193,154,46,.5);background:linear-gradient(180deg,#fdf6e2,#fffdf7);color:#8a6a10;
   padding:5px 13px;font-weight:700}
 .needbio{margin-left:auto;display:inline-flex;align-items:center;gap:6px;white-space:nowrap;
@@ -430,6 +439,7 @@ footer{margin-top:56px;padding-top:22px;border-top:1px solid var(--line);color:v
 
 /* ══ 사주 정밀 풀이 ══ */
 .jump{position:sticky;top:56px;z-index:40;margin:0 -18px;padding:9px 18px;background:rgba(251,247,236,.93);
+  -webkit-overflow-scrolling:touch;overscroll-behavior-x:contain;
   backdrop-filter:saturate(160%) blur(12px);-webkit-backdrop-filter:saturate(160%) blur(12px);
   border-bottom:1px solid var(--line);display:flex;gap:6px;overflow-x:auto;scrollbar-width:none}
 .jump::-webkit-scrollbar{display:none}
@@ -473,9 +483,24 @@ table.wonguk td{padding:0;vertical-align:top}
 .sitem .h em{font-style:normal;margin-left:auto;font-size:10.5px;color:var(--dim2)}
 .sitem p{margin:5px 0 0;font-size:13.2px;line-height:1.68;color:#4a4438;word-break:keep-all}
 
-.deun{display:flex;gap:7px;overflow-x:auto;margin:12px -18px 0;padding:2px 18px 8px;scrollbar-width:none}
+.hscroll{position:relative;margin:12px -18px 0}
+.hscroll::before,.hscroll::after{content:'';position:absolute;top:0;bottom:18px;width:38px;
+  pointer-events:none;z-index:2;opacity:0;transition:opacity .22s}
+.hscroll::before{left:0;background:linear-gradient(90deg,var(--bg) 12%,rgba(251,247,236,0))}
+.hscroll::after{right:0;background:linear-gradient(270deg,var(--bg) 12%,rgba(251,247,236,0))}
+.hscroll.sc-l::before{opacity:1}
+.hscroll.sc-r::after{opacity:1}
+.hscroll .swipe{position:absolute;right:14px;bottom:-2px;z-index:3;pointer-events:none;
+  display:flex;align-items:center;gap:4px;padding:4px 9px;border-radius:999px;
+  background:rgba(193,154,46,.94);color:#fffaf0;font-size:10.5px;font-weight:800;letter-spacing:-.03em;
+  box-shadow:0 3px 10px rgba(70,56,20,.22);opacity:0;transition:opacity .25s}
+.hscroll.sc-r .swipe{opacity:1}
+.hscroll .swipe i{font-style:normal;animation:nudge 1.3s ease-in-out infinite}
+@keyframes nudge{0%,100%{transform:translateX(0)}50%{transform:translateX(3px)}}
+.deun{display:flex;gap:7px;overflow-x:auto;padding:2px 18px 20px;scrollbar-width:none;
+  -webkit-overflow-scrolling:touch;overscroll-behavior-x:contain;scroll-snap-type:x proximity}
 .deun::-webkit-scrollbar{display:none}
-.dcard{flex:0 0 108px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:10px 9px;text-align:center;position:relative}
+.dcard{flex:0 0 108px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:10px 9px;text-align:center;position:relative;scroll-snap-align:center}
 .dcard.now{border-color:var(--gold);box-shadow:0 0 0 2px rgba(193,154,46,.18)}
 .dcard.past{opacity:.55}
 .dcard i{display:block;font-style:normal;font-size:10.5px;color:var(--dim)}
@@ -2141,6 +2166,18 @@ function bindQuick(onGo){
     var f=el('fwrap'); if(f){f.hidden=false;f.scrollIntoView({behavior:'smooth',block:'center'});}
   };
 }
+
+/* 지금 어떤 사주로 보고 있는지 + 바로 바꾸기 */
+function whoBar(){
+  var b=getBirth(); if(!b||!b.birth) return '';
+  var d=b.birth;
+  return '<div class="whobar"><span class="w1">'+
+      '<b>'+esc(b.name||'내')+'</b>님 · '+d.y+'.'+d.m+'.'+d.d+
+      (d.lunar?' 음력':'')+(d.unknownTime?' · 시간 모름':' · '+String(d.hour).padStart(2,'0')+':'+String(d.minute||0).padStart(2,'0'))+
+      ' · '+(d.gender==='f'?'여자':'남자')+
+    '</span><a class="w2" href="/my">다른 사주로 보기 ›</a></div>';
+}
+
 function introBox(k){
   var I=INTRO[k];if(!I)return '';
   return '<div class="card intro">'+
@@ -2203,6 +2240,7 @@ function renderTojeong(j,b){
     '<h1 style="font-size:31px">'+esc(r.head)+'</h1>'+
     '<p class="lead" style="font-size:15px">'+esc(b.name||'내')+'님 · 세는나이 '+r.age+'세 · '+
       '음력 '+r.lunar.m+'월 '+r.lunar.d+'일'+(r.lunar.leap?' (윤달)':'')+'</p>'+
+    whoBar()+
   '</section>'+
 
   '<section class="sec fade" style="margin-top:22px">'+
@@ -2885,7 +2923,10 @@ function paintBio(){
   el2.innerHTML='<span class="bh" style="background:'+((c&&c.color)||'#c19a2e')+'1f;color:'+((c&&c.color)||'#a07c1c')+'">'+
       esc((c&&c.han)||'★')+'</span>'+
     '<span class="bn">'+esc(b.name||'내 사주')+'</span>'+
-    '<span class="bg">'+esc(b.birth.y)+'</span>';
+    '<span class="bg">'+esc(b.birth.y)+'</span>'+
+    '<span class="bx">바꾸기</span>';
+  el2.title='사주 정보 바꾸기';
+  el2.setAttribute('aria-label',(b.name||'내 사주')+' 사주 정보 바꾸기');
   el2.onclick=function(){tap();viewProfile();history.pushState({},'','/my');};
 }
 /* 상단 방문 통계 */
@@ -3045,6 +3086,7 @@ function renderToday(j,b){
     '<div class="eyebrow">'+dt.y+'년 '+dt.m+'월 '+dt.d+'일 · 일진 '+esc(T.dayGZ)+'</div>'+
     '<h1 style="font-size:31px">'+esc(t.headline)+'</h1>'+
     '<p class="lead" style="font-size:15px">'+esc(t.body)+'</p>'+
+    whoBar()+
   '</section>'+
 
   '<section class="sec" style="margin-top:24px">'+
@@ -3233,6 +3275,7 @@ function renderDeep(j,b){
       '<span class="chip">'+esc(sa.gender==='f'?'여자':'남자')+'</span>'+
       '<span class="chip">'+esc(ch.name)+' '+esc(ch.han)+'</span>'+
     '</div>'+
+    whoBar()+
   '</section>'+
   '<section class="sec fade" style="margin-top:20px"><div class="gold-sec">'+
     '<div class="eyebrow" style="color:#c9a227">한눈에 보는 총평</div>'+
@@ -3424,13 +3467,14 @@ function renderDeep(j,b){
       ? '<div class="card"><p style="margin:0;font-size:14px;color:#4a4438;line-height:1.7">'+esc(D.daeun.note)+'</p>'+
         '<button class="btn sec2" style="margin-top:12px" onclick="location.href=\'/my\'">성별 넣고 대운 보기</button></div>'
       : '<p class="tiny" style="margin:-2px 0 4px">'+esc(D.daeun.note)+'</p>'+
-        '<div class="deun">'+D.daeun.list.map(function(d,i){
+        '<div class="hscroll" id="daewrap"><div class="deun" id="daescroll">'+D.daeun.list.map(function(d,i){
           return '<div class="dcard'+(i===D.daeun.current?' now':(i<D.daeun.current?' past':''))+'">'+
             (i===D.daeun.current?'<span class="tag">지금</span>':'')+
             '<i>'+d.age+'~'+d.ageTo+'세</i><b style="color:'+ECOL_D[SELEM[d.stem]]+'">'+esc(d.gz)+'</b>'+
             '<s style="color:'+d.color+'">'+esc(d.sipsin)+'</s><u>'+d.year+'년~</u></div>';
-        }).join('')+'</div>'+
-        '<p class="tiny" style="margin-top:2px">'+esc(D.daeun.before)+'</p>'+
+        }).join('')+'</div><span class="swipe">옆으로 밀어보세요 <i>›</i></span></div>'+
+        '<p class="tiny" style="margin-top:2px">가로로 밀면 '+D.daeun.list[0].age+'세부터 '+
+          D.daeun.list[D.daeun.list.length-1].ageTo+'세까지 아홉 구간이 다 나옵니다. '+esc(D.daeun.before)+'</p>'+
         '<div class="slist" style="margin-top:14px">'+D.daeun.list.map(function(d,i){
           var now=(i===D.daeun.current);
           return '<div class="sitem" style="--c:'+d.color+(now?';background:var(--gold-soft);border-color:rgba(193,154,46,.45)':'')+'">'+
@@ -3484,7 +3528,22 @@ function renderDeep(j,b){
     var sc=now.parentNode;
     sc.scrollLeft=Math.max(0,now.offsetLeft-sc.clientWidth/2+now.offsetWidth/2);
   }
+  bindHScroll(el('daescroll'),el('daewrap'));
   reveal(app);window.scrollTo(0,0);
+}
+
+
+/* 가로 스크롤 영역 — 좌우로 더 있다는 걸 눈에 보이게 */
+function bindHScroll(box,wrap){
+  if(!box||!wrap)return;
+  function upd(){
+    var max=box.scrollWidth-box.clientWidth;
+    wrap.classList.toggle('sc-l',box.scrollLeft>6);
+    wrap.classList.toggle('sc-r',box.scrollLeft<max-6);
+  }
+  box.addEventListener('scroll',upd,{passive:true});
+  window.addEventListener('resize',upd);
+  setTimeout(upd,60);upd();
 }
 
 function dedupeRel(rel){
@@ -3566,6 +3625,7 @@ function renderLife(j,b){
     '<h1 style="font-size:30px">내 사주를<br>아홉 갈래로 봅니다</h1>'+
     '<p class="lead" style="font-size:15px">건강 · 재물 · 일 · 애정 · 문서 · 가정 · 사람 · 이동 · 말년. '+
       '오행 분포와 십신 구성, 지지의 합충과 신살까지 넣어 갈래마다 점수와 풀이를 따로 냈습니다.</p>'+
+    whoBar()+
   '</section>'+
 
   '<section class="sec" style="margin-top:22px"><div class="gold-sec">'+
