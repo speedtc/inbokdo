@@ -1155,6 +1155,27 @@ function starMap(entries,owner,opt){
 }
 
 /* ===== 화면: 홈 ===== */
+
+/* 홈 화면 메뉴 소개 */
+var HOME_MENU=[
+  {h:'/saju',   ic:'四', c:'#7a8b99', t:'사주 정밀 풀이', d:'원국 8자·십신·격국·용신·신살·대운 90년', tag:'가장 깊음'},
+  {h:'/today',  ic:'☀', c:'#e8a33b', t:'오늘의 운세',    d:'일진 · 12시진 흐름 · 오늘 맞는 띠 · 이번 주'},
+  {h:'/tojeong',ic:'卦', c:'#b8746e', t:'토정비결',      d:'144괘 · 여덟 갈래 · 12개월 월운', tag:'NEW'},
+  {h:'/life',   ic:'◈', c:'#4ea87a', t:'분야별 풀이',    d:'건강·재물·일·애정·문서·가정·사람·이동·말년'},
+  {h:'/wealth', ic:'財', c:'#c19a2e', t:'재물지도',      d:'단톡방에서 누가 돈그릇이 큰 사람인가'},
+  {h:'/love',   ic:'緣', c:'#b8446e', t:'연애지도',      d:'누구에게 인연이 먼저 올까'},
+  {h:'/work',   ic:'業', c:'#3c6ca6', t:'일운지도',      d:'누가 크게 쓰일 사람일까'},
+  {h:'/about',  ic:'?', c:'#7a8b99', t:'계산 방법',     d:'우리가 쓴 명리 방법을 그대로 공개합니다'}
+];
+var HOME_TOPIC=[
+  {h:'/wealth',han:'財',c:'#c19a2e',t:'재물지도',d:'누가 돈그릇이 제일 큰 사람일까',
+   b:'가운데가 財, 안쪽에 있을수록 재물 그릇이 큰 사람입니다. 연봉이나 자산은 묻지 않습니다.'},
+  {h:'/love',han:'緣',c:'#b8446e',t:'연애지도',d:'누구에게 인연이 먼저 올까',
+   b:'가운데가 緣, 안쪽에 있을수록 인연이 두터운 사람입니다. 애인 유무는 묻지 않습니다.'},
+  {h:'/work',han:'業',c:'#3c6ca6',t:'일운지도',d:'누가 크게 쓰일 사람일까',
+   b:'가운데가 業, 안쪽에 있을수록 크게 쓰이는 사주입니다. 직업이나 연봉은 묻지 않습니다.'}
+];
+
 function viewHome(){
   app.innerHTML='';
   app.appendChild(h(
@@ -1171,6 +1192,18 @@ function viewHome(){
   '<section class="sec rv">'+
     '<div class="sky"><div class="mapbox" id="demo"></div>'+mapLegend()+'</div>'+
     '<p class="tiny center" style="margin-top:11px">자리는 <b class="gold">주고받음</b>으로 정해집니다. 나를 채워주는 사람은 위쪽, 내가 채워주는 사람은 아래쪽. 점수가 높을수록 안쪽으로 들어오고, 같은 오행끼리는 선으로 이어집니다.</p>'+
+  '</section>'+
+
+  '<section class="sec rv">'+
+    '<h2>전부 무료로 봅니다</h2>'+
+    '<p class="tiny" style="margin:-6px 0 12px">가입도 결제도 없습니다. 생년월일을 <b>한 번만</b> 넣으면 아래 메뉴가 전부 열립니다.</p>'+
+    '<div class="plist">'+HOME_MENU.map(function(m){
+      return '<a class="prow" href="'+esc(m.h)+'">'+
+        '<span class="av" style="background:'+m.c+'1c;color:'+m.c+'">'+esc(m.ic)+'</span>'+
+        '<span class="nm"><b>'+esc(m.t)+'</b><i>'+esc(m.d)+'</i></span>'+
+        (m.tag?'<span class="chip" style="margin-left:auto;flex:0 0 auto">'+esc(m.tag)+'</span>':'')+
+        '<span class="go tiny">›</span></a>';
+    }).join('')+'</div>'+
   '</section>'+
 
   '<section class="sec rv">'+
@@ -1213,18 +1246,19 @@ function viewHome(){
 
   '<section class="sec rv">'+
     '<h2>단톡방으로 겨루기</h2>'+
-    '<p class="tiny" style="margin:-6px 0 0">인연지도는 나와 상대의 <b>사이</b>를 봅니다. 재물지도는 각자의 <b>그릇</b>을 봅니다.</p>'+
-    '<div class="card" style="margin-top:14px;border-color:rgba(193,154,46,.32);background:linear-gradient(155deg,#fdf4da,#fffdf7 62%)">'+
-      '<div style="display:flex;align-items:center;gap:13px">'+
-        '<div class="av" style="width:46px;height:46px;flex:0 0 46px;background:#c19a2e1f;color:#a07c1c;font-size:21px">財</div>'+
-        '<div style="flex:1;min-width:0"><b style="font-size:18px;letter-spacing:-.03em">재물지도</b>'+
-        '<div class="tiny" style="color:var(--dim)">누가 돈그릇이 제일 큰 사람일까</div></div>'+
-      '</div>'+
-      '<p style="margin:12px 0 0;font-size:14.5px;color:#4a4438;line-height:1.7">'+
-        '방을 만들어 단톡방에 던지면 각자 생일만 넣습니다. 가운데가 財, 안쪽에 있을수록 재물 그릇이 큰 사람입니다. '+
-        '<b>연봉이나 자산은 묻지 않습니다.</b></p>'+
-      '<button class="btn" id="gow" style="margin-top:15px">재물지도 만들기</button>'+
-    '</div>'+
+    '<p class="tiny" style="margin:-6px 0 0">인연지도는 나와 상대의 <b>사이</b>를 봅니다. 아래 세 지도는 각자의 <b>그릇</b>을 봅니다. '+
+      '방을 만들어 단톡방에 던지면 각자 생일만 넣고, 한 장의 지도에 순위가 그려집니다.</p>'+
+    HOME_TOPIC.map(function(x,i){
+      return '<div class="card" style="margin-top:'+(i?10:14)+'px;border-color:'+x.c+'44;background:linear-gradient(155deg,'+x.c+'12,#fffdf7 62%)">'+
+        '<div style="display:flex;align-items:center;gap:13px">'+
+          '<div class="av" style="width:46px;height:46px;flex:0 0 46px;background:'+x.c+'1f;color:'+x.c+';font-size:21px">'+esc(x.han)+'</div>'+
+          '<div style="flex:1;min-width:0"><b style="font-size:18px;letter-spacing:-.03em">'+esc(x.t)+'</b>'+
+          '<div class="tiny" style="color:var(--dim)">'+esc(x.d)+'</div></div>'+
+        '</div>'+
+        '<p style="margin:12px 0 0;font-size:14px;color:#4a4438;line-height:1.7">'+esc(x.b)+'</p>'+
+        '<a class="btn sec2" style="margin-top:13px;display:block;text-align:center;text-decoration:none" href="'+esc(x.h)+'">'+esc(x.t)+' 만들기</a>'+
+      '</div>';
+    }).join('')+
   '</section>'+
 
   '<section class="sec rv">'+
@@ -1263,7 +1297,6 @@ function viewHome(){
 
   el('go').onclick=el('go2').onclick=function(){tap();location.hash='';viewCreate();};
   el('go3').onclick=function(){tap();shareSite();};
-  var gw=el('gow');if(gw)gw.onclick=function(){tap();location.href='/wealth';};
   api('/api/stats').then(function(st){
     var bar=el('statBar');if(!bar)return;
     var v=[[st.today,'오늘 방문'],[st.total,'누적 방문'],[st.maps,'만든 지도'],[st.entries,'찍힌 별']];
@@ -3563,7 +3596,32 @@ function viewAbout(){
       ['세운·월운','그 해 간지와 내 일간·일지의 관계(십신·충·합·귀인·공망)로 냅니다. 월운은 절기 기준이라 인월(寅月)은 입춘부터입니다.']
     ],'계산은 전통 명리 방식 그대로이고, 풀이 문장은 전부 저희가 직접 썼습니다.')+
 
-    blk('8','성별을 받는 이유',[
+    blk('8','오늘의 운세는 이렇게 냅니다',[
+      ['일진(日辰)','오늘 날짜를 60갑자로 세운 것이 일진입니다. 내 일간과의 십신, 십이운성, 천간합·천간충, 내 일지와의 충·합·해, 천을귀인을 모두 넣어 점수를 냅니다.'],
+      ['12시진','오늘의 일간에서 오자둔(五鼠遁)으로 열두 시진의 천간을 뽑아 각각 내 일간과 견줍니다. 하루 안에서도 시간대마다 결이 다릅니다.'],
+      ['오늘 맞는 띠','오늘 일진의 지지와 육합·삼합을 이루는 띠가 잘 맞는 띠, 충·해를 이루는 띠가 조심할 띠입니다. 사람을 가리라는 뜻이 아니라 대화의 결을 미리 알아두는 용도입니다.'],
+      ['이번 주','오늘부터 이레 동안의 일진을 같은 방식으로 계산합니다. 중요한 약속을 잡을 때 쓰세요.'],
+      ['길색·길방','내 <b>용신(用神)</b> 오행에 해당하는 색과 방향입니다. 가장 얇은 오행이 아니라 억부·조후로 판정한 용신을 씁니다.']
+    ],'오늘의 운세는 매일 0시(한국 시각)에 바뀝니다.')+
+
+    blk('9','분야별 아홉 갈래는 이렇게 냅니다',[
+      ['재물·일·애정','각각 전용 엔진으로 계산합니다. 재물은 재성의 두께와 감당력(재다신약)·식상생재·군겁쟁재·재고를, 일운은 일간의 힘과 관성·식상의 균형을, 애정은 배우자궁과 도화·홍염·합충을 봅니다.'],
+      ['건강','오행의 쏠림 정도(표준편차)와 지지의 충 개수, 일간의 세기로 냅니다. 가장 얇은 오행에 해당하는 장부를 함께 짚습니다.'],
+      ['학업·문서','인성의 두께에 문창귀인·학당귀인·정관을 더합니다. 재성이 지나치게 세면 감점합니다(재극인).'],
+      ['가정·부모','년주와 월주의 상태, 인성, 년월 사이의 충으로 봅니다.'],
+      ['사람·귀인','지지의 합 개수, 천을귀인, 비겁의 적정선으로 냅니다.'],
+      ['이동·주거','역마살과 지지의 충으로 냅니다. 합이 많으면 자리를 지키는 쪽으로 봅니다.'],
+      ['말년','시주의 상태와 식상·재성으로 봅니다. 태어난 시각을 모르면 평균으로 처리합니다.']
+    ],'갈래마다 계산 근거가 다릅니다. 하나의 점수를 아홉 개로 나눈 것이 아닙니다.')+
+
+    blk('10','관계 풀이는 이렇게 냅니다',[
+      ['방향이 있습니다','상대가 나에게 주는 십신과 내가 상대에게 주는 십신이 다릅니다. 그래서 같은 두 사람이라도 서로가 서로에게 다른 사람입니다.'],
+      ['일지 궁합','두 사람의 일지(日支)는 배우자궁이자 인연궁입니다. 육합·충·복음·상생·상극을 따로 봅니다.'],
+      ['오행 보완','내게 얇은 기운을 상대가 넉넉히 가지고 있는지, 둘 다 같은 기운으로 쏠려 있는지를 봅니다.'],
+      ['관계 적합도','친구·동료 / 같이 일하기 / 연인·부부 / 스승·조력 네 가지로 나눠 각각 점수를 냅니다. 같은 두 사람도 어떤 관계로 만나느냐에 따라 결이 다릅니다.']
+    ])+
+
+    blk('11','성별을 받는 이유',[
       ['대운의 방향','대운은 남녀에 따라 흐르는 방향이 정반대입니다(양남음녀 순행 · 음남양녀 역행). 성별 없이는 10년 흐름을 아예 세울 수 없습니다.'],
       ['배우자와 자녀 자리','남자는 재성이 처, 관성이 자녀입니다. 여자는 관성이 남편, 식상이 자녀입니다. 성별에 따라 보는 자리가 반대로 바뀝니다.'],
       ['어디에 저장되나','성별과 생년월일은 <b>이용자 브라우저에만</b> 저장됩니다. 지도나 방에 참여할 때를 빼면 서버로 보내지 않고, 다른 참여자에게도 공개하지 않습니다.']
