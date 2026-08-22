@@ -329,6 +329,12 @@ details.adv[open] summary::before{content:'－ '}
   color:#8a7c5c;border:1px solid rgba(217,180,91,.28);border-radius:999px;padding:2px 8px}
 .adwrap{margin-top:26px}
 .adwrap .tiny{margin-top:8px;text-align:center}
+.consent{margin-top:18px;padding:14px 15px;border:1px solid rgba(60,48,16,.15);border-radius:13px;background:rgba(240,232,210,.42)}
+.consent .chk{display:flex;align-items:flex-start;gap:9px;font-size:13.5px;line-height:1.65;color:#4a4438;cursor:pointer}
+.consent .chk input{margin-top:2px;width:18px;height:18px;flex:0 0 18px;accent-color:#a07c1c}
+.consent .chk b{color:#231f18}
+.consent .req{font-style:normal;font-weight:700;color:#a07c1c}
+.consent a{color:#a07c1c;text-decoration:underline}
 .adask{display:flex;align-items:center;justify-content:center;gap:7px;flex-wrap:wrap;
   margin-top:10px;padding:9px 12px;border:1px dashed var(--line2);border-radius:12px;
   background:rgba(255,255,255,.55);text-decoration:none}
@@ -826,7 +832,9 @@ function formHTML(o){
   var lun=!!o.lunar;
   return ''+
   '<div class="field"><label for="fName">'+esc(o.nameLabel||'이름 또는 닉네임')+'</label>'+
-    '<input class="inp" id="fName" maxlength="12" autocomplete="off" value="'+esc(o.name||'')+'" placeholder="'+esc(o.namePh||'예: 김도현, 도현이')+'"></div>'+
+    '<input class="inp" id="fName" maxlength="12" autocomplete="off" value="'+esc(o.name||'')+'" placeholder="'+esc(o.namePh||'예: 김도현, 도현이')+'">'+
+    '<div class="hint">실명 대신 <b>별명</b>을 권합니다. 이 이름은 지도에 표시되어 같은 링크를 받은 사람에게 보입니다. '+
+    '전화번호·주소·이메일 같은 개인정보는 넣지 마세요.</div></div>'+
   '<div class="field"><label>성별</label><div class="seg" id="fSex">'+
     '<button type="button" data-v="m" aria-pressed="'+(o.gender==='m'?'true':'false')+'">남자</button>'+
     '<button type="button" data-v="f" aria-pressed="'+(o.gender==='f'?'true':'false')+'">여자</button></div>'+
@@ -847,6 +855,18 @@ function formHTML(o){
     '<label class="chk" style="margin-top:10px"><input type="checkbox" id="fTrue"><span>진태양시로 보정 (서울 기준 −32분)</span></label>'+
     '<div class="hint">한국 표준시는 동경 135도 기준이라 실제 태양시와 약 32분 차이가 납니다. 시간 경계에 태어났다면 켜보세요.</div>'+
   '</details>'+
+  (o.noConsent?'':
+  '<div class="consent">'+
+    '<label class="chk"><input type="checkbox" id="fAgree"><span>'+
+      '입력한 이름·생년월일을 <b>사주 계산과 지도 표시</b>에 이용하는 데 동의합니다. <i class="req">(필수)</i><br>'+
+      '<a href="/privacy" target="_blank" rel="noopener">개인정보처리방침</a> · '+
+      '<a href="/terms" target="_blank" rel="noopener">이용약관</a></span></label>'+
+    '<label class="chk" style="margin-top:11px"><input type="checkbox" id="fAge"><span>'+
+      '나는 <b>만 14세 이상</b>이며, 내 정보를 직접 입력하고 있습니다. <i class="req">(필수)</i></span></label>'+
+    '<div class="tiny" style="margin-top:11px;line-height:1.7;color:var(--dim)">'+
+      '생년월일은 <b style="color:#4a4438">지도 주인에게도, 다른 참여자에게도 보이지 않습니다.</b> '+
+      '궁합 계산에만 쓰이고, 화면에는 이름만 나옵니다.</div>'+
+  '</div>')+
   '<div class="err" id="fErr"></div>'+
   '<button class="btn" id="fGo" style="margin-top:18px">'+esc(o.cta||'다음')+'</button>';
 }
@@ -893,6 +913,9 @@ function bindForm(root,onSubmit){
     var name=root.querySelector('#fName').value.trim();
     if(!name){err.textContent='이름 또는 닉네임을 입력해 주세요.';root.querySelector('#fName').focus();return;}
     if(sexSeg&&!sex){err.textContent='성별을 선택해 주세요.';sexSeg.scrollIntoView({block:'center',behavior:'smooth'});return;}
+    var ag=root.querySelector('#fAgree'), av=root.querySelector('#fAge');
+    if(ag&&!ag.checked){err.textContent='개인정보 이용 동의에 체크해 주세요.';ag.closest('.consent').scrollIntoView({block:'center',behavior:'smooth'});return;}
+    if(av&&!av.checked){err.textContent='만 14세 이상 확인에 체크해 주세요.';av.closest('.consent').scrollIntoView({block:'center',behavior:'smooth'});return;}
     var hv=root.querySelector('#fH').value;
     var unknown=(hv==='모름');
     var birth={
@@ -2251,12 +2274,27 @@ function quickJoinBox(cta){
   return '<div class="quick" id="quickBox">'+
     '<div class="qt"><b>'+esc(b.name||'내')+'</b>님 · '+d.y+'.'+d.m+'.'+d.d+
       (d.lunar?' 음력':'')+(d.unknownTime?' · 시간 모름':'')+'</div>'+
-    '<button class="btn" id="qgo">'+esc(cta)+'</button>'+
+    '<div class="consent" style="margin-top:13px">'+
+      '<label class="chk"><input type="checkbox" id="qAgree"><span>'+
+        '이름·생년월일을 <b>사주 계산과 지도 표시</b>에 이용하는 데 동의하고, '+
+        '<b>만 14세 이상</b>입니다. <i class="req">(필수)</i><br>'+
+        '<a href="/privacy" target="_blank" rel="noopener">개인정보처리방침</a> · '+
+        '<a href="/terms" target="_blank" rel="noopener">이용약관</a></span></label>'+
+      '<div class="tiny" style="margin-top:10px;line-height:1.7;color:var(--dim)">'+
+        '생년월일은 지도 주인에게도 다른 참여자에게도 보이지 않습니다. 화면에는 이름만 나옵니다.</div>'+
+    '</div>'+
+    '<div class="err" id="qErr"></div>'+
+    '<button class="btn" id="qgo" style="margin-top:12px">'+esc(cta)+'</button>'+
     '<button class="btn sec2" id="qedit" style="margin-top:8px">다른 정보로 넣기</button>'+
   '</div>';
 }
 function bindQuick(onGo){
-  var g=el('qgo'); if(g)g.onclick=function(){tap();onGo();};
+  var g=el('qgo'); if(g)g.onclick=function(){
+    var a=el('qAgree'), er=el('qErr');
+    if(a&&!a.checked){ if(er)er.textContent='동의에 체크해 주세요.'; a.closest('.consent').scrollIntoView({block:'center',behavior:'smooth'}); return; }
+    if(er)er.textContent='';
+    tap();onGo();
+  };
   var e=el('qedit'); if(e)e.onclick=function(){
     tap();
     var q=el('quickBox'); if(q)q.hidden=true;
@@ -3080,7 +3118,7 @@ function viewProfile(){
   }
   body+='<section class="sec '+(b&&b.birth?'rv':'fade')+'" id="formSec"'+(pend?'':' hidden')+'>'+
     '<h2>'+(b&&b.birth?'생년월일 바꾸기':pend?'성별 고르기':'생년월일 넣기')+'</h2>'+
-    '<div class="card" id="fw">'+formHTML(birthPrefill({cta:b&&b.birth?'바꾸기':pend?'저장하고 내 사주 보기':'저장하고 오늘의 운세 보기'}))+'</div>'+
+    '<div class="card" id="fw">'+formHTML(birthPrefill({noConsent:true,cta:b&&b.birth?'바꾸기':pend?'저장하고 내 사주 보기':'저장하고 오늘의 운세 보기'}))+'</div>'+
   '</section>';
   app.appendChild(h(head+body+
     '<section class="sec rv">'+pageShareBox('home')+'</section>'+
