@@ -147,6 +147,14 @@ async function ensureSchema(db) {
     db.prepare(`CREATE TABLE IF NOT EXISTS stats (
       day TEXT PRIMARY KEY, hits INTEGER NOT NULL DEFAULT 0
     )`),
+    // 광고 노출·클릭 집계 (광고주에게 보여줄 숫자)
+    db.prepare(`CREATE TABLE IF NOT EXISTS ad_stats (
+      day TEXT NOT NULL,
+      ad TEXT NOT NULL,
+      views INTEGER NOT NULL DEFAULT 0,
+      clicks INTEGER NOT NULL DEFAULT 0,
+      PRIMARY KEY (day, ad)
+    )`),
     // 분야별 방 (재물지도 등). 주인이 중앙에 서지 않고 주제가 중앙에 선다.
     db.prepare(`CREATE TABLE IF NOT EXISTS rooms (
       code TEXT PRIMARY KEY,
@@ -467,6 +475,39 @@ async function handleApi(request, env, url) {
         serverDay: todayKST(),
       });
     } catch (e) { return bad(e.message || '계산 실패'); }
+  }
+
+  // 광고 노출·클릭 집계
+  if (path === '/api/ad' && request.method === 'POST') {
+    const body = await request.json().catch(() => null);
+    const ad = String(body?.ad || '').slice(0, 40);
+    const kind = body?.kind === 'click' ? 'clicks' : 'views';
+    if (!ad || !/^[a-z0-9_-]+$/i.test(ad)) return json({ ok: false });
+    const day = kstDay();
+    try {
+      await db.prepare(
+        `INSERT INTO ad_stats (day, ad, ${kind}) VALUES (?, ?, 1)
+         ON CONFLICT(day, ad) DO UPDATE SET ${kind} = ${kind} + 1`
+      ).bind(day, ad).run();
+    } catch (e) { /* 집계 실패는 무시 */ }
+    return json({ ok: true });
+  }
+
+  // 광고 성과 (광고주에게 보여줄 숫자)
+  if (path === '/api/ad/stats' && request.method === 'GET') {
+    const days = Math.min(120, Math.max(1, parseInt(url.searchParams.get('days') || '30', 10)));
+    const from = kstDay(Date.now() - days * 86400000);
+    try {
+      const rs = await db.prepare(
+        `SELECT ad, SUM(views) AS views, SUM(clicks) AS clicks
+         FROM ad_stats WHERE day >= ? GROUP BY ad ORDER BY views DESC`
+      ).bind(from).all();
+      const daily = await db.prepare(
+        `SELECT day, SUM(views) AS views, SUM(clicks) AS clicks
+         FROM ad_stats WHERE day >= ? GROUP BY day ORDER BY day DESC`
+      ).bind(from).all();
+      return json({ from, days, ads: rs.results || [], daily: daily.results || [] });
+    } catch (e) { return json({ from, days, ads: [], daily: [] }); }
   }
 
   // 사주 심화 풀이

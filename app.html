@@ -696,6 +696,7 @@ function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){
 function tap(){try{navigator.vibrate&&navigator.vibrate(8)}catch(e){}}
 var RV=null;
 function reveal(root){
+  try{bindAds()}catch(e){}
   if(!('IntersectionObserver' in window))return;
   if(!RV)RV=new IntersectionObserver(function(es){
     es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');RV.unobserve(e.target);}});
@@ -1004,26 +1005,81 @@ function placeRings(pts,AX,ORDER,RG){
   return out;
 }
 /* 광고 슬롯 — 지금은 자체 채널 하나만 노출한다 */
-var ADS=[{
-  href:'https://open.kakao.com/o/gEn88Wkc',
-  img:'/ad1.png',
-  title:'多주소 · 다주택 & 주택임대사업 이야기',
-  sub:'다주택자 오픈채팅방',
-  cta:'들어가기'
-}];
-function adBox(note){
-  var a=ADS[0];if(!a)return '';
+/* 광고 슬롯 — 여러 개를 돌아가며 노출한다.
+   id       집계용 고유값 (바꾸지 말 것)
+   weight   노출 비중 (클수록 자주)
+   topics   이 메뉴에서 우선 노출 (없으면 전 메뉴)
+   note     이미지 아래 한 줄 설명                          */
+var ADS=[
+  { id:'dajusoh', weight:3,
+    href:'https://open.kakao.com/o/gEn88Wkc',
+    img:'/ad1.png',
+    title:'多주소 · 다주택 & 주택임대사업 이야기',
+    cta:'클릭시 오픈채팅방으로 이동됩니다',
+    topics:['wealth','work'],
+    note:'부동산·임대사업 이야기를 나누는 방입니다.' }
+];
+/* 광고가 하나뿐이면 그대로, 여럿이면 가중치로 뽑되 직전 광고는 피한다 */
+var AD_LAST=null;
+function pickAd(topic){
+  var pool=ADS.filter(function(a){return !a.topics||!topic||a.topics.indexOf(topic)>=0;});
+  if(!pool.length)pool=ADS.slice();
+  if(!pool.length)return null;
+  if(pool.length>1&&AD_LAST){
+    var f=pool.filter(function(a){return a.id!==AD_LAST;});
+    if(f.length)pool=f;
+  }
+  var tot=0;pool.forEach(function(a){tot+=(a.weight||1)});
+  var r=Math.random()*tot, a=pool[0];
+  for(var i=0;i<pool.length;i++){ r-=(pool[i].weight||1); if(r<=0){a=pool[i];break;} }
+  AD_LAST=a.id;
+  return a;
+}
+/* 노출·클릭 집계 (실패해도 화면에 영향 없음) */
+function adPing(kind,id,topic){
+  try{
+    var b=JSON.stringify({kind:kind,ad:id,topic:topic||'',path:location.pathname});
+    if(navigator.sendBeacon)navigator.sendBeacon('/api/ad',new Blob([b],{type:'application/json'}));
+    else fetch('/api/ad',{method:'POST',headers:{'content-type':'application/json'},body:b,keepalive:true}).catch(function(){});
+  }catch(e){}
+}
+function adBox(note,topic){
+  var a=pickAd(topic);if(!a)return '';
+  var n=note||a.note||'';
   return '<div class="adwrap">'+
-    '<a class="adbox" href="'+esc(a.href)+'" target="_blank" rel="noopener">'+
+    '<a class="adbox" href="'+esc(a.href)+'" target="_blank" rel="noopener" data-ad="'+esc(a.id)+'"'+
+      ' data-adtopic="'+esc(topic||'')+'">'+
       '<img src="'+esc(a.img)+'" alt="'+esc(a.title)+'" decoding="async" width="720" height="222">'+
       '<span class="adcta"><span class="adtag">광고</span>'+
-        '<span><u>클릭시 오픈채팅방으로 이동됩니다</u> ›</span></span>'+
+        '<span><u>'+esc(a.cta||'자세히 보기')+'</u> ›</span></span>'+
     '</a>'+
-    (note?'<div class="tiny">'+note+'</div>':'')+
+    (n?'<div class="tiny">'+n+'</div>':'')+
     '<a class="adask" href="'+esc(CONTACT)+'" target="_blank" rel="noopener">'+
       '<span class="q">이 자리에 광고를 싣고 싶으신가요?</span>'+
       '<span class="a">광고 문의하기 ›</span></a>'+
   '</div>';
+}
+/* 화면에 실제로 보였을 때 1회 노출, 누르면 클릭 집계 */
+var AD_SEEN={};
+function bindAds(){
+  var boxes=[].slice.call(app.querySelectorAll('.adbox[data-ad]'));
+  if(!boxes.length)return;
+  boxes.forEach(function(bx){
+    bx.addEventListener('click',function(){ adPing('click',bx.dataset.ad,bx.dataset.adtopic); });
+  });
+  if(!('IntersectionObserver' in window)){
+    boxes.forEach(function(bx){ adPing('view',bx.dataset.ad,bx.dataset.adtopic); });
+    return;
+  }
+  var io=new IntersectionObserver(function(es){
+    es.forEach(function(e){
+      if(!e.isIntersecting)return;
+      var bx=e.target, k=bx.dataset.ad+'|'+location.pathname;
+      if(!AD_SEEN[k]){ AD_SEEN[k]=1; adPing('view',bx.dataset.ad,bx.dataset.adtopic); }
+      io.unobserve(bx);
+    });
+  },{threshold:.5});
+  boxes.forEach(function(bx){io.observe(bx)});
 }
 /* 페이지별 공유 */
 var PAGE_SHARE={
@@ -2552,7 +2608,7 @@ function renderRoom(j,mine){
     '<section class="sec fade" id="fwrap"'+(getBirth()&&getBirth().birth?' hidden':'')+'><div class="card" id="fw">'+
     formHTML(birthPrefill({cta:'내 별 찍기',nameLabel:'뭐라고 부를까요',namePh:'예: 평원, 김대리'}))+'</div></section>')+
   '<section class="sec rv" id="wlist"></section>'+
-  '<section class="sec rv">'+adBox()+'</section>'+
+  '<section class="sec rv">'+adBox(null,topic)+'</section>'+
   '<section class="sec rv">'+otherTopics(topic)+'</section>'+
   '<footer>'+esc(T.footer)+' 입력한 생년월일은 다른 참여자에게 보이지 않습니다.</footer>'));
 
@@ -2712,7 +2768,7 @@ function renderRoomResult(r,code){
 
   '<section class="sec fade"><h2>내 사주</h2>'+sajuCard(r.me.saju,ch)+'</section>'+
   '<section class="sec rv">'+roomShareBox(code,r.title,topic)+'</section>'+
-  '<section class="sec rv">'+adBox()+'</section>'+
+  '<section class="sec rv">'+adBox(null,topic)+'</section>'+
   '<section class="sec rv">'+otherTopics(topic)+'</section>'+
   '<section class="sec rv"><button class="btn" id="back">지도에서 순위 보기</button></section>'+
   '<footer>'+esc(T.footer)+'</footer>'));
