@@ -1041,40 +1041,6 @@ function constBox(j){
       : '<div class="tiny" style="margin-top:11px">주고받음의 다섯 자리가 다 차면 별자리가 완성됩니다.</div>')+
   '</div>'+h2;
 }
-function capBar(j){
-  var lim=j.limit||10,n=Math.min(j.count,lim),pct=Math.round(n/lim*100);
-  return '<div class="cap"><span class="bt'+(j.full?' full':'')+'"><i style="width:'+pct+'%"></i></span>'+
-    '<b>'+j.count+' / '+lim+'명</b></div>'+
-    (j.full
-      ? '<div class="tiny" style="margin-top:7px;color:#8e5d17">자리가 다 찼어요. 아래에서 자리를 늘려보세요.</div>'
-      : '<div class="tiny" style="margin-top:7px">'+(lim-j.count)+'자리 남았어요.</div>');
-}
-function growBox(j){
-  var lim=j.limit||5, maxed=lim>=30;
-  var done=!!j.checkedInToday, shared=!!j.sharedToday;
-  return '<div class="upsell" id="growBox">'+
-    '<div class="eyebrow" style="color:#c9a227">자리 늘리기</div>'+
-    '<b style="display:block;font-size:21px;font-weight:700;letter-spacing:-.035em;margin-top:8px">'+
-      (maxed?'늘릴 수 있는 만큼 다 채웠어요':'하루에 두 개까지 늘릴 수 있어요')+'</b>'+
-    '<p style="margin:9px 0 0;font-size:14.5px;color:#4a4438;line-height:1.66">'+
-      (maxed
-        ? '30명까지 다 채웠습니다. 이제 친구를 초대해서 늘려보세요.'
-        : '지금 정원은 <b class="gold">'+lim+'명</b>. 출석 1개 + 공유 1개, 최대 30명까지 늘릴 수 있어요.')+'</p>'+
-    (maxed?'':'<div class="chips" style="margin-top:12px">'+
-      '<span class="chip"'+(done?' style="color:#2b7350;border-color:rgba(43,115,80,.34)"':'')+'>'+(done?'✓ 오늘 출석 완료':'출석 +1')+'</span>'+
-      '<span class="chip"'+(shared?' style="color:#2b7350;border-color:rgba(43,115,80,.34)"':'')+'>'+(shared?'✓ 오늘 공유 완료':'공유 +1')+'</span>'+
-      '<span class="chip">초대 성공 +2</span></div>')+
-    (j.streak>1?'<div class="chips" style="margin-top:11px"><span class="chip" style="color:#a07c1c;border-color:rgba(217,180,91,.4)">🔥 '+j.streak+'일 연속</span>'+
-      (j.invites?'<span class="chip">초대 '+j.invites+'명 · +'+(j.invites*2)+'자리</span>':'')+'</div>':
-     (j.invites?'<div class="chips" style="margin-top:11px"><span class="chip">초대 '+j.invites+'명 · +'+(j.invites*2)+'자리</span></div>':''))+
-    (maxed?'':'<button class="btn'+(done?' sec2':'')+'" id="chk" style="margin-top:16px"'+(done?' disabled':'')+'>'+
-      (done?'오늘 출석 완료 · 내일 또 오세요':'출석하고 자리 1개 늘리기')+'</button>')+
-    '<div class="tiny" style="margin-top:12px;padding-top:11px;border-top:1px solid rgba(60,48,16,.11);line-height:1.65">'+
-      '<b style="color:#4a4438">공유 버튼을 누르면 하루 1개</b>가 바로 늘고, '+
-      '친구가 내 링크로 들어와 <b style="color:#4a4438">자기 인연지도를 만들면</b> 2개가 더 늘어납니다.</div>'+
-  '</div>';
-}
-// 로그인한 상태에서 브라우저에만 있던 지도를 자동으로 계정에 붙인다
 function claimIfNeeded(j){
   if(!ME||j.saved!==false)return;
   var mine=store('inbokdo_mine')||{};
@@ -1084,46 +1050,6 @@ function claimIfNeeded(j){
     .then(function(){toast('내 계정에 저장했어요');setTimeout(function(){viewMap(j.code)},800);})
     .catch(function(){});
 }
-function bindCheckin(code){
-  var b=el('chk');if(!b)return;
-  b.onclick=function(){
-    tap();
-    var mine=store('inbokdo_mine')||{};
-    var tk=mine[code]&&mine[code].token;
-    if(!tk){toast('이 지도의 주인만 출석할 수 있어요');return;}
-    b.innerHTML='<span class="spin"></span>';b.disabled=true;
-    api('/api/maps/'+code+'/checkin',{method:'POST',body:JSON.stringify({token:tk})})
-      .then(function(r){
-        toast(r.message||'출석했어요');
-        setTimeout(function(){viewMap(code)},700);
-      })
-      .catch(function(e){b.disabled=false;b.textContent='출석하고 자리 1개 늘리기';toast(e.message);});
-  };
-}
-function upsellBox(j){
-  return '<div class="upsell">'+
-    '<div class="eyebrow" style="color:#c9a227">자리가 다 찼어요</div>'+
-    '<b style="display:block;font-size:21px;font-weight:700;letter-spacing:-.035em;margin-top:8px">'+
-      '별을 더 받고 싶다면</b>'+
-    '<p style="margin:9px 0 0;font-size:14.5px;color:#4a4438;line-height:1.66">'+
-      '무료로 '+(j.limit||10)+'명까지 받았습니다. 한 번 후원하면 이 지도는 계속 열려 있습니다.</p>'+
-    '<ul><li>참여 인원 300명까지</li><li>지도 영구 보관</li><li>새 참여자 알림</li></ul>'+
-    '<button class="btn" id="unlock" style="margin-top:16px">후원하고 계속 받기</button>'+
-    '<div class="tiny center" style="margin-top:10px">준비 중입니다. 조금만 기다려 주세요.</div>'+
-  '</div>';
-}
-function bindUnlock(code){
-  var b=el('unlock');if(!b)return;
-  b.onclick=function(){
-    tap();
-    var mine=store('inbokdo_mine')||{};
-    var tk=mine[code]&&mine[code].token;
-    b.innerHTML='<span class="spin"></span>';
-    api('/api/maps/'+code+'/unlock',{method:'POST',body:JSON.stringify({token:tk})})
-      .then(function(){toast('열렸습니다');location.reload();})
-      .catch(function(e){b.textContent='후원하고 계속 받기';toast(e.message);});
-  };
-}
 function shareBox(code,ownerName){
   var url=location.origin+'/m/'+code;
   return '<div class="sharebox">'+
@@ -1131,7 +1057,7 @@ function shareBox(code,ownerName){
     '<b style="display:block;font-size:19px;font-weight:700;letter-spacing:-.035em;margin-top:8px">'+
       '이 링크를 받은 친구만 내 지도에 별이 찍힙니다</b>'+
     '<div class="tiny" style="margin-top:7px;color:var(--dim);line-height:1.65">'+
-      '친구는 생년월일만 넣으면 됩니다. 가입도, 앱 설치도 필요 없어요.</div>'+
+      '친구는 생년월일만 넣으면 됩니다. 가입도, 앱 설치도 필요 없어요. <b style="color:#4a4438">인원 제한 없이</b> 몇 명이든 받습니다.</div>'+
     '<div class="linkrow"><input id="lnk" readonly value="'+esc(url)+'"><button id="cpy">복사</button></div>'+
     '<button class="btn" id="shr" style="margin-top:10px">내 별자리 공유하기</button>'+
     '<button class="btn sec2" id="grp" style="margin-top:9px">단톡방에 통째로 보내기</button>'+
@@ -1193,18 +1119,10 @@ function doShare(code,ownerName,group){
   if(navigator.share){navigator.share({title:title,text:txt,url:url}).catch(function(){});return;}
   copyLink(code);
 }
-function claimShare(code){
-  var mine=store('inbokdo_mine')||{};
-  var tk=mine[code]&&mine[code].token;
-  if(!tk)return;
-  api('/api/maps/'+code+'/shared',{method:'POST',body:JSON.stringify({token:tk})})
-    .then(function(r){ if(r.ok){toast(r.message);setTimeout(function(){viewMap(code)},900);} })
-    .catch(function(){});
-}
 function bindShare(code,ownerName){
-  var c=el('cpy');if(c)c.onclick=function(){tap();copyLink(code);claimShare(code);};
-  var s=el('shr');if(s)s.onclick=function(){tap();doShare(code,ownerName);claimShare(code);};
-  var g=el('grp');if(g)g.onclick=function(){tap();doShare(code,ownerName,true);claimShare(code);};
+  var c=el('cpy');if(c)c.onclick=function(){tap();copyLink(code);};
+  var s=el('shr');if(s)s.onclick=function(){tap();doShare(code,ownerName);};
+  var g=el('grp');if(g)g.onclick=function(){tap();doShare(code,ownerName,true);};
   var t=el('sit');if(t)t.onclick=function(){tap();shareSite();};
 }
 
@@ -1217,14 +1135,12 @@ function renderOwner(j){
     '<h1 style="font-size:29px">'+esc(j.ownerName)+'님의 인연지도</h1>'+
     '<p class="lead" style="font-size:14.5px">'+
       (pts.length? '지금까지 <b class="gold">'+pts.length+'명</b>이 별을 남겼습니다. 안쪽에 있을수록 나와 기운이 잘 맞는 사람입니다.'
-                 : '아직 아무도 없습니다. 아래 링크를 친구에게 보내보세요.')+'</p>'+
-    capBar(j)+
+                 : '아직 아무도 없습니다. 아래 링크를 친구에게 보내보세요. 몇 명이 오든 다 받습니다.')+'</p>'+
   '</section>'+
   '<section class="sec rv" style="margin-top:30px">'+constBox(j)+'</section>'+
   '<section class="sec fade" style="margin-top:20px"><div class="sky"><div class="mapbox" id="map"></div>'+mapLegend()+'</div>'+
     '<div id="selBox"></div></section>'+
   '<section class="sec rv">'+shareBox(j.code,j.ownerName)+'</section>'+
-  '<section class="sec rv">'+growBox(j)+'</section>'+
   (j.saved===false&&PROVIDERS.length
     ? '<section class="sec rv"><div class="card" style="border-color:rgba(217,180,91,.28);background:linear-gradient(155deg,rgba(217,180,91,.16),rgba(255,255,255,.6))">'+
       '<div class="eyebrow" style="color:#c9a227">아직 저장 안 됨</div>'+
@@ -1240,7 +1156,6 @@ function renderOwner(j){
   el('map').innerHTML=starMap(pts,j.ownerChar,{sel:SEL});
   bindStars(pts);
   bindShare(j.code,j.ownerName);
-  bindCheckin(j.code);
   bindSso(app);
   claimIfNeeded(j);
   var bg=el('brag');
@@ -1252,10 +1167,9 @@ function renderOwner(j){
     if(navigator.share)navigator.share({title:'인연지도',text:msg,url:url}).catch(function(){});
     else copyLink(j.code);
   };
-  setDock('<button class="btn">'+(j.full?'자리 늘리기':'내 별자리 공유하기')+'</button>',function(){
-    if(j.full){var g=el('growBox');if(g)g.scrollIntoView({behavior:'smooth',block:'center'});}
-    else doShare(j.code,j.ownerName);
-  },'.sharebox, #growBox');
+  setDock('<button class="btn">내 별자리 공유하기</button>',function(){
+    doShare(j.code,j.ownerName);
+  },'.sharebox');
   reveal(app);
 
   if(pts.length){
@@ -1448,8 +1362,8 @@ function renderVisitorFull(j){
   app.innerHTML='';
   app.appendChild(h(
   '<section class="fade" style="padding-top:34px">'+
-    '<div class="eyebrow">자리가 다 찼어요</div>'+
-    '<h1 style="font-size:30px">'+esc(j.ownerName)+'님의 인연지도는<br>지금 <span class="gold">'+j.count+'명</span>이 꽉 채웠어요</h1>'+
+    '<div class="eyebrow">지도가 가득 찼어요</div>'+
+    '<h1 style="font-size:30px">'+esc(j.ownerName)+'님의 인연지도에<br><span class="gold">'+j.count+'명</span>이 모였어요</h1>'+
     '<p class="lead">조금 늦었네요. 대신 <b>내 인연지도</b>를 만들어서 '+esc(j.ownerName)+'님을 초대해보는 건 어때요?</p>'+
     '<button class="btn" id="mk" style="margin-top:26px">내 인연지도 만들기</button>'+
   '</section>'+
@@ -1503,7 +1417,7 @@ function renderVisitor(j){
       renderResult(r,j.code);
     }).catch(function(e){
       done(e.message);
-      if(/자리가 다 찼/.test(e.message)) setTimeout(function(){
+      if(/최대 \d+명/.test(e.message)) setTimeout(function(){
         api('/api/maps/'+j.code).then(function(n){MAP=n;MAP.code=j.code;renderVisitorFull(n);});
       },900);
     });

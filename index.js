@@ -137,24 +137,12 @@ async function ensureSchema(db) {
   ]) { try { await db.prepare(sql).run(); } catch (e) { /* 이미 존재 */ } }
 }
 
-const FREE_LIMIT = 5;       // 기본 정원
-const CHECKIN_CAP = 30;     // 출석체크로 늘릴 수 있는 최대치
-const REF_BONUS = 2;        // 내 링크로 들어온 친구가 지도를 만들면 주는 자리
-const REF_CAP = 60;         // 초대 보상 포함 상한
+// 정원 제한 없음. 한 지도가 받을 수 있는 절대 상한만 둔다.
 const HARD_CAP = 300;       // 절대 상한
 
 /** 한국 날짜 문자열 (YYYY-MM-DD) */
 function kstDay(ts) {
   return new Date((ts ?? Date.now()) + 9 * 3600 * 1000).toISOString().slice(0, 10);
-}
-function prevDay(day) {
-  const d = new Date(day + 'T00:00:00Z');
-  d.setUTCDate(d.getUTCDate() - 1);
-  return d.toISOString().slice(0, 10);
-}
-function limitOf(row) {
-  const n = Number(row.entry_limit);
-  return Number.isFinite(n) && n > 0 ? Math.min(n, HARD_CAP) : FREE_LIMIT;
 }
 
 // 옛 데이터에는 axis 가 없어 십신 이름에서 되살린다
@@ -206,9 +194,6 @@ async function bumpStats(env) {
 }
 
 // 결제 검증 자리. 실제 PG(카카오페이·토스·Stripe 등)를 붙일 때 이 함수만 채우면 된다.
-async function verifyPayment(env, body) {
-  return false;
-}
 
 async function handleApi(request, env, url) {
   const db = env.DB;
@@ -228,7 +213,7 @@ async function handleApi(request, env, url) {
       providers: enabledProviders(env),
       maps: results.map((r) => ({
         code: r.code, name: r.owner_name, char: charPayload(r.day_stem),
-        count: r.n, limit: r.entry_limit, createdAt: r.created_at,
+        count: r.n, limit: HARD_CAP, createdAt: r.created_at,
       })),
     });
   }
@@ -267,19 +252,16 @@ async function handleApi(request, env, url) {
       `INSERT INTO maps (code, owner_name, owner_token, birth_json, saju_json, day_stem, ref_code, user_id, entry_limit, plan, created_at)
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'free', ?)`
     ).bind(code, name, token, JSON.stringify(birth), JSON.stringify(saju), saju.dayStem, ref,
-      me ? me.id : null, FREE_LIMIT, Date.now()).run();
+      me ? me.id : null, HARD_CAP, Date.now()).run();
 
-    // 초대 보상: 내 링크를 타고 온 사람이 자기 지도를 만들면 초대한 쪽 정원 +2
+    // 초대 기록 (통계용). 정원 제한이 없어져 보상은 더 이상 주지 않는다.
     let refRewarded = false;
     if (ref && ref !== code) {
-      const parent = await db.prepare(`SELECT code, entry_limit FROM maps WHERE code = ?`).bind(ref).first();
+      const parent = await db.prepare(`SELECT code FROM maps WHERE code = ?`).bind(ref).first();
       if (parent) {
         try {
           await db.prepare(`INSERT INTO referrals (child, parent, created_at) VALUES (?, ?, ?)`)
             .bind(code, ref, Date.now()).run();
-          const next = Math.min(REF_CAP, Number(parent.entry_limit || FREE_LIMIT) + REF_BONUS);
-          await db.prepare(`UPDATE maps SET entry_limit = ? WHERE code = ?`).bind(next, ref).run();
-          refRewarded = true;
         } catch (e) { /* 이미 기록됨 */ }
       }
     }
@@ -308,14 +290,10 @@ async function handleApi(request, env, url) {
       ownerSaju: isOwner ? sajuPayload(saju) : { dist: saju.dist, zodiac: saju.zodiac },
       isOwner,
       count: results.length,
-      limit: limitOf(row),
+      limit: HARD_CAP,
       plan: row.plan || 'free',
-      full: results.length >= limitOf(row),
+      full: results.length >= HARD_CAP,
       saved: isOwner ? !!row.user_id : undefined,
-      checkedInToday: isOwner ? row.last_checkin === kstDay() : undefined,
-      sharedToday: isOwner ? row.last_share === kstDay() : undefined,
-      streak: isOwner ? (row.streak || 0) : undefined,
-      canCheckin: isOwner ? (limitOf(row) < CHECKIN_CAP) : undefined,
       invites: isOwner ? (await db.prepare(`SELECT COUNT(*) AS n FROM referrals WHERE parent = ?`).bind(code).first()).n : undefined,
       entries: results.map((r, i) => ({ ...entryRow(r), rank: i + 1 })),
       createdAt: row.created_at,
@@ -337,11 +315,10 @@ async function handleApi(request, env, url) {
     if (!row) return bad('없는 지도입니다.', 404);
 
     const cnt = await db.prepare(`SELECT COUNT(*) AS n FROM entries WHERE code = ?`).bind(code).first();
-    const lim = limitOf(row);
-    if (cnt.n >= lim) {
+    if (cnt.n >= HARD_CAP) {
       return json({
-        error: `이 지도는 자리가 다 찼어요. (${lim}명)`,
-        reason: 'LIMIT', limit: lim, count: cnt.n,
+        error: `이 지도는 최대 ${HARD_CAP}명까지 받을 수 있어요.`,
+        reason: 'LIMIT', limit: HARD_CAP, count: cnt.n,
         ownerName: row.owner_name,
       }, 402);
     }
@@ -419,83 +396,6 @@ async function handleApi(request, env, url) {
     } catch (e) { return bad(e.message || '계산 실패'); }
   }
 
-  // 출석체크: 하루 1회, 자리 1개
-  const mCheck = path.match(/^\/api\/maps\/([0-9a-z]{4,12})\/checkin$/);
-  if (mCheck && request.method === 'POST') {
-    const code = mCheck[1];
-    const body = await request.json().catch(() => ({}));
-    const row = await db.prepare(`SELECT * FROM maps WHERE code = ?`).bind(code).first();
-    if (!row) return bad('없는 지도입니다.', 404);
-    const owns = (me && row.user_id && row.user_id === me.id) || body.token === row.owner_token;
-    if (!owns) return bad('지도 주인만 출석할 수 있어요.', 403);
-
-    const today = kstDay();
-    if (row.last_checkin === today) {
-      return json({ ok: false, reason: 'ALREADY', limit: limitOf(row), streak: row.streak || 0,
-        message: '오늘은 이미 출석했어요.' });
-    }
-    const cur = limitOf(row);
-    const streak = row.last_checkin === prevDay(today) ? (row.streak || 0) + 1 : 1;
-
-    if (cur >= CHECKIN_CAP) {
-      await db.prepare(`UPDATE maps SET last_checkin = ?, streak = ? WHERE code = ?`)
-        .bind(today, streak, code).run();
-      return json({ ok: false, reason: 'MAXED', limit: cur, streak,
-        message: `출석으로 늘릴 수 있는 최대(${CHECKIN_CAP}명)에 도달했어요.` });
-    }
-    const next = Math.min(CHECKIN_CAP, cur + 1);
-    await db.batch([
-      db.prepare(`INSERT OR IGNORE INTO checkins (code, day, created_at) VALUES (?, ?, ?)`)
-        .bind(code, today, Date.now()),
-      db.prepare(`UPDATE maps SET entry_limit = ?, last_checkin = ?, streak = ? WHERE code = ?`)
-        .bind(next, today, streak, code),
-    ]);
-    return json({ ok: true, limit: next, gained: next - cur, streak,
-      message: `자리 한 개가 늘었어요. 이제 ${next}명까지 받을 수 있어요.` });
-  }
-
-  // 공유 보상: 하루 1회, 자리 1개
-  const mShare = path.match(/^\/api\/maps\/([0-9a-z]{4,12})\/shared$/);
-  if (mShare && request.method === 'POST') {
-    const code = mShare[1];
-    const body = await request.json().catch(() => ({}));
-    const row = await db.prepare(`SELECT * FROM maps WHERE code = ?`).bind(code).first();
-    if (!row) return bad('없는 지도입니다.', 404);
-    const owns = (me && row.user_id && row.user_id === me.id) || body.token === row.owner_token;
-    if (!owns) return bad('지도 주인만 받을 수 있어요.', 403);
-
-    const today = kstDay();
-    if (row.last_share === today) {
-      return json({ ok: false, reason: 'ALREADY', limit: limitOf(row), message: '공유 보상은 하루에 한 번이에요.' });
-    }
-    const cur = limitOf(row);
-    if (cur >= CHECKIN_CAP) {
-      await db.prepare(`UPDATE maps SET last_share = ? WHERE code = ?`).bind(today, code).run();
-      return json({ ok: false, reason: 'MAXED', limit: cur, message: `늘릴 수 있는 최대(${CHECKIN_CAP}명)에 도달했어요.` });
-    }
-    const next = Math.min(CHECKIN_CAP, cur + 1);
-    await db.batch([
-      db.prepare(`INSERT OR IGNORE INTO shares (code, day, created_at) VALUES (?, ?, ?)`).bind(code, today, Date.now()),
-      db.prepare(`UPDATE maps SET entry_limit = ?, last_share = ? WHERE code = ?`).bind(next, today, code),
-    ]);
-    return json({ ok: true, limit: next, gained: 1, message: `공유 고마워요. 자리가 하나 늘어 ${next}명까지 받을 수 있어요.` });
-  }
-
-  // 오늘의 운세 + 분야별 풀이
-  if (path === '/api/fortune' && request.method === 'POST') {
-    const body = await request.json().catch(() => null);
-    const err = validBirth(body?.birth);
-    if (err) return bad(err);
-    let s;
-    try { s = computeSaju(normBirth(body.birth)); } catch (e) { return bad(e.message || '계산 실패'); }
-    return json({
-      char: charPayload(s.dayStem),
-      saju: sajuPayload(s),
-      today: todayFortune(s),
-      areas: lifeAreas(s),
-    });
-  }
-
   // 방문 통계
   if (path === '/api/stats' && request.method === 'GET') {
     const today = kstDay();
@@ -504,27 +404,6 @@ async function handleApi(request, env, url) {
     const c = await db.prepare(`SELECT COUNT(*) AS n FROM maps`).first();
     const e = await db.prepare(`SELECT COUNT(*) AS n FROM entries`).first();
     return json({ today: (a && a.hits) || 0, total: (b && b.n) || 0, maps: c.n, entries: e.n });
-  }
-
-  // 정원 늘리기 (결제/후원 연동 예정)
-  const mUnlock = path.match(/^\/api\/maps\/([0-9a-z]{4,12})\/unlock$/);
-  if (mUnlock && request.method === 'POST') {
-    const code = mUnlock[1];
-    const body = await request.json().catch(() => ({}));
-    const row = await db.prepare(`SELECT owner_token, plan FROM maps WHERE code = ?`).bind(code).first();
-    if (!row) return bad('없는 지도입니다.', 404);
-    if (body.token !== row.owner_token) return bad('지도 주인만 바꿀 수 있어요.', 403);
-
-    // 결제 검증이 붙기 전까지는 열어주지 않는다.
-    if (!env.PAY_PROVIDER) {
-      return json({ error: '후원 결제는 준비 중입니다. 곧 열립니다.', reason: 'NOT_READY' }, 501);
-    }
-    const ok = await verifyPayment(env, body);
-    if (!ok) return bad('결제 확인에 실패했습니다.', 402);
-    await db.prepare(
-      `UPDATE maps SET plan = 'supporter', entry_limit = ?, unlocked_at = ? WHERE code = ?`
-    ).bind(HARD_CAP, Date.now(), code).run();
-    return json({ ok: true, limit: HARD_CAP, plan: 'supporter' });
   }
 
   // 음력 윤달 정보
