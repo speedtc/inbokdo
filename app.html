@@ -69,6 +69,10 @@ header{position:sticky;top:0;z-index:40;
 
 /* 별자리 메뉴 */
 /* 토정비결 */
+.quick{background:linear-gradient(155deg,#fdf4da,#fffdf7 62%);border:1px solid rgba(193,154,46,.32);
+  border-radius:var(--r);padding:18px;box-shadow:0 1px 2px rgba(70,56,20,.05)}
+.quick .qt{font-size:14.5px;color:#4a4438;letter-spacing:-.02em;margin-bottom:13px;text-align:center}
+.quick .qt b{font-weight:700;color:#231f18}
 .intro{background:linear-gradient(155deg,#fdf6e2,#fff 58%);border-color:rgba(193,154,46,.28)}
 .uphint{margin-top:16px;display:flex;align-items:flex-start;gap:8px;padding:11px 15px;border-radius:16px;
   font-size:13.5px;font-weight:600;letter-spacing:-.025em;color:#5a4408;line-height:1.6;
@@ -603,13 +607,16 @@ function formHTML(o){
   var years='';for(var y=2035;y>=1900;y--)years+='<option value="'+y+'"'+(y===(o.y||1995)?' selected':'')+'>'+y+'</option>';
   var months='';for(var m=1;m<=12;m++)months+='<option value="'+m+'"'+(m===(o.m||1)?' selected':'')+'>'+m+'월</option>';
   var days='';for(var d=1;d<=31;d++)days+='<option value="'+d+'"'+(d===(o.d||1)?' selected':'')+'>'+d+'일</option>';
-  var hrs='';for(var i=0;i<HOURS.length;i++)hrs+='<option value="'+HOURS[i][0]+'">'+HOURS[i][1]+'</option>';
+  var hv=(o.hour==null?'모름':String(o.hour));
+  var hrs='';for(var i=0;i<HOURS.length;i++){var hk=String(HOURS[i][0]);
+    hrs+='<option value="'+HOURS[i][0]+'"'+(hk===hv?' selected':'')+'>'+HOURS[i][1]+'</option>';}
+  var lun=!!o.lunar;
   return ''+
   '<div class="field"><label for="fName">'+esc(o.nameLabel||'이름 또는 닉네임')+'</label>'+
-    '<input class="inp" id="fName" maxlength="12" autocomplete="off" placeholder="'+esc(o.namePh||'예: 김도현, 도현이')+'"></div>'+
+    '<input class="inp" id="fName" maxlength="12" autocomplete="off" value="'+esc(o.name||'')+'" placeholder="'+esc(o.namePh||'예: 김도현, 도현이')+'"></div>'+
   '<div class="field"><label>달력</label><div class="seg" id="fCal">'+
-    '<button type="button" data-v="solar" aria-pressed="true">양력</button>'+
-    '<button type="button" data-v="lunar" aria-pressed="false">음력</button></div></div>'+
+    '<button type="button" data-v="solar" aria-pressed="'+(lun?'false':'true')+'">양력</button>'+
+    '<button type="button" data-v="lunar" aria-pressed="'+(lun?'true':'false')+'">음력</button></div></div>'+
   '<div class="field"><label>생년월일</label><div class="row">'+
     '<select class="inp" id="fY" style="flex:1.35">'+years+'</select>'+
     '<select class="inp" id="fM">'+months+'</select>'+
@@ -628,7 +635,8 @@ function formHTML(o){
 }
 
 function bindForm(root,onSubmit){
-  var cal='solar';
+  var pre=root.querySelector('#fCal button[data-v="lunar"]');
+  var cal=(pre&&pre.getAttribute('aria-pressed')==='true')?'lunar':'solar';
   var seg=root.querySelector('#fCal');
   var leapWrap=root.querySelector('#fLeapWrap');
   var hint=root.querySelector('#fLunarHint');
@@ -1181,7 +1189,7 @@ function viewCreate(){
         '<div class="tiny" style="margin-top:6px">로그인 없이 만들어도 되지만, 이 브라우저에서만 찾을 수 있어요.</div>'+
         ssoBtns('/')+'</div>'
       : '')+
-    '<div class="card" style="margin-top:22px" id="fw">'+formHTML({cta:'내 인연지도 만들기'})+'</div>'+
+    '<div class="card" style="margin-top:22px" id="fw">'+formHTML(birthPrefill({cta:'내 인연지도 만들기'}))+'</div>'+
   '</section>'));
   bindSso(app);
   bindForm(el('fw'),function(data,done){
@@ -1610,20 +1618,22 @@ function renderVisitor(j){
   '</section>'+
   '<section class="sec fade"><div class="sky"><div class="mapbox" id="map"></div>'+mapLegend()+'</div>'+
     '<p class="tiny center" style="margin-top:11px">이미 자리를 잡은 사람들입니다. 이름만 보이고 생년월일은 아무에게도 보이지 않아요.</p></section>'+
-  '<section class="sec fade"><div class="card" id="fw">'+
-    formHTML({cta:'내 별 남기기',nameLabel:'뭐라고 부를까요',namePh:'예: 지민, 동아리 지민'})+'</div></section>'+
+  (getBirth()&&getBirth().birth ? '<section class="sec fade">'+quickJoinBox('이 정보로 내 별 남기기')+'</section>' : '')+
+  '<section class="sec fade" id="fwrap"'+(getBirth()&&getBirth().birth?' hidden':'')+'><div class="card" id="fw">'+
+    formHTML(birthPrefill({cta:'내 별 남기기',nameLabel:'뭐라고 부를까요',namePh:'예: 지민, 동아리 지민'}))+'</div></section>'+
   '<section class="sec fade"><button class="btn sec2" id="own">나도 내 인연지도 만들기</button></section>'+
   '<footer>입력한 생년월일은 궁합 계산에만 쓰이고 지도 주인에게도 보이지 않습니다. 결과는 재미로만 봐주세요.</footer>'));
 
   el('map').innerHTML=starMap(j.entries,j.ownerChar,{});
   el('own').onclick=function(){tap();goCreate(j.code);};
   setDock('<button class="btn">내 별 남기기</button>',function(){
-    var n=document.querySelector('#fw');
+    var q=el('quickBox');
+    var n=(q&&!q.hidden)?q:document.querySelector('#fw');
     n.scrollIntoView({behavior:'smooth',block:'center'});
-    setTimeout(function(){var f=n.querySelector('#fName');if(f)f.focus();},420);
-  },'#fw');
+    if(n!==q)setTimeout(function(){var f=n.querySelector('#fName');if(f)f.focus();},420);
+  },'#fw, #quickBox');
   reveal(app);
-  bindForm(el('fw'),function(data,done){
+  function joinMap(data,done){
     saveBirth(data.name,data.birth);paintBio();
     api('/api/maps/'+j.code+'/join',{method:'POST',body:JSON.stringify(data)}).then(function(r){
       var jd=store('inbokdo_joined')||{};
@@ -1631,10 +1641,19 @@ function renderVisitor(j){
       store('inbokdo_joined',jd);
       renderResult(r,j.code);
     }).catch(function(e){
-      done(e.message);
+      if(done)done(e.message); else toast(e.message);
       if(/최대 \d+명/.test(e.message)) setTimeout(function(){
         api('/api/maps/'+j.code).then(function(n){MAP=n;MAP.code=j.code;renderVisitorFull(n);});
       },900);
+    });
+  }
+  bindForm(el('fw'),joinMap);
+  bindQuick(function(){
+    var b=getBirth();if(!b||!b.birth)return;
+    var g=el('qgo');if(g){g.innerHTML='<span class="spin"></span>';g.disabled=true;}
+    joinMap({name:b.name,birth:b.birth},function(msg){
+      if(g){g.disabled=false;g.textContent='이 정보로 내 별 남기기';}
+      if(msg)toast(msg);
     });
   });
   window.scrollTo(0,0);
@@ -1800,6 +1819,34 @@ var INTRO={
     n:'별의 방향은 주고받음(누가 채워주고 누가 이끄는지), 거리는 궁합 점수입니다. 사람이 모일수록 별자리가 완성됩니다.',
     c:['관계 점수','주고받음','인원 제한 없음']}
 };
+function birthPrefill(extra){
+  var b=getBirth(), o=extra||{};
+  if(b&&b.birth){
+    o.name=b.name||''; o.y=b.birth.y; o.m=b.birth.m; o.d=b.birth.d;
+    o.hour=b.birth.unknownTime?null:b.birth.hour;
+    o.lunar=!!b.birth.lunar;
+  }
+  return o;
+}
+/* 저장된 사주가 있으면 한 번에 넣게 해준다 */
+function quickJoinBox(cta){
+  var b=getBirth(); if(!b||!b.birth) return '';
+  var d=b.birth;
+  return '<div class="quick" id="quickBox">'+
+    '<div class="qt"><b>'+esc(b.name||'내')+'</b>님 · '+d.y+'.'+d.m+'.'+d.d+
+      (d.lunar?' 음력':'')+(d.unknownTime?' · 시간 모름':'')+'</div>'+
+    '<button class="btn" id="qgo">'+esc(cta)+'</button>'+
+    '<button class="btn sec2" id="qedit" style="margin-top:8px">다른 정보로 넣기</button>'+
+  '</div>';
+}
+function bindQuick(onGo){
+  var g=el('qgo'); if(g)g.onclick=function(){tap();onGo();};
+  var e=el('qedit'); if(e)e.onclick=function(){
+    tap();
+    var q=el('quickBox'); if(q)q.hidden=true;
+    var f=el('fwrap'); if(f){f.hidden=false;f.scrollIntoView({behavior:'smooth',block:'center'});}
+  };
+}
 function introBox(k){
   var I=INTRO[k];if(!I)return '';
   return '<div class="card intro">'+
@@ -1938,8 +1985,7 @@ function viewRoomNew(topic){
     '<div class="card" id="fw">'+
       '<div class="field" style="margin-top:0"><label for="rTitle">방 이름</label>'+
         '<input class="inp" id="rTitle" maxlength="20" autocomplete="off" placeholder="예: 부동산 스터디방, 우리 동기들"></div>'+
-      formHTML({cta:T.label+' 만들기',nameLabel:'내 이름 또는 닉네임',namePh:'예: 평원',
-        y:b&&b.birth?b.birth.y:null,m:b&&b.birth?b.birth.m:null,d:b&&b.birth?b.birth.d:null})+
+      formHTML(birthPrefill({cta:T.label+' 만들기',nameLabel:'내 이름 또는 닉네임',namePh:'예: 평원'}))+
     '</div>'+
   '</section>'+
 
@@ -2077,8 +2123,9 @@ function renderRoom(j,mine){
   '<section class="sec fade" style="margin-top:18px"><div class="sky"><div class="mapbox" id="wmap"></div>'+tLegend(topic)+'</div>'+
     '<div id="wsel"></div></section>'+
   '<section class="sec rv">'+roomShareBox(j.code,j.title,topic)+'</section>'+
-  (meRow?'':'<section class="sec fade"><div class="card" id="fw">'+
-    formHTML({cta:'내 별 찍기',nameLabel:'뭐라고 부를까요',namePh:'예: 평원, 김대리'})+'</div></section>')+
+  (meRow?'':(getBirth()&&getBirth().birth?'<section class="sec fade">'+quickJoinBox('이 정보로 내 별 찍기')+'</section>':'')+
+    '<section class="sec fade" id="fwrap"'+(getBirth()&&getBirth().birth?' hidden':'')+'><div class="card" id="fw">'+
+    formHTML(birthPrefill({cta:'내 별 찍기',nameLabel:'뭐라고 부를까요',namePh:'예: 평원, 김대리'}))+'</div></section>')+
   '<section class="sec rv" id="wlist"></section>'+
   '<section class="sec rv">'+adBox()+'</section>'+
   '<section class="sec rv">'+otherTopics(topic)+'</section>'+
@@ -2107,20 +2154,30 @@ function renderRoom(j,mine){
     });
   }
   if(!meRow){
-    bindForm(el('fw'),function(data,done){
+    function joinRoom(data,done){
       saveBirth(data.name,data.birth);paintBio();
       api('/api/rooms/'+j.code+'/join',{method:'POST',body:JSON.stringify(data)}).then(function(r){
         var mr=store('inbokdo_myroom')||{};
         mr[j.code]={id:r.entryId,token:r.entryToken,name:data.name};
         store('inbokdo_myroom',mr);
         renderRoomResult(r,j.code);
-      }).catch(function(e){done(e.message);});
+      }).catch(function(e){ if(done)done(e.message); else toast(e.message); });
+    }
+    bindForm(el('fw'),joinRoom);
+    bindQuick(function(){
+      var bb=getBirth();if(!bb||!bb.birth)return;
+      var g=el('qgo');if(g){g.innerHTML='<span class="spin"></span>';g.disabled=true;}
+      joinRoom({name:bb.name,birth:bb.birth},function(msg){
+        if(g){g.disabled=false;g.textContent='이 정보로 내 별 찍기';}
+        if(msg)toast(msg);
+      });
     });
     setDock('<button class="btn">내 별 찍기</button>',function(){
-      var n=document.querySelector('#fw');
+      var q=el('quickBox');
+      var n=(q&&!q.hidden)?q:document.querySelector('#fw');
       n.scrollIntoView({behavior:'smooth',block:'center'});
-      setTimeout(function(){var f=n.querySelector('#fName');if(f)f.focus();},420);
-    },'#fw');
+      if(n!==q)setTimeout(function(){var f=n.querySelector('#fName');if(f)f.focus();},420);
+    },'#fw, #quickBox');
   }else{
     setDock('<button class="btn">단톡방에 공유하기</button>',function(){doRoomShare(j.code,j.title,topic);},'.sharebox');
   }
