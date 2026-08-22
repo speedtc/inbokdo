@@ -65,11 +65,11 @@ export const WRINGS = [
 
 /* ── 점수대 이름 ────────────────────────────────────── */
 const BANDS = [
-  { min: 78, key: 'gotgan', label: '곳간이 든든한 사주', tone: 'gold',
+  { min: 77, key: 'gotgan', label: '곳간이 든든한 사주', tone: 'gold',
     line: '벌리는 힘과 지키는 힘이 같이 있습니다. 재물 쪽으로는 타고난 축에 듭니다.' },
-  { min: 66, key: 'doneun', label: '벌이가 도는 사주', tone: 'green',
+  { min: 69, key: 'doneun', label: '벌이가 도는 사주', tone: 'green',
     line: '돈이 들어오고 나가는 회로가 제대로 돕니다. 구조를 만들면 쌓입니다.' },
-  { min: 52, key: 'ssuneun', label: '쓰는 만큼 들어오는 사주', tone: 'blue',
+  { min: 57, key: 'ssuneun', label: '쓰는 만큼 들어오는 사주', tone: 'blue',
     line: '큰 손실도 큰 대박도 드뭅니다. 정기적으로 들어오는 줄기를 늘리는 게 과제입니다.' },
   { min: 38, key: 'saram', label: '돈보다 사람이 먼저 붙는 사주', tone: 'gray',
     line: '돈을 직접 좇으면 늦고, 사람과 실력을 쌓아두면 그게 나중에 돈이 됩니다.' },

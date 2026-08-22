@@ -1,7 +1,7 @@
 // index.js — 인연지도 Cloudflare Worker
 import { computeSaju } from './saju.js';
 import { analyze, TYPES, CHARACTERS, scoreBand, AXES, AXIS_ORDER } from './compat.js';
-import { wealthScore, WAXES, WAXIS_ORDER, WRINGS } from './wealth.js';
+import { TOPICS, isTopic, topicsPayload } from './topics.js';
 import { leapMonthOf, lunarMonthLength } from './astro.js';
 import APP_HTML from './app.html';
 import OG_PNG from './og.png';
@@ -458,13 +458,15 @@ async function handleApi(request, env, url) {
     if (!body) return bad('요청을 읽을 수 없습니다.');
     const name = cleanName(body.name);
     if (!name) return bad('이름 또는 닉네임을 입력해 주세요.');
-    const title = cleanName(body.title) || `${name}님의 재물지도`;
+    const rawTopic = isTopic(body.topic) ? body.topic : 'wealth';
+    const title = cleanName(body.title) || `${name}님의 ${TOPICS[rawTopic].label}`;
     const err = validBirth(body.birth);
     if (err) return bad(err);
 
+    const topic = isTopic(body.topic) ? body.topic : 'wealth';
     let saju;
     try { saju = computeSaju(normBirth(body.birth)); } catch (e) { return bad(e.message || '사주를 계산할 수 없습니다.'); }
-    const res = wealthScore(saju);
+    const res = TOPICS[topic].score(saju);
 
     const me = await currentUser(request, env);
     const code = randCode();
@@ -473,8 +475,8 @@ async function handleApi(request, env, url) {
     const now = Date.now();
 
     await db.prepare(
-      `INSERT INTO rooms (code, topic, title, owner_token, user_id, created_at) VALUES (?, 'wealth', ?, ?, ?, ?)`
-    ).bind(code, title, token, me ? me.id : null, now).run();
+      `INSERT INTO rooms (code, topic, title, owner_token, user_id, created_at) VALUES (?, ?, ?, ?, ?, ?)`
+    ).bind(code, topic, title, token, me ? me.id : null, now).run();
 
     const ins = await db.prepare(
       `INSERT INTO room_entries (code, name, birth_json, saju_json, result_json, score, day_stem, token, created_at)
@@ -483,7 +485,7 @@ async function handleApi(request, env, url) {
       JSON.stringify(res), res.score, saju.dayStem, entryToken, now).run();
 
     return json({
-      code, token, title,
+      code, token, title, topic,
       entryId: ins.meta.last_row_id, entryToken,
       me: { name, char: charPayload(saju.dayStem), saju: sajuPayload(saju) },
       result: res, rank: 1, total: 1,
@@ -534,9 +536,10 @@ async function handleApi(request, env, url) {
     }
 
     const birth = normBirth(body.birth);
+    const topic = isTopic(row.topic) ? row.topic : 'wealth';
     let saju;
     try { saju = computeSaju(birth); } catch (e) { return bad(e.message || '사주를 계산할 수 없습니다.'); }
-    const res = wealthScore(saju);
+    const res = TOPICS[topic].score(saju);
 
     const token = randToken();
     const ins = await db.prepare(
@@ -551,7 +554,7 @@ async function handleApi(request, env, url) {
     ).bind(code, res.score, res.score, id).first();
 
     return json({
-      code, title: row.title,
+      code, title: row.title, topic,
       entryId: id, entryToken: token,
       me: { name, char: charPayload(saju.dayStem), saju: sajuPayload(saju) },
       result: res, rank: rank.r, total: cnt.n + 1,
@@ -565,28 +568,29 @@ async function handleApi(request, env, url) {
     const token = url.searchParams.get('token') || '';
     const row = await db.prepare(`SELECT * FROM room_entries WHERE code = ? AND id = ?`).bind(code, id).first();
     if (!row || row.token !== token) return bad('결과를 찾을 수 없습니다.', 404);
-    const room = await db.prepare(`SELECT title FROM rooms WHERE code = ?`).bind(code).first();
+    const room = await db.prepare(`SELECT title, topic FROM rooms WHERE code = ?`).bind(code).first();
     const rank = await db.prepare(
       `SELECT COUNT(*) + 1 AS r FROM room_entries WHERE code = ? AND (score > ? OR (score = ? AND id < ?))`
     ).bind(code, row.score, row.score, row.id).first();
     const total = await db.prepare(`SELECT COUNT(*) AS n FROM room_entries WHERE code = ?`).bind(code).first();
     return json({
-      code, title: room ? room.title : '재물지도',
+      code, title: room ? room.title : '운세지도', topic: (room && isTopic(room.topic)) ? room.topic : 'wealth',
       entryId: row.id, entryToken: token,
       me: { name: row.name, char: charPayload(row.day_stem), saju: sajuPayload(JSON.parse(row.saju_json)) },
       result: JSON.parse(row.result_json), rank: rank.r, total: total.n,
     });
   }
 
-  // 내 사주만으로 재물 점수 (방 없이)
-  if (path === '/api/wealth' && request.method === 'POST') {
+  // 방 없이 내 점수만 (재물·연애·일)
+  if (path === '/api/topic' && request.method === 'POST') {
     const body = await request.json().catch(() => null);
     if (!body) return bad('요청을 읽을 수 없습니다.');
+    if (!isTopic(body.topic)) return bad('없는 주제입니다.');
     const err = validBirth(body.birth);
     if (err) return bad(err);
     try {
       const s = computeSaju(normBirth(body.birth));
-      return json({ char: charPayload(s.dayStem), saju: sajuPayload(s), result: wealthScore(s) });
+      return json({ char: charPayload(s.dayStem), saju: sajuPayload(s), result: TOPICS[body.topic].score(s) });
     } catch (e) { return bad(e.message || '계산 실패'); }
   }
 
@@ -613,7 +617,7 @@ async function handleApi(request, env, url) {
 
   // 메타데이터
   if (path === '/api/meta') {
-    return new Response(JSON.stringify({ types: TYPES, characters: CHARACTERS, axes: AXES, axisOrder: AXIS_ORDER, waxes: WAXES, waxisOrder: WAXIS_ORDER, wrings: WRINGS }), {
+    return new Response(JSON.stringify({ types: TYPES, characters: CHARACTERS, axes: AXES, axisOrder: AXIS_ORDER, topics: topicsPayload() }), {
       headers: { 'content-type': 'application/json; charset=utf-8', 'cache-control': 'public, max-age=3600' },
     });
   }
@@ -630,7 +634,7 @@ function renderPage(meta) {
 <meta name="robots" content="${meta.noindex ? 'noindex,nofollow' : 'index,follow'}">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="ko_KR">
-<meta property="og:site_name" content="인연지도">
+<meta property="og:site_name" content="스피드 운세지도">
 <meta property="og:title" content="${t}">
 <meta property="og:description" content="${d}">
 <meta property="og:url" content="${u}">
@@ -696,26 +700,28 @@ export default {
       });
     }
     const PAGES = {
-      '/today': { view: 'today', title: '오늘의 운세 · 인연지도', desc: '오늘 일진과 내 사주를 견줘 오늘 하루의 결을 풀어드립니다. 무료입니다.' },
-      '/saju': { view: 'saju', title: '내 사주팔자 · 인연지도', desc: '생년월일시를 여덟 글자로 세우고 오행 분포까지 보여드립니다. 무료입니다.' },
-      '/life': { view: 'life', title: '분야별 풀이 · 인연지도', desc: '건강·재물·일·사람. 내 원국을 네 갈래로 나눠 풀어드립니다. 무료입니다.' },
-      '/about': { view: 'about', title: '어떻게 계산하나요 · 인연지도', desc: '인연지도가 쓰는 명리학 방법과 천문 계산을 그대로 공개합니다.' },
-      '/my': { view: 'profile', title: '내 사주 · 인연지도', desc: '생년월일을 한 번만 넣으면 오늘의 운세·사주팔자·분야별 풀이가 바로 열립니다.' },
-      '/wealth': { view: 'wealthNew', title: '재물지도 · 인연지도', desc: '단톡방 사람들의 재물 사주를 한 장의 지도에 모읍니다. 가운데가 財, 안쪽에 있을수록 재물 그릇이 큰 사람입니다. 무료입니다.' },
+      '/today': { view: 'today', title: '오늘의 운세 · 스피드 운세지도', desc: '오늘 일진과 내 사주를 견줘 오늘 하루의 결을 풀어드립니다. 무료입니다.' },
+      '/saju': { view: 'saju', title: '내 사주팔자 · 스피드 운세지도', desc: '생년월일시를 여덟 글자로 세우고 오행 분포까지 보여드립니다. 무료입니다.' },
+      '/life': { view: 'life', title: '분야별 풀이 · 스피드 운세지도', desc: '건강·재물·일·사람. 내 원국을 네 갈래로 나눠 풀어드립니다. 무료입니다.' },
+      '/about': { view: 'about', title: '어떻게 계산하나요 · 스피드 운세지도', desc: '스피드 운세지도가 쓰는 명리학 방법과 천문 계산을 그대로 공개합니다.' },
+      '/my': { view: 'profile', title: '내 사주 · 스피드 운세지도', desc: '생년월일을 한 번만 넣으면 오늘의 운세·사주팔자·분야별 풀이가 바로 열립니다.' },
+      '/wealth': { view: 'roomNew', topic: 'wealth', title: '재물지도 · 스피드 운세지도', desc: '단톡방 사람들의 재물 사주를 한 장의 지도에 모읍니다. 가운데가 財, 안쪽에 있을수록 재물 그릇이 큰 사람입니다. 무료입니다.' },
+      '/love': { view: 'roomNew', topic: 'love', title: '연애지도 · 스피드 운세지도', desc: '단톡방에서 누구에게 인연이 먼저 오는지 사주로 봅니다. 애인 유무는 묻지 않습니다. 무료입니다.' },
+      '/work': { view: 'roomNew', topic: 'work', title: '일운지도 · 스피드 운세지도', desc: '누가 크게 쓰일 사람인지 사주로 봅니다. 직업이나 연봉은 묻지 않습니다. 무료입니다.' },
     };
     if (PAGES[url.pathname]) {
       const pg = PAGES[url.pathname];
       if (env.DB) ctx.waitUntil(bumpStats(env));
       return new Response(renderPage({
         title: pg.title, desc: pg.desc, url: origin + url.pathname, origin,
-        boot: { view: pg.view, providers: enabledProviders(env), kakaoKey: env.KAKAO_JS_KEY || '' },
+        boot: { view: pg.view, topic: pg.topic, providers: enabledProviders(env), kakaoKey: env.KAKAO_JS_KEY || '' },
       }), { headers: { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'no-store' } });
     }
 
     if (url.pathname === '/login' || url.pathname === '/me') {
       return new Response(renderPage({
-        title: url.pathname === '/login' ? '인연지도 로그인' : '내 지도 · 인연지도',
-        desc: '인연지도', url: origin + url.pathname, origin,
+        title: url.pathname === '/login' ? '스피드 운세지도 로그인' : '내 지도 · 스피드 운세지도',
+        desc: '스피드 운세지도', url: origin + url.pathname, origin,
         boot: { view: url.pathname === '/login' ? 'login' : 'mine', providers: enabledProviders(env), kakaoKey: env.KAKAO_JS_KEY || '' },
       }), { headers: { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'no-store' } });
     }
@@ -745,7 +751,7 @@ export default {
         }
       } catch (e) { /* 무시 */ }
       const providers = enabledProviders(env);
-      const title = ownerName ? `${ownerName}님의 인연지도 · 나에게 넌, 어떤 인연일까` : '인연지도';
+      const title = ownerName ? `${ownerName}님의 인연지도 · 스피드 운세지도` : '스피드 운세지도';
       const desc = ownerName
         ? `생일만 넣으면 ${ownerName}님과 나 사이에 오가는 기운을 사주로 풀어드립니다. 가입도 결제도 없이 30초면 끝납니다.`
         : '내 사람 별자리를 그려보세요.';
@@ -758,23 +764,24 @@ export default {
     const mRoomPage = url.pathname.match(/^\/w\/([0-9a-z]{4,12})\/?$/);
     if (mRoomPage) {
       const code = mRoomPage[1];
-      let title2 = '';
+      let title2 = '', topic2 = 'wealth';
       try {
         if (env.DB) {
           await ensureSchema(env.DB);
-          const row = await env.DB.prepare(`SELECT title FROM rooms WHERE code = ?`).bind(code).first();
-          if (row) title2 = row.title;
+          const row = await env.DB.prepare(`SELECT title, topic FROM rooms WHERE code = ?`).bind(code).first();
+          if (row) { title2 = row.title; topic2 = isTopic(row.topic) ? row.topic : 'wealth'; }
         }
       } catch (e) { /* 무시 */ }
       const providers = enabledProviders(env);
-      const title = title2 ? `${title2} · 재물지도` : '재물지도 · 인연지도';
+      const TL = TOPICS[topic2].label;
+      const title = title2 ? `${title2} · ${TL}` : `${TL} · 스피드 운세지도`;
       const desc = title2
-        ? `생일만 넣으면 내 재물 사주가 이 지도에 찍힙니다. 가운데가 財, 안쪽에 있을수록 재물 그릇이 큰 사람입니다. 무료입니다.`
-        : '단톡방 사람들의 재물 사주를 한 장의 지도에 모읍니다.';
+        ? `생일만 넣으면 내 사주가 이 지도에 찍힙니다. ${TOPICS[topic2].lead} 무료입니다.`
+        : `단톡방 사람들의 사주를 한 장의 지도에 모읍니다. ${TL}, 전부 무료입니다.`;
       if (env.DB) ctx.waitUntil(bumpStats(env));
       return new Response(renderPage({
         title, desc, url: `${origin}/w/${code}`, origin,
-        boot: { view: 'room', code, roomTitle: title2, kakaoKey: env.KAKAO_JS_KEY || '', providers },
+        boot: { view: 'room', code, roomTitle: title2, topic: topic2, kakaoKey: env.KAKAO_JS_KEY || '', providers },
         noindex: true,
       }), { headers: { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'no-store' } });
     }
@@ -782,7 +789,7 @@ export default {
     if (url.pathname === '/' || url.pathname === '') {
       if (env.DB) ctx.waitUntil(bumpStats(env));
       return new Response(renderPage({
-        title: '인연지도 · 나에게 넌, 어떤 인연일까',
+        title: '스피드 운세지도 · 사주 전부 무료',
         desc: '사주팔자·오늘의 운세·인연지도·재물지도, 모든 메뉴가 무료입니다. 생일만 넣으면 두 사람 사이에 오가는 기운을 별자리처럼 그려드립니다. 가입도 결제도 없이 30초면 끝납니다.',
         url: origin, origin, boot: { view: 'home', kakaoKey: env.KAKAO_JS_KEY || '', providers: enabledProviders(env) },
       }), { headers: { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'no-store' } });

@@ -7,7 +7,7 @@ const SHELL = (title, body) => `<!DOCTYPE html>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#080b14">
 <meta name="robots" content="index,follow">
-<title>${title} · 인연지도</title>
+<title>${title} · 스피드 운세지도</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
 <style>
 *,*::before,*::after{box-sizing:border-box}
@@ -30,8 +30,8 @@ td{color:#c3cad8}
 .note{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.10);border-radius:14px;padding:16px;margin:18px 0}
 footer{margin-top:56px;padding-top:20px;border-top:1px solid rgba(255,255,255,.09);color:#5d6579;font-size:13px}
 </style></head>
-<body><div class="w"><a class="back" href="/">← 인연지도</a>${body}
-<footer>인연지도 因緣地圖</footer></div></body></html>`;
+<body><div class="w"><a class="back" href="/">← 스피드 운세지도</a>${body}
+<footer>📚 스피드 운세지도 運勢地圖</footer></div></body></html>`;
 
 export function privacyPage(env) {
   const kakao = env.CONTACT_KAKAO || 'https://open.kakao.com/me/speedtc';
@@ -41,7 +41,7 @@ export function privacyPage(env) {
 <h1>개인정보처리방침</h1>
 <p class="date">시행일 ${updated}</p>
 
-<p>인연지도(이하 "서비스")는 이용자의 개인정보를 소중히 다루며, 「개인정보 보호법」을 비롯한 관련 법령을 준수합니다.</p>
+<p>스피드 운세지도(이하 "서비스", 구 인연지도)는 이용자의 개인정보를 소중히 다루며, 「개인정보 보호법」을 비롯한 관련 법령을 준수합니다.</p>
 
 <h2>1. 수집하는 개인정보</h2>
 <table>
@@ -107,7 +107,7 @@ export function termsPage(env) {
 <p class="date">시행일 ${updated}</p>
 
 <h2>제1조 (목적)</h2>
-<p>이 약관은 인연지도(이하 "서비스")의 이용 조건과 절차, 이용자와 서비스의 권리·의무를 정합니다.</p>
+<p>이 약관은 스피드 운세지도(이하 "서비스", 구 인연지도)의 이용 조건과 절차, 이용자와 서비스의 권리·의무를 정합니다.</p>
 
 <h2>제2조 (서비스의 성격)</h2>
 <div class="note">

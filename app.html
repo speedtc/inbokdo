@@ -56,9 +56,11 @@ header{position:sticky;top:0;z-index:40;
   border-bottom:1px solid rgba(150,120,40,.16);
   padding-top:var(--safe-t)}
 .hdr{max-width:540px;margin:0 auto;padding:13px 22px 10px;display:flex;align-items:center;gap:10px}
-.logo{display:flex;align-items:center;gap:11px;font-weight:800;letter-spacing:-.02em}
+.logo{display:flex;align-items:baseline;gap:8px;font-weight:800;letter-spacing:-.02em}
 .logo .mk{width:32px;height:32px;flex:0 0 32px}
-.logo b{font-size:21px;letter-spacing:-.035em;color:#231f18}
+.logo b{font-size:19px;letter-spacing:-.042em;color:#231f18;white-space:nowrap;display:flex;align-items:center;gap:5px}
+.logo .lg-e{font-size:23px;line-height:1}
+.logo .gd{color:#a07c1c}
 .logo span{font-size:11px;color:var(--gold-dim);font-weight:600;letter-spacing:.16em;margin-left:2px}
 .hdr .sp{flex:1}
 .ghost{border:1px solid rgba(60,48,16,.18);border-radius:999px;padding:7px 14px;font-size:13px;font-weight:600;
@@ -87,7 +89,7 @@ header{position:sticky;top:0;z-index:40;
 /* 상단 내 사주 + 방문 통계 */
 .subbar{border-bottom:1px solid rgba(150,120,40,.13);background:linear-gradient(180deg,rgba(255,253,247,.9),rgba(251,247,236,.6))}
 .sbin{max-width:540px;margin:0 auto;padding:8px 22px;display:flex;align-items:center;gap:10px}
-.biochip{display:inline-flex;align-items:center;gap:7px;padding:4px 11px 4px 5px;border-radius:999px;
+.biochip{margin-left:auto;display:inline-flex;align-items:center;gap:7px;padding:4px 11px 4px 5px;border-radius:999px;
   font-size:12.5px;font-weight:600;letter-spacing:-.02em;color:#5f5849;white-space:nowrap;max-width:62%;
   background:#fff;border:1px solid rgba(60,48,16,.13);box-shadow:0 1px 2px rgba(70,56,20,.04);
   transition:transform .25s var(--spring),border-color .18s}
@@ -106,7 +108,7 @@ header{position:sticky;top:0;z-index:40;
 @keyframes nbp{0%,100%{transform:scale(1)}18%{transform:scale(1.07)}36%{transform:scale(1)}}
 .needbio i{font-style:normal;font-size:11px}
 @media(prefers-reduced-motion:reduce){.needbio.pulse{animation:none}}
-.hstat{margin-left:auto;display:flex;gap:11px;font-size:11.5px;color:var(--dim2);letter-spacing:-.02em;white-space:nowrap}
+.hstat{margin-right:auto;display:flex;gap:11px;font-size:11.5px;color:var(--dim2);letter-spacing:-.02em;white-space:nowrap}
 .hstat b{font-weight:700;color:var(--gold2);font-variant-numeric:tabular-nums}
 @media(max-width:379px){ .logo span{display:none} .hstat{gap:8px} }
 .nv{flex:0 0 auto;display:inline-flex;align-items:center;gap:6px;padding:8px 13px;border-radius:999px;
@@ -367,25 +369,17 @@ footer{margin-top:56px;padding-top:22px;border-top:1px solid var(--line);color:v
 <body>
 <header>
   <div class="hdr">
-    <a class="logo" href="/" aria-label="인연지도 홈">
-      <svg class="mk" viewBox="0 0 32 32" fill="none" aria-hidden="true">
-        <circle cx="16" cy="16" r="14" stroke="#8a7534" stroke-width="1"/>
-        <circle cx="16" cy="16" r="9" stroke="#8a7534" stroke-width=".6" opacity=".55"/>
-        <path d="M16 5.4l1.9 5.9h6.2l-5 3.6 1.9 5.9-5-3.6-5 3.6 1.9-5.9-5-3.6h6.2z" fill="#e8c876"/>
-        <circle cx="24.5" cy="21.5" r="1.5" fill="#d9b45b" opacity=".9"/>
-        <circle cx="7.5" cy="20" r="1.1" fill="#d9b45b" opacity=".7"/>
-        <circle cx="9" cy="9" r="1" fill="#d9b45b" opacity=".6"/>
-      </svg>
-      <b>인연지도</b><span>因緣地圖</span>
+    <a class="logo" href="/" aria-label="스피드 운세지도 홈">
+      <b><span class="lg-e">📚</span>스피드 <span class="gd">운세지도</span></b><span>運勢地圖</span>
     </a>
     <div class="sp"></div>
     <button class="ghost" id="navBtn" hidden>내 지도</button>
   </div>
 </header>
 <div class="subbar"><div class="sbin">
+  <div class="hstat" id="hstat"><span>오늘 <b>—</b></span><span>누적 <b>—</b></span></div>
   <button class="biochip" id="bioBtn" type="button" hidden></button>
   <button class="needbio" id="needBio" type="button" hidden>사주 정보를 입력하세요 <i>›</i></button>
-  <div class="hstat" id="hstat"><span>오늘 <b>—</b></span><span>누적 <b>—</b></span></div>
 </div></div>
 <div class="navsky" id="navsky" aria-label="주요 메뉴"></div>
 
@@ -423,16 +417,7 @@ var AXES={
 };
 var CONTACT=(window.__CONTACT__||'https://open.kakao.com/me/speedtc');
 var AXIS_ORDER=['in','gwan','sik','jae','bi'];
-/* 재물지도 — 버는 방식 5자리 (중앙은 사람이 아니라 財) */
-var WAXES={
-  'moeum'  :{key:'moeum'  ,angle:0  ,sipsin:'정재',name:'모으는 자리'    ,short:'모으기',col:'#7ec9a2',lcol:'#2f855f'},
-  'wolgeup':{key:'wolgeup',angle:70 ,sipsin:'관성',name:'월급 자리'      ,short:'월급'  ,col:'#8fa8c9',lcol:'#3c6ca6'},
-  'jangsa' :{key:'jangsa' ,angle:145,sipsin:'식상',name:'장사 자리'      ,short:'장사'  ,col:'#e29a68',lcol:'#bd6c31'},
-  'gulligi':{key:'gulligi',angle:215,sipsin:'편재',name:'굴리는 자리'    ,short:'굴리기',col:'#d9b45b',lcol:'#a07c1c'},
-  'hamkke' :{key:'hamkke' ,angle:288,sipsin:'비겁',name:'함께 버는 자리' ,short:'함께'  ,col:'#9aa3b8',lcol:'#5c6579'}
-};
-var WAXIS_ORDER=['moeum','wolgeup','jangsa','gulligi','hamkke'];
-var WRINGS=[{r:74,name:'곳간'},{r:108,name:'살림'},{r:138,name:'벌이'},{r:162,name:'씨앗'}];
+var TOPICS=null;   /* /api/meta 에서 채운다 */
 var SIPSIN_AX={'비견':'bi','겁재':'bi','식신':'sik','상관':'sik','편재':'jae','정재':'jae',
                '편관':'gwan','정관':'gwan','편인':'in','정인':'in'};
 function axKey(k,ko){return (k&&AXES[k])?k:(SIPSIN_AX[ko]||'bi');}
@@ -794,22 +779,28 @@ function adBox(note){
 /* 페이지별 공유 */
 var PAGE_SHARE={
   today:{path:'/today', label:'오늘의 운세', line:'오늘 운세, 친구도 무료로 볼 수 있어요',
-    t:'오늘의 운세 · 인연지도',
+    t:'오늘의 운세 · 스피드 운세지도',
     d:'오늘 일진과 내 사주를 견줘 하루의 결을 풀어줘요. 가입도 결제도 없이 무료.', cta:'오늘 운세 보기'},
   saju:{path:'/saju', label:'사주팔자', line:'내 여덟 글자, 돈 안 내고 보세요',
-    t:'내 사주팔자 · 인연지도',
+    t:'내 사주팔자 · 스피드 운세지도',
     d:'생년월일만 넣으면 여덟 글자와 오행 분포까지 나와요. 전부 무료.', cta:'내 사주 보기'},
   life:{path:'/life', label:'건강·재물운', line:'건강운 재물운, 전부 무료로 봅니다',
-    t:'분야별 풀이 · 인연지도',
+    t:'분야별 풀이 · 스피드 운세지도',
     d:'건강 · 재물 · 일 · 사람. 내 사주를 네 갈래로 풀어줘요. 전부 무료.', cta:'내 풀이 보기'},
   about:{path:'/about', label:'계산 방법', line:'어떻게 계산하는지 다 공개했어요',
-    t:'어떻게 계산하나요 · 인연지도',
+    t:'어떻게 계산하나요 · 스피드 운세지도',
     d:'절기와 삭 시각까지 직접 계산합니다. 쓰는 방법을 그대로 공개했어요.', cta:'계산 방법 보기'},
   wealth:{path:'/wealth', label:'재물지도', line:'우리 방 재물운 순위 뽑아볼래요?',
-    t:'재물지도 · 인연지도',
+    t:'재물지도 · 스피드 운세지도',
     d:'단톡방 사람들 재물 사주를 한 장에 모아요. 금액은 안 물어봅니다. 무료.', cta:'재물지도 만들기'},
-  home:{path:'/', label:'인연지도', line:'모든 메뉴가 무료입니다',
-    t:'인연지도 因緣地圖',
+  love:{path:'/love', label:'연애지도', line:'우리 방에서 누가 제일 인기 사주일까',
+    t:'연애지도 · 스피드 운세지도',
+    d:'단톡방에서 누구에게 인연이 먼저 오는지 사주로 봐요. 애인 있냐고 안 물어봄. 무료.', cta:'연애지도 만들기'},
+  work:{path:'/work', label:'일운지도', line:'우리 방에서 누가 제일 크게 될까',
+    t:'일운지도 · 스피드 운세지도',
+    d:'누가 크게 쓰일 사람인지 사주로 봐요. 직업도 연봉도 안 물어봄. 무료.', cta:'일운지도 만들기'},
+  home:{path:'/', label:'운세지도', line:'모든 메뉴가 무료입니다',
+    t:'스피드 운세지도',
     d:'사주팔자 · 오늘의 운세 · 인연지도 · 재물지도, 모든 메뉴가 무료입니다.', cta:'인연지도 열기'}
 };
 function doPageShare(k){
@@ -1069,7 +1060,7 @@ function viewHome(){
   '<section class="sec rv">'+supportBox()+'</section>'+
 
   '<footer>'+
-    '<b style="color:#7a7365">인연지도 因緣地圖</b><br>'+
+    '<b style="color:#7a7365">📚 스피드 운세지도 運勢地圖</b><br>'+
     '사주 명리는 사람을 이해하는 오래된 언어이지 정답지가 아닙니다. 여기 나온 결과로 사람을 재단하지 마세요. '+
     '실제 관계는 결국 주고받은 말과 시간으로 만들어집니다.<br><br>'+
     '입력한 생년월일은 궁합 계산에만 쓰이며, 다른 참여자에게는 절대 보이지 않습니다.<br><br>'+
@@ -1262,7 +1253,7 @@ function copyLink(code){
 }
 function shareSite(){
   var url=location.origin;
-  var title='인연지도 因緣地圖';
+  var title='스피드 운세지도';
   var txt='생년월일만 넣으면 내 곁의 사람들이 나에게 어떤 기운인지 사주로 풀어주는 곳이에요. 30초면 끝나요.';
   if(window.Kakao&&window.Kakao.isInitialized&&window.Kakao.isInitialized()){
     try{
@@ -1743,92 +1734,76 @@ function renderVisitorMapOnly(code){
   });
 }
 
-/* ═════════ 재물지도 ═════════ */
-var ROOM=null;
-function wDesc(k){
-  return {
-    moeum:'큰 걸 노리기보다 새는 곳을 막아서 쌓는 쪽입니다. 들어오는 액수는 정해져 있어도 남는 게 있는 사람입니다.',
-    wolgeup:'조직과 직함에서 돈이 나옵니다. 자리가 곧 돈이라, 자리를 지키면 돈도 따라옵니다.',
-    jangsa:'내가 만들어서 파는 쪽입니다. 손에서 나온 것이 돈이 되는 회로라, 움직인 만큼 벌립니다.',
-    gulligi:'판을 키워서 버는 쪽입니다. 기회를 보는 눈이 빠르고, 남의 돈까지 움직여 일을 만듭니다.',
-    hamkke:'혼자보다 사람을 끼고 벌립니다. 사람이 재산인 대신, 같은 돈을 두고 겹치는 일도 생깁니다.'
-  }[k]||'';
-}
-function wHow(k){
-  return {
-    moeum:'월급·임대료처럼 날짜가 정해진 수입이 잘 맞습니다. 목돈을 한 번에 굴리는 일에는 손이 늦습니다.',
-    wolgeup:'승진·자격증·직책이 그대로 수입입니다. 반대로 조직을 나오면 수입 구조를 새로 짜야 합니다.',
-    jangsa:'기술·콘텐츠·영업처럼 결과물이 눈에 보이는 일이 맞습니다. 쉬면 바로 수입이 끊기는 게 약점입니다.',
-    gulligi:'사업·투자·중개처럼 규모가 곧 수익인 일이 맞습니다. 크게 벌고 크게 나가니 브레이크를 남이 잡아줘야 합니다.',
-    hamkke:'동업·팀·조직 영업이 맞습니다. 시작할 때 지분과 역할을 문서로 못 박아두면 오래갑니다.'
-  }[k]||'';
-}
-var WCENTER={han:'財',name:'재물'};
-function wMapOpt(extra){
-  var o={axes:WAXES,order:WAXIS_ORDER,rings:WRINGS,pick:function(e){return e.axis||'moeum'}};
+/* ═════════ 분야별 지도 (재물 · 연애 · 일) ═════════ */
+var ROOM=null, WSEL=null;
+function TP(k){ return (TOPICS&&TOPICS[k])||(TOPICS&&TOPICS.wealth); }
+function tAx(t,k){ var T=TP(t); return (T&&T.axes[k])||(T&&T.axes[T.order[0]]); }
+function tMapOpt(t,extra){
+  var T=TP(t);
+  var o={axes:T.axes,order:T.order,rings:T.rings,pick:function(e){return e.axis||T.order[0]}};
   if(extra)for(var k in extra)o[k]=extra[k];
   return o;
 }
-function wLegend(){ return mapLegend(WAXES,WAXIS_ORDER,WRINGS); }
+function tLegend(t){ var T=TP(t); return mapLegend(T.axes,T.order,T.rings); }
+function tCenter(t){ var T=TP(t); return {han:T.han,name:T.center}; }
+function tTone(b){
+  return {gotgan:'gold',doneun:'green',ssuneun:'blue',saram:'gray',ssiat:'amber',
+          gipeun:'gold',sunhwan:'green',bogotong:'blue',honja:'gray',jaram:'amber',
+          jeongsang:'gold',oreum:'green',dajim:'blue',jaebae:'gray',junbi:'amber'}[b]||'gray';
+}
 
 /* 방 만들기 화면 */
-function viewWealthNew(){
+function viewRoomNew(topic){
   setDock(null);
-  var b=getBirth();
+  var T=TP(topic), b=getBirth();
   app.innerHTML='';
   app.appendChild(h(
   '<section class="fade" style="padding-top:30px">'+
-    '<div class="eyebrow">재물지도</div>'+
-    '<h1 style="font-size:31px">누가 <span class="gold">돈그릇</span>이<br>제일 큰 사람일까</h1>'+
-    '<p class="lead" style="font-size:15px">단톡방에 링크를 던지면 각자 생일만 넣습니다. '+
-      '가운데가 <b class="gold">財</b>, 안쪽에 있을수록 재물 그릇이 큰 사람입니다. '+
-      '<b>돈 액수는 묻지 않습니다.</b> 오직 사주로만 자리가 정해집니다.</p>'+
+    '<div class="eyebrow">'+esc(T.label)+'</div>'+
+    '<h1 style="font-size:31px">'+esc(T.tagline)+'</h1>'+
+    '<p class="lead" style="font-size:15px">단톡방에 링크를 던지면 각자 생일만 넣습니다. '+esc(T.lead)+'</p>'+
   '</section>'+
 
   '<section class="sec fade" style="margin-top:22px">'+
     '<div class="card" id="fw">'+
       '<div class="field" style="margin-top:0"><label for="rTitle">방 이름</label>'+
         '<input class="inp" id="rTitle" maxlength="20" autocomplete="off" placeholder="예: 부동산 스터디방, 우리 동기들"></div>'+
-      formHTML({cta:'재물지도 만들기',nameLabel:'내 이름 또는 닉네임',namePh:'예: 평원',
+      formHTML({cta:T.label+' 만들기',nameLabel:'내 이름 또는 닉네임',namePh:'예: 평원',
         y:b&&b.birth?b.birth.y:null,m:b&&b.birth?b.birth.m:null,d:b&&b.birth?b.birth.d:null})+
     '</div>'+
   '</section>'+
 
   '<section class="sec rv">'+
-    '<h2>다섯 가지 버는 방식</h2>'+
-    '<p class="tiny" style="margin:-6px 0 0">별의 방향은 <b>어떻게 버는 사람인가</b>로 정해집니다.</p>'+
-    '<div class="plist">'+WAXIS_ORDER.map(function(k){
-      var A=WAXES[k];
+    '<h2>다섯 가지 자리</h2>'+
+    '<p class="tiny" style="margin:-6px 0 0">별의 방향은 <b>어떤 결의 사람인가</b>로 정해집니다.</p>'+
+    '<div class="plist">'+T.order.map(function(k){
+      var A=T.axes[k];
       return '<div class="prow" style="cursor:default;align-items:flex-start">'+
         '<span class="av" style="background:'+A.lcol+'1f;color:'+A.lcol+';font-size:13px">'+esc(A.short)+'</span>'+
         '<span class="nm" style="white-space:normal">'+
           '<b>'+esc(A.name)+' <span class="tiny" style="color:var(--dim2);font-weight:600">'+esc(A.sipsin)+'</span></b>'+
-          '<i style="white-space:normal;line-height:1.55;margin-top:2px">'+esc(wDesc(k))+'</i></span></div>';
+          '<i style="white-space:normal;line-height:1.55;margin-top:2px">'+esc(A.desc)+'</i></span></div>';
     }).join('')+'</div>'+
   '</section>'+
 
   '<section class="sec rv">'+
     '<h2>거리는 이렇게 정해집니다</h2>'+
     '<div class="card">'+
-      '<p style="margin:0;font-size:14.5px;line-height:1.8;color:#4a4438">'+
-      '재성(財星)이 얼마나 두터운지, 그 재물을 <b>감당할 힘</b>이 있는지(재다신약), '+
-      '식상이 재를 만들어주는지(식상생재), 비겁이 내 몫을 나눠 갖는지(군겁쟁재), '+
-      '재물 창고(財庫)를 깔고 있는지, 태어난 달이 재성인지를 따져 점수를 냅니다.</p>'+
-      '<div class="chips">'+WRINGS.map(function(g,i){
+      '<p style="margin:0;font-size:14.5px;line-height:1.8;color:#4a4438">'+esc(T.partsNote)+'</p>'+
+      '<div class="chips">'+T.rings.map(function(g,i){
         return '<span class="chip">'+(i===0?'안쪽 ':'')+esc(g.name)+'</span>';}).join('')+'</div>'+
-      '<p class="tiny" style="margin:13px 0 0">연봉·자산 같은 금액은 입력받지 않습니다. 물어볼 생각도 없습니다.</p>'+
+      '<p class="tiny" style="margin:13px 0 0">생년월일 말고는 아무것도 묻지 않습니다.</p>'+
     '</div>'+
   '</section>'+
-  '<section class="sec rv">'+pageShareBox('wealth')+'</section>'+
-  '<footer>재물운은 타고난 그릇을 보는 것이지 지금 통장 잔고가 아닙니다. 투자 판단의 근거로 쓰지 마세요.</footer>'));
+  '<section class="sec rv">'+otherTopics(topic)+'</section>'+
+  '<section class="sec rv">'+adBox()+'</section>'+
+  '<footer>'+esc(T.footer)+'</footer>'));
 
   bindForm(el('fw'),function(data,done){
     data.title=(el('rTitle').value||'').trim();
+    data.topic=topic;
     saveBirth(data.name,data.birth);paintBio();
     api('/api/rooms',{method:'POST',body:JSON.stringify(data)}).then(function(j){
-      var rm=store('inbokdo_rooms')||{};
-      rm[j.code]={token:j.token,title:j.title,at:Date.now()};
-      store('inbokdo_rooms',rm);
       var mr=store('inbokdo_myroom')||{};
       mr[j.code]={id:j.entryId,token:j.entryToken,name:data.name};
       store('inbokdo_myroom',mr);
@@ -1837,6 +1812,18 @@ function viewWealthNew(){
   });
   reveal(app);window.scrollTo(0,0);
 }
+function otherTopics(cur){
+  if(!TOPICS)return '';
+  var ks=Object.keys(TOPICS).filter(function(k){return k!==cur});
+  if(!ks.length)return '';
+  return '<h2>다른 지도도 있어요</h2><div class="plist">'+ks.map(function(k){
+    var T=TOPICS[k];
+    return '<a class="prow" href="'+esc(T.path)+'">'+
+      '<span class="av" style="background:#c19a2e1f;color:#a07c1c">'+esc(T.han)+'</span>'+
+      '<span class="nm"><b>'+esc(T.label)+'</b><i>'+esc(T.tagline)+'</i></span>'+
+      '<span class="tiny">›</span></a>';
+  }).join('')+'</div>';
+}
 
 /* 방 화면 */
 function viewRoom(code){
@@ -1844,109 +1831,99 @@ function viewRoom(code){
     '<div class="skel" style="height:320px;margin-top:22px"></div>';
   api('/api/rooms/'+code).then(function(j){
     ROOM=j;ROOM.code=code;
-    var mine=(store('inbokdo_myroom')||{})[code];
-    if(mine)renderRoom(j,mine); else renderRoom(j,null);
+    renderRoom(j,(store('inbokdo_myroom')||{})[code]||null);
   }).catch(function(e){
     app.innerHTML='<section class="center" style="padding-top:64px"><h1 style="font-size:24px">'+esc(e.message)+'</h1>'+
       '<p class="lead">링크가 잘못되었거나 삭제된 방일 수 있어요.</p>'+
-      '<button class="btn" style="margin-top:22px" onclick="location.href=\'/wealth\'">내 재물지도 만들기</button></section>';
+      '<button class="btn" style="margin-top:22px" onclick="location.href=\'/wealth\'">내 지도 만들기</button></section>';
   });
 }
-function roomShareBox(code,title){
-  var url=location.origin+'/w/'+code;
+function roomShareBox(code,title,topic){
+  var url=location.origin+'/w/'+code, T=TP(topic);
   return '<div class="sharebox">'+
     '<div class="eyebrow" style="color:#c9a227">이 방 공유하기</div>'+
     '<b style="display:block;font-size:19px;font-weight:700;letter-spacing:-.035em;margin-top:8px">'+
-      '단톡방에 던지면 각자 자기 별이 찍힙니다</b>'+
+      esc(T.shareLine)+'</b>'+
     '<div class="tiny" style="margin-top:7px;color:var(--dim);line-height:1.65">'+
       '생년월일만 넣으면 끝. 가입도 앱 설치도 없고, <b style="color:#4a4438">인원 제한도 없습니다.</b></div>'+
     '<div class="linkrow"><input id="rlnk" readonly value="'+esc(url)+'"><button id="rcpy">복사</button></div>'+
     '<button class="btn" id="rshr" style="margin-top:10px">단톡방에 공유하기</button>'+
   '</div>';
 }
-function doRoomShare(code,title){
-  var url=location.origin+'/w/'+code;
-  var t=(title||'재물지도');
-  var txt='우리 방 재물운 순위 뽑아보자. 생일만 넣으면 사주로 나옴. 돈 액수는 안 물어봄';
+function doRoomShare(code,title,topic){
+  var url=location.origin+'/w/'+code, T=TP(topic);
+  var t=(title||T.label);
   if(window.Kakao&&window.Kakao.isInitialized&&window.Kakao.isInitialized()){
     try{
       window.Kakao.Share.sendDefault({objectType:'feed',
-        content:{title:t+' · 재물지도',description:txt,imageUrl:location.origin+'/og.png',
+        content:{title:t+' · '+T.label,description:T.shareTxt,imageUrl:location.origin+'/og.png',
           imageWidth:1200,imageHeight:630,link:{mobileWebUrl:url,webUrl:url}},
-        buttons:[{title:'내 재물 별 찍기',link:{mobileWebUrl:url,webUrl:url}}]});
+        buttons:[{title:'내 별 찍기',link:{mobileWebUrl:url,webUrl:url}}]});
       return;
     }catch(e){}
   }
-  if(navigator.share){navigator.share({title:t,text:txt,url:url}).catch(function(){});return;}
-  copyRoomLink(code);
+  if(navigator.share){navigator.share({title:t,text:T.shareTxt,url:url}).catch(function(){});return;}
+  copyText(url,'링크를 복사했어요');
 }
-function copyRoomLink(code){
-  var url=location.origin+'/w/'+code;
-  if(navigator.clipboard&&navigator.clipboard.writeText){
-    navigator.clipboard.writeText(url).then(function(){toast('링크를 복사했어요')}).catch(function(){toast(url)});
-  }else{var i=el('rlnk');if(i){i.select();try{document.execCommand('copy');toast('링크를 복사했어요')}catch(e){toast(url)}}}
-}
-function bindRoomShare(code,title){
-  var c=el('rcpy');if(c)c.onclick=function(){tap();copyRoomLink(code);};
-  var sh=el('rshr');if(sh)sh.onclick=function(){tap();doRoomShare(code,title);};
+function bindRoomShare(code,title,topic){
+  var c=el('rcpy');if(c)c.onclick=function(){tap();copyText(location.origin+'/w/'+code,'링크를 복사했어요');};
+  var sh=el('rshr');if(sh)sh.onclick=function(){tap();doRoomShare(code,title,topic);};
 }
 function renderRoom(j,mine){
+  var topic=j.topic||'wealth', T=TP(topic);
   var pts=j.entries||[];
   var meId=mine?mine.id:null;
   var meRow=meId?pts.filter(function(x){return x.id===meId})[0]:null;
   app.innerHTML='';
   app.appendChild(h(
   '<section class="fade" style="padding-top:28px">'+
-    '<div class="eyebrow">재물지도</div>'+
+    '<div class="eyebrow">'+esc(T.label)+'</div>'+
     '<h1 style="font-size:29px">'+esc(j.title)+'</h1>'+
     '<p class="lead" style="font-size:14.5px">'+
-      (pts.length? '지금까지 <b class="gold">'+pts.length+'명</b>이 별을 찍었습니다. 가운데 財에 가까울수록 재물 그릇이 큰 사주입니다.'
+      (pts.length? '지금까지 <b class="gold">'+pts.length+'명</b>이 별을 찍었습니다. '+esc(T.lead)
                  : '아직 아무도 없습니다. 아래 링크를 단톡방에 보내보세요.')+'</p>'+
   '</section>'+
   (meRow
     ? '<section class="sec fade" style="margin-top:20px">'+
-      '<div class="card" style="border-color:'+WAXES[meRow.axis].lcol+'40;background:linear-gradient(155deg,'+WAXES[meRow.axis].lcol+'14,#fff 62%)">'+
+      '<div class="card" style="border-color:'+tAx(topic,meRow.axis).lcol+'40;background:linear-gradient(155deg,'+tAx(topic,meRow.axis).lcol+'14,#fff 62%)">'+
         '<div style="display:flex;align-items:center;gap:13px">'+
-          '<div class="av" style="width:46px;height:46px;flex:0 0 46px;background:'+WAXES[meRow.axis].lcol+'1f;color:'+WAXES[meRow.axis].lcol+';font-size:13px">'+esc(WAXES[meRow.axis].short)+'</div>'+
+          '<div class="av" style="width:46px;height:46px;flex:0 0 46px;background:'+tAx(topic,meRow.axis).lcol+'1f;color:'+tAx(topic,meRow.axis).lcol+';font-size:13px">'+esc(tAx(topic,meRow.axis).short)+'</div>'+
           '<div style="flex:1;min-width:0"><div class="tiny" style="color:var(--dim2);letter-spacing:.06em">내 자리</div>'+
-          '<b style="font-size:17px;display:block;letter-spacing:-.03em">'+esc(WAXES[meRow.axis].name)+'</b>'+
+          '<b style="font-size:17px;display:block;letter-spacing:-.03em">'+esc(tAx(topic,meRow.axis).name)+'</b>'+
           '<div class="tiny" style="color:var(--dim)">'+esc(meRow.bandLabel)+'</div></div>'+
-          '<div style="text-align:right"><div class="sc" style="font-size:25px;color:'+scColor(wTone(meRow.band))+'">'+meRow.score+'</div>'+
+          '<div style="text-align:right"><div class="sc" style="font-size:25px;color:'+scColor(tTone(meRow.band))+'">'+meRow.score+'</div>'+
           '<div class="tiny">'+meRow.rank+'위 / '+pts.length+'명</div></div>'+
         '</div>'+
-        '<button class="btn sec2" id="mydet" style="margin-top:14px">내 재물 사주 자세히 보기</button>'+
+        '<button class="btn sec2" id="mydet" style="margin-top:14px">내 결과 자세히 보기</button>'+
       '</div></section>'
     : '')+
-  '<section class="sec fade" style="margin-top:18px"><div class="sky"><div class="mapbox" id="wmap"></div>'+wLegend()+'</div>'+
+  '<section class="sec fade" style="margin-top:18px"><div class="sky"><div class="mapbox" id="wmap"></div>'+tLegend(topic)+'</div>'+
     '<div id="wsel"></div></section>'+
-  '<section class="sec rv">'+roomShareBox(j.code,j.title)+'</section>'+
+  '<section class="sec rv">'+roomShareBox(j.code,j.title,topic)+'</section>'+
   (meRow?'':'<section class="sec fade"><div class="card" id="fw">'+
-    formHTML({cta:'내 재물 별 찍기',nameLabel:'뭐라고 부를까요',namePh:'예: 평원, 김대리'})+'</div></section>')+
+    formHTML({cta:'내 별 찍기',nameLabel:'뭐라고 부를까요',namePh:'예: 평원, 김대리'})+'</div></section>')+
   '<section class="sec rv" id="wlist"></section>'+
   '<section class="sec rv">'+adBox()+'</section>'+
-  '<section class="sec rv"><button class="btn sec2" id="wnew">다른 방 만들기</button>'+
-    '<button class="btn sec2" id="wmy" style="margin-top:9px">내 인연지도 만들기</button></section>'+
-  '<footer>재물운은 타고난 그릇을 보는 것이지 지금 통장 잔고가 아닙니다. 입력한 생년월일은 다른 참여자에게 보이지 않습니다.</footer>'));
+  '<section class="sec rv">'+otherTopics(topic)+'</section>'+
+  '<footer>'+esc(T.footer)+' 입력한 생년월일은 다른 참여자에게 보이지 않습니다.</footer>'));
 
-  el('wmap').innerHTML=starMap(pts,WCENTER,wMapOpt({me:meId,sel:WSEL}));
-  bindRoomShare(j.code,j.title);
-  bindWStars(pts);
-  el('wnew').onclick=function(){tap();location.href='/wealth';};
-  el('wmy').onclick=function(){tap();location.href='/';};
+  el('wmap').innerHTML=starMap(pts,tCenter(topic),tMapOpt(topic,{me:meId,sel:WSEL}));
+  bindRoomShare(j.code,j.title,topic);
+  bindWStars();
   var md=el('mydet');
   if(md)md.onclick=function(){tap();showRoomResult(j.code,mine.id,mine.token);};
 
   if(pts.length){
-    el('wlist').innerHTML='<h2>재물 순위</h2>'+
-      '<p class="tiny" style="margin:-8px 0 0">사주로 본 재물 그릇의 크기입니다. 지금 가진 돈이 아닙니다.</p>'+
+    el('wlist').innerHTML='<h2>'+esc(T.listTitle)+'</h2>'+
+      '<p class="tiny" style="margin:-8px 0 0">'+esc(T.listNote)+'</p>'+
       '<div class="plist">'+pts.map(function(p,i){
-        var c=charBy(p.charKey),A=WAXES[p.axis]||WAXES.moeum;
+        var c=charBy(p.charKey),A=tAx(topic,p.axis);
         return '<button class="prow'+(p.id===meId?' me':'')+'" data-wid="'+p.id+'">'+
           '<span class="rk'+(i<3?' top':'')+'">'+(i+1)+'</span>'+
           '<span class="av" style="background:'+c.color+'22;color:'+c.color+'">'+esc(c.han)+'</span>'+
           '<span class="nm"><b>'+esc(p.name)+(p.id===meId?' <span class="gold">(나)</span>':'')+'</b>'+
           '<i>'+esc(A.name)+' · '+esc(p.bandLabel)+'</i></span>'+
-          '<span class="sc" style="color:'+scColor(wTone(p.band))+'">'+p.score+'</span></button>';
+          '<span class="sc" style="color:'+scColor(tTone(p.band))+'">'+p.score+'</span></button>';
       }).join('')+'</div>';
     el('wlist').addEventListener('click',function(e){
       var b=e.target.closest('[data-wid]');if(!b)return;selectWStar(Number(b.dataset.wid));
@@ -1962,21 +1939,17 @@ function renderRoom(j,mine){
         renderRoomResult(r,j.code);
       }).catch(function(e){done(e.message);});
     });
-    setDock('<button class="btn">내 재물 별 찍기</button>',function(){
+    setDock('<button class="btn">내 별 찍기</button>',function(){
       var n=document.querySelector('#fw');
       n.scrollIntoView({behavior:'smooth',block:'center'});
       setTimeout(function(){var f=n.querySelector('#fName');if(f)f.focus();},420);
     },'#fw');
   }else{
-    setDock('<button class="btn">단톡방에 공유하기</button>',function(){doRoomShare(j.code,j.title);},'.sharebox');
+    setDock('<button class="btn">단톡방에 공유하기</button>',function(){doRoomShare(j.code,j.title,topic);},'.sharebox');
   }
   reveal(app);window.scrollTo(0,0);
 }
-function wTone(band){
-  return {gotgan:'gold',doneun:'green',ssuneun:'blue',saram:'gray',ssiat:'amber'}[band]||'gray';
-}
-var WSEL=null;
-function bindWStars(pts){
+function bindWStars(){
   var box=el('wmap');if(!box)return;
   box.addEventListener('click',function(e){
     var g=e.target.closest('.star');if(!g)return;
@@ -1986,24 +1959,25 @@ function bindWStars(pts){
 function selectWStar(id){
   WSEL=(WSEL===id?null:id);
   if(!ROOM)return;
+  var topic=ROOM.topic||'wealth';
   var pts=ROOM.entries||[];
   var mine=(store('inbokdo_myroom')||{})[ROOM.code];
-  el('wmap').innerHTML=starMap(pts,WCENTER,wMapOpt({me:mine?mine.id:null,sel:WSEL}));
+  el('wmap').innerHTML=starMap(pts,tCenter(topic),tMapOpt(topic,{me:mine?mine.id:null,sel:WSEL}));
   var box=el('wsel');
   if(WSEL==null){box.innerHTML='';return;}
   var p=pts.filter(function(x){return x.id===WSEL})[0];if(!p){box.innerHTML='';return;}
-  var c=charBy(p.charKey),A=WAXES[p.axis]||WAXES.moeum;
+  var c=charBy(p.charKey),A=tAx(topic,p.axis);
   box.innerHTML='<div class="card fade" style="margin-top:12px">'+
     '<div style="display:flex;align-items:center;gap:12px">'+
       '<div class="av" style="width:44px;height:44px;flex:0 0 44px;background:'+c.color+'22;color:'+c.color+';font-size:19px">'+esc(c.han)+'</div>'+
       '<div style="flex:1;min-width:0"><b style="font-size:17px">'+esc(p.name)+'</b>'+
       '<div class="tiny" style="color:var(--dim)">'+esc(c.name)+' · '+esc(p.bandLabel)+'</div></div>'+
-      '<div style="text-align:right"><div class="sc" style="font-size:24px;color:'+scColor(wTone(p.band))+'">'+p.score+'</div>'+
+      '<div style="text-align:right"><div class="sc" style="font-size:24px;color:'+scColor(tTone(p.band))+'">'+p.score+'</div>'+
       '<div class="tiny">'+p.rank+'위</div></div>'+
     '</div>'+
     '<hr class="d">'+
     '<div class="lbl tiny" style="letter-spacing:.13em;font-weight:800;color:'+A.lcol+'">'+esc(A.name)+' · '+esc(A.sipsin)+'</div>'+
-    '<p style="margin:6px 0 0;font-size:13.5px;color:#4a4438;line-height:1.7">'+esc(wDesc(p.axis))+'</p>'+
+    '<p style="margin:6px 0 0;font-size:13.5px;color:#4a4438;line-height:1.7">'+esc(A.desc)+'</p>'+
   '</div>';
   box.scrollIntoView({behavior:'smooth',block:'nearest'});
 }
@@ -2013,8 +1987,9 @@ function showRoomResult(code,id,token){
     .catch(function(){toast('결과를 찾을 수 없어요');});
 }
 function renderRoomResult(r,code){
-  var res=r.result, A=WAXES[res.axis]||WAXES.moeum;
-  var tone=wTone(res.band), pct=r.total>1?Math.round((1-(r.rank-1)/r.total)*100):100;
+  var topic=r.topic||'wealth', T=TP(topic);
+  var res=r.result, A=tAx(topic,res.axis);
+  var tone=tTone(res.band), pct=r.total>1?Math.round((1-(r.rank-1)/r.total)*100):100;
   var ch=charBy(r.me.char.key);
   app.innerHTML='';
   app.appendChild(h(
@@ -2029,26 +2004,23 @@ function renderRoomResult(r,code){
 
   '<section class="sec fade" style="margin-top:24px">'+
     '<div class="typecard" style="--c:'+A.lcol+';background:#fff">'+
-      '<div class="lbl">내가 돈을 버는 방식</div>'+
+      '<div class="lbl">'+esc(T.myLabel)+'</div>'+
       '<h3 style="color:'+A.lcol+'">'+esc(A.name)+'</h3>'+
       '<div class="whyline">'+esc(A.sipsin)+'이 가장 두텁습니다</div>'+
-      '<p>'+esc(wDesc(res.axis))+'</p>'+
+      '<p>'+esc(A.desc)+'</p>'+
     '</div>'+
-    '<div class="card" style="margin-top:10px"><div class="tiny" style="color:#4a4438;font-size:13.5px">💡 '+esc(wHow(res.axis))+'</div></div>'+
+    '<div class="card" style="margin-top:10px"><div class="tiny" style="color:#4a4438;font-size:13.5px">💡 '+esc(A.how)+'</div></div>'+
   '</section>'+
 
   '<section class="sec rv">'+
-    '<h2>내 재물 구조</h2>'+
+    '<h2>내 구조</h2>'+
     '<div class="card">'+
-      '<div class="bars">'+
-        wbar('재성 (돈 자리)',res.parts.jae,'#d9b45b')+
-        wbar('일간의 힘',res.parts.body,'#4ea87a')+
-        wbar('식상 (만드는 힘)',res.parts.sik,'#e2734a')+
-        wbar('관성 (자리)',res.parts.gwan,'#4f86c6')+
-      '</div>'+
-      '<div class="chips" style="margin-top:13px"><span class="chip">'+esc(res.parts.strength)+'</span>'+
+      '<div class="bars">'+T.parts.map(function(pp){
+        return wbar(pp[1],res.parts[pp[0]]||0,pp[2]);
+      }).join('')+'</div>'+
+      '<div class="chips" style="margin-top:13px"><span class="chip">'+esc(res.parts.strength||'')+'</span>'+
         '<span class="chip">'+esc(A.sipsin)+' 중심</span></div>'+
-      '<p class="tiny" style="margin:12px 0 0">재성이 두터워도 그걸 감당할 힘(일간)이 얇으면 돈이 오히려 나를 부립니다. 두 막대의 균형이 점수를 크게 좌우합니다.</p>'+
+      '<p class="tiny" style="margin:12px 0 0">'+esc(T.partsNote)+'</p>'+
     '</div>'+
   '</section>'+
 
@@ -2057,16 +2029,14 @@ function renderRoomResult(r,code){
       '<span>'+esc(n.d)+'</span></div></div>';}).join('')+'</div></section>':'')+
 
   '<section class="sec fade"><h2>내 사주</h2>'+sajuCard(r.me.saju,ch)+'</section>'+
-
-  '<section class="sec rv">'+roomShareBox(code,r.title)+'</section>'+
+  '<section class="sec rv">'+roomShareBox(code,r.title,topic)+'</section>'+
   '<section class="sec rv">'+adBox()+'</section>'+
-  '<section class="sec rv"><button class="btn" id="back">지도에서 순위 보기</button>'+
-    '<button class="btn sec2" id="mkmap" style="margin-top:9px">내 인연지도도 만들기</button></section>'+
-  '<footer>재물운은 타고난 그릇을 보는 것이지 지금 통장 잔고가 아닙니다. 투자 판단의 근거로 쓰지 마세요.</footer>'));
+  '<section class="sec rv">'+otherTopics(topic)+'</section>'+
+  '<section class="sec rv"><button class="btn" id="back">지도에서 순위 보기</button></section>'+
+  '<footer>'+esc(T.footer)+'</footer>'));
 
-  bindRoomShare(code,r.title);
+  bindRoomShare(code,r.title,topic);
   el('back').onclick=function(){tap();location.href='/w/'+code;};
-  el('mkmap').onclick=function(){tap();location.href='/';};
   setDock('<button class="btn">지도에서 순위 보기</button>',function(){location.href='/w/'+code;},'#back');
   reveal(app);window.scrollTo(0,0);
 }
@@ -2079,7 +2049,7 @@ function wbar(label,v,col){
 /* ===== 부트 ===== */
 function loadMeta(){
   if(TYPES)return Promise.resolve();
-  return api('/api/meta').then(function(j){TYPES=j.types;CHARS=j.characters;});
+  return api('/api/meta').then(function(j){TYPES=j.types;CHARS=j.characters;TOPICS=j.topics;});
 }
 function loadMe(){
   return api('/api/me').then(function(j){
@@ -2140,6 +2110,8 @@ var MENU=[
   {k:'life',  ic:'◈', c:'#4ea87a', t:'분야별 풀이', d:'건강 · 재물 · 일 · 사람', go:function(){location.href='/life'}},
   {k:'map',   ic:'✦', c:'#d9b45b', t:'내 인연지도', d:'내 사람들의 별자리', go:function(){goMyMap()}},
   {k:'wealth',ic:'財', c:'#c19a2e', t:'재물지도', d:'누가 돈그릇이 큰 사람인가', go:function(){location.href='/wealth'}},
+  {k:'love',  ic:'緣', c:'#b8446e', t:'연애지도', d:'누구에게 인연이 먼저 올까', go:function(){location.href='/love'}},
+  {k:'work',  ic:'業', c:'#3c6ca6', t:'일운지도', d:'누가 크게 쓰일 사람일까', go:function(){location.href='/work'}},
   {k:'about', ic:'?', c:'#7a8b99', t:'계산 방법', d:'우리가 쓴 명리 방법 공개', go:function(){location.href='/about'}},
   {k:'profile', ic:'●', c:'#c19a2e', t:'내 사주', d:'한 번만 넣으면 계속 쓰입니다', go:function(){location.href='/my'}}
 ];
@@ -2151,28 +2123,31 @@ function goMyMap(){
   location.href='/m/'+codes[0];
 }
 function menuHref(k){
-  return k==='today'?'/today':k==='saju'?'/saju':k==='life'?'/life':k==='about'?'/about':k==='profile'?'/my':k==='wealth'?'/wealth':'#';
+  return k==='today'?'/today':k==='saju'?'/saju':k==='life'?'/life':k==='about'?'/about':k==='profile'?'/my':k==='wealth'?'/wealth':k==='love'?'/love':k==='work'?'/work':'#';
 }
 /* 본문 상단 별자리 메뉴 — 여덟 개 별을 눌러 이동한다 */
 var NAVSKY=[
-  {k:'map',     t:'내 인연지도', x: 62, y: 46, r:6.2, badge:'추천'},
-  {k:'wealth',  t:'재물지도',   x:182, y: 30, r:6.2},
-  {k:'today',   t:'오늘의 운세', x:300, y: 56, r:6.2},
-  {k:'saju',    t:'사주팔자',   x:110, y:108, r:4.8},
-  {k:'life',    t:'분야별 풀이', x:240, y:106, r:4.8},
-  {k:'profile', t:'내 사주',    x:174, y:146, r:3.9},
-  {k:'about',   t:'계산 방법',  x:306, y:136, r:3.9},
-  {k:'home',    t:'홈',        x: 38, y:140, r:3.9}
+  {k:'map',     t:'내 인연지도', x: 60, y: 44, r:6.4, badge:'추천'},
+  {k:'wealth',  t:'재물지도',   x:176, y: 30, r:6.0},
+  {k:'today',   t:'오늘의 운세', x:298, y: 44, r:6.0},
+  {k:'love',    t:'연애지도',   x:110, y:104, r:5.6},
+  {k:'work',    t:'일운지도',   x:232, y: 98, r:5.6},
+  {k:'saju',    t:'사주팔자',   x: 40, y:154, r:4.4},
+  {k:'life',    t:'분야별 풀이', x:170, y:162, r:4.4},
+  {k:'about',   t:'계산 방법',  x:308, y:152, r:3.9},
+  {k:'profile', t:'내 사주',    x:250, y:200, r:3.9},
+  {k:'home',    t:'홈',        x: 96, y:212, r:3.9}
 ];
-var NAVLINE=[[0,1],[1,2],[0,3],[3,5],[5,4],[4,1],[4,6],[7,3],[2,6]];
+var NAVLINE=[[0,1],[1,2],[0,3],[3,4],[4,1],[3,5],[3,6],[4,6],[4,7],[7,8],[6,8],[5,9],[6,9]];
 function buildNav(){
   var box=el('navsky');if(!box)return;
   var cur=BOOT.view||'home';
   if(cur==='map'){ var mn=store('inbokdo_mine')||{}; if(!mn[BOOT.code])cur=''; }
-  if(cur==='room'||cur==='wealthNew')cur='wealth';
+  if(cur==='room')cur=(BOOT.topic||'wealth');
+  if(cur==='roomNew')cur=(BOOT.topic||'wealth');
 
   var P={};NAVSKY.forEach(function(n){P[n.k]=n;});
-  var g='<svg viewBox="0 0 360 176" role="navigation" aria-label="주요 메뉴">';
+  var g='<svg viewBox="0 0 360 232" role="navigation" aria-label="주요 메뉴">';
   NAVLINE.forEach(function(L){
     var a=NAVSKY[L[0]],b=NAVSKY[L[1]];
     g+='<line class="nvsline" x1="'+a.x+'" y1="'+a.y+'" x2="'+b.x+'" y2="'+b.y+'"/>';
@@ -2608,7 +2583,7 @@ Promise.all([loadMeta(),loadMe()]).then(function(){
   else if(BOOT.view==='mine')viewMine();
   else if(BOOT.view==='about')viewAbout();
   else if(BOOT.view==='profile')viewProfile();
-  else if(BOOT.view==='wealthNew')viewWealthNew();
+  else if(BOOT.view==='roomNew')viewRoomNew(BOOT.topic||'wealth');
   else if(BOOT.view==='room')viewRoom(BOOT.code);
   else if(BOOT.view==='today'||BOOT.view==='saju'||BOOT.view==='life')fortunePage(BOOT.view);
   else if(BOOT.view==='map')viewMap(BOOT.code);
