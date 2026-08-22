@@ -6,7 +6,7 @@ import { tojeong } from './tojeong.js';
 import { deepSaju, extendDeep } from './deep.js';
 import { leapMonthOf, lunarMonthLength } from './astro.js';
 import APP_HTML from './app.html';
-import OG_PNG from './og.png';
+import OG_HOME from './og-home.png';
 import OG_SAJU from './og-saju.png';
 import OG_TODAY from './og-today.png';
 import OG_TOJEONG from './og-tojeong.png';
@@ -18,7 +18,7 @@ import OG_MAP from './og-map.png';
 
 /* 페이지별 썸네일 */
 const OG_FILES = {
-  'og.png': OG_PNG, 'og-saju.png': OG_SAJU, 'og-today.png': OG_TODAY,
+  'og-home.png': OG_HOME, 'og.png': OG_HOME, 'og-saju.png': OG_SAJU, 'og-today.png': OG_TODAY,
   'og-tojeong.png': OG_TOJEONG, 'og-life.png': OG_LIFE, 'og-wealth.png': OG_WEALTH,
   'og-love.png': OG_LOVE, 'og-work.png': OG_WORK, 'og-map.png': OG_MAP,
 };
@@ -704,7 +704,7 @@ async function handleApi(request, env, url) {
 }
 
 function renderPage(meta) {
-  const img = OG_FILES[meta.img] ? meta.img : 'og.png';
+  const img = OG_FILES[meta.img] ? meta.img : 'og-home.png';
   const t = esc(meta.title);
   const d = esc(meta.desc);
   const u = esc(meta.url);
@@ -786,7 +786,7 @@ export default {
       '/today': { view: 'today', img: 'og-today.png', title: '오늘의 운세 · 스피드 운세지도', desc: '오늘 일진과 내 사주를 견줘 하루의 결을 봅니다. 시간대별 12시진 흐름, 오늘 맞는 띠, 이번 주 7일 흐름까지 무료입니다.' },
       '/saju': { view: 'saju', img: 'og-saju.png', title: '사주 정밀 풀이 · 스피드 운세지도', desc: '원국 여덟 글자에 십신·지장간·십이운성·공망, 신강신약·격국·용신, 신살 20여 종, 궁과 육친, 대운 90년과 올해 12개월까지. 전부 무료입니다.' },
       '/life': { view: 'life', img: 'og-life.png', title: '분야별 풀이 · 스피드 운세지도', desc: '건강·재물·일·애정·문서·가정·사람·이동·말년. 내 원국을 아홉 갈래로 나눠 점수와 풀이를 따로 냅니다. 무료입니다.' },
-      '/about': { view: 'about', img: 'og.png', title: '어떻게 계산하나요 · 스피드 운세지도', desc: '스피드 운세지도가 쓰는 명리학 방법과 천문 계산을 그대로 공개합니다.' },
+      '/about': { view: 'about', img: 'og-home.png', title: '어떻게 계산하나요 · 스피드 운세지도', desc: '스피드 운세지도가 쓰는 명리학 방법과 천문 계산을 그대로 공개합니다.' },
       '/tojeong': { view: 'tojeong', img: 'og-tojeong.png', title: '토정비결 · 스피드 운세지도', desc: '올해 나의 토정비결을 무료로 봅니다. 144괘 작괘는 전통 그대로, 여기에 재물·직장·애정·건강·문서·이동·사람·구설 여덟 갈래와 12개월 월운까지 더했습니다.' },
       '/my': { view: 'profile', img: 'og-saju.png', title: '내 사주 · 스피드 운세지도', desc: '생년월일을 한 번만 넣으면 오늘의 운세·사주팔자·분야별 풀이가 바로 열립니다.' },
       '/wealth': { view: 'roomNew', topic: 'wealth', img: 'og-wealth.png', title: '재물지도 · 스피드 운세지도', desc: '단톡방 사람들의 재물 사주를 한 장의 지도에 모읍니다. 가운데가 財, 안쪽에 있을수록 재물 그릇이 큰 사람입니다. 무료입니다.' },
@@ -805,7 +805,7 @@ export default {
     if (url.pathname === '/login' || url.pathname === '/me') {
       return new Response(renderPage({
         title: url.pathname === '/login' ? '스피드 운세지도 로그인' : '내 지도 · 스피드 운세지도',
-        desc: '스피드 운세지도', url: origin + url.pathname, origin, img: 'og.png',
+        desc: '스피드 운세지도', url: origin + url.pathname, origin, img: 'og-home.png',
         boot: { view: url.pathname === '/login' ? 'login' : 'mine', providers: enabledProviders(env), kakaoKey: env.KAKAO_JS_KEY || '' },
       }), { headers: { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'no-store' } });
     }
