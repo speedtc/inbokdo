@@ -480,6 +480,48 @@ table.wonguk td{padding:0;vertical-align:top}
   background:#fff;border:1px solid var(--line2);color:var(--ink2)}
 .relchip.bad{background:#fdf1ec;border-color:#f0cfc0;color:#b5532e}
 .relchip.good{background:#eef8f2;border-color:#bfe3ce;color:#2f855f}
+
+/* ══ 오늘의 운세 / 분야별 심화 ══ */
+.hgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:10px}
+@media(min-width:480px){.hgrid{grid-template-columns:repeat(4,1fr)}}
+.hcell{background:#fff;border:1px solid var(--line);border-radius:11px;padding:8px 7px;text-align:center;position:relative}
+.hcell.top{border-color:rgba(193,154,46,.55);background:var(--gold-soft)}
+.hcell.bot{border-color:rgba(192,90,60,.35);background:#fdf3ef}
+.hcell b{display:block;font-size:13px;font-weight:800;letter-spacing:-.04em}
+.hcell i{display:block;font-style:normal;font-size:9.5px;color:var(--dim2);margin-top:1px}
+.hcell s{display:block;text-decoration:none;font-size:15px;font-weight:800;margin-top:4px;font-variant-numeric:tabular-nums}
+.hcell .tk{height:4px;border-radius:99px;background:rgba(60,48,16,.08);margin-top:4px;overflow:hidden}
+.hcell .tk i{display:block;height:100%;border-radius:99px;margin:0}
+.hcell u{display:block;text-decoration:none;font-size:9.5px;color:var(--dim);margin-top:3px}
+
+.wk{display:flex;gap:5px;margin-top:10px}
+.wkd{flex:1;background:#fff;border:1px solid var(--line);border-radius:11px;padding:8px 3px 7px;text-align:center}
+.wkd.now{border-color:var(--gold);background:var(--gold-soft)}
+.wkd i{display:block;font-style:normal;font-size:10px;color:var(--dim);letter-spacing:-.03em}
+.wkd b{display:block;font-size:12px;font-weight:700;margin-top:2px;letter-spacing:-.04em}
+.wkd .bar{height:44px;display:flex;align-items:flex-end;justify-content:center;margin-top:5px}
+.wkd .bar span{width:11px;border-radius:4px 4px 0 0;display:block}
+.wkd s{display:block;text-decoration:none;font-size:11px;font-weight:800;margin-top:3px;font-variant-numeric:tabular-nums}
+
+.zrow{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.zchip{font-size:12.5px;font-weight:700;letter-spacing:-.03em;border-radius:10px;padding:5px 10px;background:#fff;border:1px solid var(--line2)}
+.zchip.g{background:#eef8f2;border-color:#bfe3ce;color:#2f855f}
+.zchip.b{background:#fdf1ec;border-color:#f0cfc0;color:#b5532e}
+
+.acard{background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px 15px;margin-top:10px}
+.acard .top{display:flex;align-items:center;gap:9px}
+.acard .ico{width:32px;height:32px;flex:0 0 32px;border-radius:10px;display:flex;align-items:center;justify-content:center;
+  font-size:15px;font-weight:800}
+.acard .nm{flex:1}
+.acard .nm b{display:block;font-size:16px;font-weight:800;letter-spacing:-.04em}
+.acard .nm i{display:block;font-style:normal;font-size:11.5px;color:var(--dim);margin-top:1px}
+.acard .sc{font-size:22px;font-weight:800;letter-spacing:-.05em;font-variant-numeric:tabular-nums}
+.acard .tk{height:6px;border-radius:99px;background:rgba(60,48,16,.07);margin-top:10px;overflow:hidden}
+.acard .tk i{display:block;height:100%;border-radius:99px}
+.acard p{margin:10px 0 0;font-size:13.8px;line-height:1.72;color:#4a4438;word-break:keep-all}
+.acard .tip{margin-top:9px;padding-top:9px;border-top:1px solid var(--line);font-size:12.8px;color:#6b6355;line-height:1.65}
+.acard .tip b{color:#a07c1c}
+.acard .lk{display:inline-block;margin-top:9px;font-size:12.5px;font-weight:700;color:#a07c1c;text-decoration:none}
 </style>
 </head>
 <body>
@@ -1899,18 +1941,19 @@ function renderVisitorMapOnly(code){
 /* 메뉴 설명 카드 — 이 메뉴가 무엇인지 */
 var INTRO={
   today:{t:'오늘의 운세란',
-    d:'오늘 하루의 결을 봅니다. 오늘 날짜의 간지(일진)와 내가 태어난 날의 천간(일간)을 견줘, 오늘 어떤 기운이 들어오는지 풀어드립니다.',
-    n:'매일 0시(한국 시각)에 바뀝니다. 사주는 평생 그대로지만 이건 날마다 달라집니다.',
-    c:['매일 바뀜','일진 × 일간','무료']},
+    d:'오늘 날짜의 간지(일진)와 내 사주를 견줘 하루의 결을 봅니다. 십신·십이운성·천간합충·지지의 충합·천을귀인을 모두 넣어 점수를 내고, '+
+      '<b>열두 시진의 시간대별 흐름</b>, <b>오늘 맞는 띠</b>, <b>이번 주 이레 흐름</b>까지 함께 냅니다.',
+    n:'매일 0시(한국 시각)에 바뀝니다. 사주는 평생 그대로지만 이건 날마다 달라집니다. 시간대는 오늘 일간에서 오자둔으로 뽑은 시간(時干)을 씁니다.',
+    c:['매일 바뀜','12시진 흐름','띠 궁합','이번 주 7일','무료']},
   saju:{t:'사주 정밀 풀이란',
     d:'태어난 연·월·일·시를 각각 두 글자씩, 모두 <b>여덟 글자</b>로 세운 것이 내 원국(原局)입니다. 여기서 십신·지장간·십이운성·공망을 뽑고, '+
       '신강·신약을 재고, 격국과 용신을 잡은 다음, 신살과 궁·육친까지 읽어 <b>대운 90년과 올해 12개월</b>까지 풀어드립니다.',
     n:'계산은 전통 명리 방식 그대로입니다. 절기 기준 년·월주, 율리우스일 일주, 오자둔 시주, 오호둔 월간, 양남음녀 대운. 풀이 문장만 저희가 직접 썼습니다.',
     c:['원국 8자','십신·지장간','십이운성','격국·용신','신살 20여 종','대운·세운·월운']},
   life:{t:'분야별 풀이란',
-    d:'내 사주 하나를 <b>건강 · 재물 · 일과 성취 · 사람</b> 네 갈래로 나눠 풀어드립니다.',
-    n:'오행이 어디에 몰리고 어디가 얇은지를 보고, 몸에서 먼저 신호가 오는 곳과 돈이 도는 방식, 조직과 사람에서의 결을 짚습니다.',
-    c:['건강','재물','일과 성취','사람']},
+    d:'내 사주 하나를 <b>건강 · 재물 · 일 · 애정 · 문서 · 가정 · 사람 · 이동 · 말년</b> 아홉 갈래로 나눠, 갈래마다 점수와 풀이를 따로 냅니다.',
+    n:'오행 분포와 십신 구성, 지지의 합충, 신살까지 넣어 계산합니다. 잘하는 갈래를 밀어주는 것이 얇은 갈래를 억지로 채우는 것보다 훨씬 효율이 좋습니다.',
+    c:['아홉 갈래','갈래별 점수','오행 균형','체질 경향']},
   tojeong:{t:'토정비결이란',
     d:'한 해의 결을 보는 옛 방식입니다. 세는나이와 그 해의 태세, 태어난 달과 날을 써서 <b>144괘</b> 중 하나를 뽑습니다. '+
       '여기에 <b>내 원국과 그 해 세운의 관계</b>를 더해 재물·직장·애정·건강·문서·이동·사람·구설 <b>여덟 갈래</b>와 12개월 월운까지 냅니다.',
@@ -2505,7 +2548,7 @@ var MENU=[
   {k:'today', ic:'☀', c:'#e8a33b', t:'오늘의 운세', d:'오늘 일진과 내 사주를 견줍니다', go:function(){location.href='/today'}},
   {k:'tojeong',ic:'卦', c:'#b8746e', t:'토정비결', d:'올해 괘 + 여덟 갈래 + 12개월', go:function(){location.href='/tojeong'}},
   {k:'saju',  ic:'四', c:'#9aa7b8', t:'내 사주팔자', d:'격국·용신·신살·대운까지 전부', go:function(){location.href='/saju'}},
-  {k:'life',  ic:'◈', c:'#4ea87a', t:'분야별 풀이', d:'건강 · 재물 · 일 · 사람', go:function(){location.href='/life'}},
+  {k:'life',  ic:'◈', c:'#4ea87a', t:'분야별 풀이', d:'아홉 갈래 점수와 풀이', go:function(){location.href='/life'}},
   {k:'map',   ic:'✦', c:'#d9b45b', t:'내 인연지도', d:'내 사람들의 별자리', go:function(){goMyMap()}},
   {k:'wealth',ic:'財', c:'#c19a2e', t:'재물지도', d:'누가 돈그릇이 큰 사람인가', go:function(){location.href='/wealth'}},
   {k:'love',  ic:'緣', c:'#b8446e', t:'연애지도', d:'누구에게 인연이 먼저 올까', go:function(){location.href='/love'}},
@@ -2756,47 +2799,117 @@ function pageFoot(cur){
 
 /* ===== 화면: 오늘의 운세 ===== */
 function renderToday(j,b){
-  var t=j.today, bd=dayBand(t.score), sc=scColor(bd.tone);
+  var t=j.today, T=j.todayDeep, bd=dayBand(t.score), sc=scColor(bd.tone);
   var dt=t.date;
+  var DOWC={ '토':'#3f6ea8','일':'#c05a3c' };
   app.innerHTML='';
   app.appendChild(h(
   '<section class="fade" style="padding-top:30px">'+
-    '<div class="eyebrow">'+dt.y+'년 '+dt.m+'월 '+dt.d+'일</div>'+
+    '<div class="eyebrow">'+dt.y+'년 '+dt.m+'월 '+dt.d+'일 · 일진 '+esc(T.dayGZ)+'</div>'+
     '<h1 style="font-size:31px">'+esc(t.headline)+'</h1>'+
     '<p class="lead" style="font-size:15px">'+esc(t.body)+'</p>'+
   '</section>'+
-  '<section class="sec" style="margin-top:26px">'+
+
+  '<section class="sec" style="margin-top:24px">'+
     '<div class="gold-sec center">'+
       '<div class="eyebrow" style="color:#c9a227">오늘의 기운</div>'+
       '<div class="scorebig" style="color:'+sc+';font-size:74px">'+t.score+'<small>점</small></div>'+
       '<div style="margin-top:10px"><span class="band tone-'+bd.tone+'">'+esc(bd.label)+'</span></div>'+
       '<div class="chips" style="justify-content:center;margin-top:14px">'+
-        '<span class="chip">오늘 일진 '+esc(t.dayGZText)+' '+esc(t.dayGZKo)+'</span>'+
-        '<span class="chip">내 일간 기준 '+esc(t.sipsin)+'</span>'+
+        '<span class="chip">일진 '+esc(T.dayGZ)+' '+esc(T.dayGZKo)+'</span>'+
+        '<span class="chip">천간 '+esc(T.stemSipsin)+'</span>'+
+        '<span class="chip">지지 '+esc(T.branchSipsin)+'</span>'+
+        '<span class="chip">십이운성 '+esc(T.unseong)+'</span>'+
+        (T.tags||[]).map(function(x){return '<span class="chip">'+esc(x)+'</span>';}).join('')+
       '</div>'+
+      '<p class="tiny" style="margin-top:12px;text-align:left">오늘 날짜의 간지(일진)를 세우고, 내 일간·일지와의 관계 — 십신, 십이운성, 천간합충, 지지의 충·합, 천을귀인 — 을 모두 따져 낸 점수입니다.</p>'+
     '</div>'+
   '</section>'+
+
   (t.notes.length?'<section class="sec rv"><h2>오늘 눈여겨볼 것</h2><div class="card">'+
     t.notes.map(function(n){return '<div class="note"><div class="ic">◈</div><div><b>'+esc(n.t)+'</b>'+
       '<span>'+esc(n.d)+'</span></div></div>';}).join('')+'</div></section>':'')+
-  '<section class="sec rv"><h2>오늘 챙기면 좋은 것</h2>'+
-    '<div class="card" style="display:flex;gap:12px">'+
-      '<div style="flex:1;text-align:center"><div class="tiny">색</div>'+
-        '<b style="display:block;font-size:15.5px;margin-top:4px;color:#a07c1c;letter-spacing:-.03em">'+esc(t.lucky.color)+'</b></div>'+
-      '<div style="width:1px;background:var(--line)"></div>'+
-      '<div style="flex:1;text-align:center"><div class="tiny">방향</div>'+
-        '<b style="display:block;font-size:15.5px;margin-top:4px;color:#a07c1c;letter-spacing:-.03em">'+esc(t.lucky.dir)+'</b></div>'+
-      '<div style="width:1px;background:var(--line)"></div>'+
-      '<div style="flex:1;text-align:center"><div class="tiny">기운</div>'+
-        '<b style="display:block;font-size:15.5px;margin-top:4px;color:#a07c1c;letter-spacing:-.03em">'+esc(t.lucky.elem)+'</b></div>'+
+
+  /* ── 시간대별 ── */
+  '<section class="sec rv">'+
+    '<h2>시간대별 흐름</h2>'+
+    '<p class="tiny" style="margin:-8px 0 4px">오늘의 일간에서 오자둔(五鼠遁)으로 열두 시진의 천간을 뽑아, 내 일간과 견줬습니다.</p>'+
+    '<div class="hgrid">'+T.hours.map(function(x){
+      var c=x.score>=68?'#c19a2e':x.score>=54?'#3f8f66':x.score>=42?'#7a8395':'#c05a3c';
+      var top=(x.i===T.bestHour.i), bot=(x.i===T.worstHour.i);
+      return '<div class="hcell'+(top?' top':bot?' bot':'')+'">'+
+        '<b>'+esc(x.name)+'</b><i>'+esc(x.time)+'</i>'+
+        '<s style="color:'+c+'">'+x.score+'</s>'+
+        '<div class="tk"><i style="width:'+x.score+'%;background:'+c+'"></i></div>'+
+        '<u>'+esc(x.sipsin)+'</u></div>';
+    }).join('')+'</div>'+
+    '<div class="card" style="margin-top:12px">'+
+      '<div class="note"><div class="ic">◈</div><div><b>가장 좋은 시간 — '+esc(T.bestHour.name)+' '+esc(T.bestHour.time)+'</b>'+
+        '<span>'+esc(T.bestHour.tip)+' 오늘 가장 중요한 일을 이 시간에 놓으세요.</span></div></div>'+
+      '<div class="note"><div class="ic">◈</div><div><b>조심할 시간 — '+esc(T.worstHour.name)+' '+esc(T.worstHour.time)+'</b>'+
+        '<span>이 시간에는 큰 결정과 껄끄러운 대화를 피하는 편이 낫습니다.</span></div></div>'+
     '</div>'+
-    '<p class="tiny" style="margin-top:9px">내 사주에서 가장 얇은 기운을 채우는 쪽입니다.</p>'+
   '</section>'+
+
+  /* ── 오늘의 띠 궁합 ── */
+  '<section class="sec rv">'+
+    '<h2>오늘 잘 맞는 사람</h2>'+
+    '<p class="tiny" style="margin:-8px 0 4px">오늘 일진의 지지 '+esc(T.dayGZ.slice(1))+'과(와) 합을 이루는 띠, 부딪히는 띠입니다.</p>'+
+    '<div class="card">'+
+      '<div style="font-size:13px;font-weight:700;color:#2f855f;letter-spacing:-.03em">함께하면 좋은 띠</div>'+
+      '<div class="zrow">'+(T.goodZodiac.length?T.goodZodiac.map(function(z){
+        return '<span class="zchip g">'+esc(z.zodiac)+'띠 <span style="opacity:.7;font-weight:600">'+esc(z.why)+'</span></span>';
+      }).join(''):'<span class="zchip">오늘은 특별히 없습니다</span>')+'</div>'+
+      '<hr class="d">'+
+      '<div style="font-size:13px;font-weight:700;color:#b5532e;letter-spacing:-.03em">한 박자 참으면 좋은 띠</div>'+
+      '<div class="zrow">'+(T.badZodiac.length?T.badZodiac.map(function(z){
+        return '<span class="zchip b">'+esc(z.zodiac)+'띠 <span style="opacity:.7;font-weight:600">'+esc(z.why)+'</span></span>';
+      }).join(''):'<span class="zchip">오늘은 특별히 없습니다</span>')+'</div>'+
+      '<p class="tiny" style="margin-top:11px">사람을 가리라는 뜻이 아닙니다. 오늘 하루 대화의 결이 어떻게 흐를지 미리 알아두는 정도로 보세요.</p>'+
+    '</div>'+
+  '</section>'+
+
+  /* ── 챙길 것 ── */
+  '<section class="sec rv"><h2>오늘 챙기면 좋은 것</h2>'+
+    '<div class="card">'+
+      '<div class="kv" style="margin-top:0">'+
+        '<div class="k"><i>색</i><b style="font-size:14px;color:#a07c1c">'+esc(T.lucky.color)+'</b></div>'+
+        '<div class="k"><i>방향</i><b style="font-size:14px;color:#a07c1c">'+esc(T.lucky.dir)+'</b></div>'+
+        '<div class="k"><i>숫자</i><b style="font-size:14px;color:#a07c1c">'+esc(T.lucky.num)+'</b></div>'+
+      '</div>'+
+      '<div class="kv">'+
+        '<div class="k" style="flex:1 1 100%"><i>내 귀인 (천을귀인 띠)</i><b style="font-size:15px">'+esc(T.lucky.gwiin||'—')+'</b></div>'+
+      '</div>'+
+      '<p class="tiny" style="margin-top:11px">내 사주에서 <b>용신</b>에 해당하는 '+esc(T.lucky.elem)+' 기운을 채우는 쪽입니다. '+
+        '옷·소품·앉는 방향처럼 사소한 것부터 맞춰보세요.</p>'+
+    '</div>'+
+  '</section>'+
+
+  /* ── 이번 주 ── */
+  '<section class="sec rv">'+
+    '<h2>이번 주 흐름</h2>'+
+    '<p class="tiny" style="margin:-8px 0 4px">오늘부터 이레 동안의 일진을 내 사주와 견줬습니다.</p>'+
+    '<div class="wk">'+T.week.map(function(w){
+      var c=w.score>=68?'#c19a2e':w.score>=54?'#3f8f66':w.score>=42?'#7a8395':'#c05a3c';
+      return '<div class="wkd'+(w.today?' now':'')+'">'+
+        '<i style="color:'+(DOWC[w.dow]||'')+'">'+esc(w.dow)+'</i><b>'+w.d+'</b>'+
+        '<div class="bar"><span style="height:'+Math.max(8,Math.round(w.score*0.44))+'px;background:'+c+'"></span></div>'+
+        '<s style="color:'+c+'">'+w.score+'</s></div>';
+    }).join('')+'</div>'+
+    '<div class="card" style="margin-top:12px">'+
+      '<div class="note"><div class="ic">◈</div><div><b>이번 주 가장 좋은 날 — '+T.bestDay.m+'월 '+T.bestDay.d+'일 ('+esc(T.bestDay.dow)+')</b>'+
+        '<span>일진 '+esc(T.bestDay.gz)+' · '+esc(T.bestDay.sipsin)+
+        (T.bestDay.tags.length?' · '+esc(T.bestDay.tags.join(' · ')):'')+
+        '. 중요한 약속이나 결정을 이 날로 맞춰보세요.</span></div></div>'+
+    '</div>'+
+  '</section>'+
+
   '<div class="rule"></div>'+
   '<section class="sec rv">'+introBox('today')+'</section>'+
+  '<section class="sec rv">'+adBox()+'</section>'+
   '<section class="sec rv">'+pageShareBox('today')+'</section>'+
   pageFoot('today')+
-  '<footer>오늘의 운세는 오늘 일진(日辰)과 내 일간의 관계로 계산합니다. 재미와 참고로만 봐주세요.</footer>'));
+  '<footer>오늘의 운세는 오늘 일진(日辰)과 내 사주의 관계로 계산합니다. 시간대는 오자둔으로 뽑은 시간(時干)을, 띠 궁합은 지지의 합·충을 씁니다. 재미와 참고로만 봐주세요.</footer>'));
   reveal(app);window.scrollTo(0,0);
 }
 
@@ -3206,29 +3319,92 @@ function renderSaju(j,b){
 
 /* ===== 화면: 분야별 풀이 ===== */
 function renderLife(j,b){
-  var ch=charBy(j.char.key);
-  var cols={health:'#4ea87a',wealth:'#d0a94f',work:'#4f86c6',people:'#d98b8b'};
+  var ch=charBy(j.char.key), L=j.life, B=L.balance;
+  var AC={health:'#4ea87a',wealth:'#c19a2e',work:'#3c6ca6',love:'#b8446e',study:'#7ec9a2',
+          family:'#c98a2e',people:'#7a8395',move:'#e2734a',late:'#8b7ab8'};
   app.innerHTML='';
   app.appendChild(h(
   '<section class="fade" style="padding-top:30px">'+
-    '<div class="eyebrow">분야별 풀이</div>'+
-    '<h1 style="font-size:30px">내 사주를<br>네 갈래로 봅니다</h1>'+
-    '<p class="lead" style="font-size:15px">건강·재물·일·사람. 오행 분포와 십신 구성으로 갈래마다 결이 다르게 나옵니다.</p>'+
+    '<div class="eyebrow">분야별 풀이 · '+esc(j.ilju?j.ilju.gz:'')+' 일주</div>'+
+    '<h1 style="font-size:30px">내 사주를<br>아홉 갈래로 봅니다</h1>'+
+    '<p class="lead" style="font-size:15px">건강 · 재물 · 일 · 애정 · 문서 · 가정 · 사람 · 이동 · 말년. '+
+      '오행 분포와 십신 구성, 지지의 합충과 신살까지 넣어 갈래마다 점수와 풀이를 따로 냈습니다.</p>'+
   '</section>'+
-  '<section class="sec" style="margin-top:22px">'+
-    j.areas.areas.map(function(a,i){
-      var c=cols[a.key]||'#d9b45b';
-      return '<div class="typecard'+(i?' rv':'')+'" style="--c:'+c+';background:#fff;margin-top:'+(i?10:0)+'px">'+
-        '<div class="lbl" style="color:'+c+'">'+a.icon+' '+esc(a.title)+'</div>'+
-        '<h3 style="font-size:20px;margin-top:6px">'+esc(a.lead)+'</h3>'+
-        '<p>'+esc(a.text)+'</p></div>';
+
+  '<section class="sec" style="margin-top:22px"><div class="gold-sec">'+
+    '<div class="eyebrow" style="color:#c9a227">한눈에 보는 균형</div>'+
+    '<div class="center" style="margin-top:4px">'+
+      '<div class="scorebig" style="color:'+scColor(L.totalTone)+';font-size:58px">'+L.total+'<small>점</small></div>'+
+      '<div style="margin-top:4px"><span class="band tone-'+L.totalTone+'">'+esc(L.totalTier)+'</span></div>'+
+    '</div>'+
+    '<p style="margin:14px 0 0;font-size:14.5px;line-height:1.78;color:#3f3930">'+L.summary+'</p>'+
+  '</div></section>'+
+
+  '<section class="sec rv" style="margin-top:18px">'+
+    L.areas.map(function(a){
+      var c=AC[a.key]||'#c19a2e';
+      return '<div class="acard">'+
+        '<div class="top">'+
+          '<div class="ico" style="background:'+c+'1c;color:'+c+'">'+esc(a.icon)+'</div>'+
+          '<div class="nm"><b>'+esc(a.title)+'</b><i>'+esc(a.lead)+'</i></div>'+
+          '<div class="sc" style="color:'+c+'">'+a.score+'</div>'+
+        '</div>'+
+        '<div class="tk"><i style="width:'+a.score+'%;background:'+c+'"></i></div>'+
+        '<p>'+esc(a.text)+'</p>'+
+        '<div class="tip"><b>이렇게 쓰세요 —</b> '+esc(a.tip)+'</div>'+
+        (a.link?'<a class="lk" href="'+esc(a.link.path)+'">'+esc(a.link.label)+' ›</a>':'')+
+      '</div>';
     }).join('')+
   '</section>'+
+
+  '<div class="rule"></div>'+
+  '<section class="sec rv">'+
+    '<h2>오행의 균형</h2>'+
+    '<p class="tiny" style="margin:-8px 0 10px">여덟 글자와 지장간까지 가중해 센 다섯 기운의 비중입니다. 한쪽으로 쏠릴수록 색이 뚜렷하고, 고를수록 적응이 빠릅니다.</p>'+
+    '<div class="card"><div class="dbar">'+
+      B.dist.map(function(v,i){
+        return '<div class="row"><span class="nm">'+ELEM_H[i]+' '+ELEM[i]+'</span>'+
+          '<span class="tk"><i style="width:'+Math.min(100,v*2.2)+'%;background:'+ECOL[i]+'"></i></span>'+
+          '<span class="vl">'+v.toFixed(1)+'%</span></div>';
+      }).join('')+
+    '</div>'+
+    '<div class="chips" style="margin-top:12px">'+
+      '<span class="chip">가장 두터움 '+ELEM_H[B.strong]+' '+ELEM[B.strong]+'</span>'+
+      '<span class="chip">가장 얇음 '+ELEM_H[B.weak]+' '+ELEM[B.weak]+'</span>'+
+      '<span class="chip">'+esc(B.strength)+'</span>'+
+      '<span class="chip">쏠림 지수 '+B.sd+'</span>'+
+    '</div>'+
+    '<p style="margin:12px 0 0;font-size:14px;color:#4a4438;line-height:1.72">'+esc(B.note)+'</p>'+
+    '</div>'+
+  '</section>'+
+
+  '<section class="sec rv">'+
+    '<h2>몸이 먼저 신호를 보내는 곳</h2>'+
+    '<div class="typecard" style="--c:#c05a3c;background:#fff">'+
+      '<div class="lbl" style="color:#b5532e">'+esc(B.organ.organ)+' · '+esc(B.organ.part)+'</div>'+
+      '<p style="margin-top:8px">'+esc(B.organText)+'</p>'+
+      '<p class="tiny" style="margin-top:10px">사주로 보는 건강은 타고난 체질의 경향입니다. 의학적 진단이 아니며, 증상이 있으면 반드시 병원에서 확인하세요.</p>'+
+    '</div>'+
+  '</section>'+
+
+  '<section class="sec rv">'+
+    '<h2>십신 다섯 무리</h2>'+
+    '<div class="card"><div class="kv" style="margin-top:0">'+
+      Object.keys(L.sipsin).map(function(k){
+        return '<div class="k"><i>'+esc(k)+'</i><b style="font-size:15px">'+L.sipsin[k].toFixed(1)+'%</b></div>';
+      }).join('')+
+    '</div>'+
+    '<p class="tiny" style="margin-top:11px">비겁은 나와 동료, 식상은 만들어 내는 힘, 재성은 돈과 결과, 관성은 자리와 책임, 인성은 배움과 도움입니다. '+
+      '<a href="/saju" style="color:#a07c1c;text-decoration:underline">사주 정밀 풀이</a>에서 열 가지로 더 잘게 볼 수 있습니다.</p>'+
+    '</div>'+
+  '</section>'+
+
   '<div class="rule"></div>'+
   '<section class="sec rv">'+introBox('life')+'</section>'+
+  '<section class="sec rv">'+adBox()+'</section>'+
   '<section class="sec rv">'+pageShareBox('life')+'</section>'+
   pageFoot('life')+
-  '<footer>오행 분포와 십신 비중으로 뽑은 해석입니다. 의학적 진단이나 투자 조언이 아닙니다.</footer>'));
+  '<footer>오행 분포와 십신 비중, 지지의 합충, 신살을 함께 넣어 낸 해석입니다. 의학적 진단이나 투자 조언이 아닙니다.</footer>'));
   reveal(app);window.scrollTo(0,0);
 }
 

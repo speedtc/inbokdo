@@ -10,7 +10,8 @@ import OG_PNG from './og.png';
 import AD1_PNG from './ad1.png';
 import { handleAuth, currentUser, ensureAuthSchema, enabledProviders } from './auth.js';
 import { privacyPage, termsPage } from './legal.js';
-import { todayFortune, lifeAreas, todayKST } from './fortune.js';
+import { todayFortune, lifeAreas, todayKST, todayDeep } from './fortune.js';
+import { lifeDeep } from './life.js';
 
 const ALPHABET = '23456789abcdefghjkmnpqrstuvwxyz';
 function randCode(n = 7) {
@@ -429,12 +430,19 @@ async function handleApi(request, env, url) {
     const err = validBirth(body.birth);
     if (err) return bad(err);
     try {
-      const s = computeSaju(normBirth(body.birth));
+      const nb = normBirth(body.birth);
+      const s = computeSaju(nb);
+      const base = deepSaju(s, { gender: nb.gender, year: todayKST().y });
       return json({
         char: charPayload(s.dayStem),
         saju: sajuPayload(s),
         today: todayFortune(s),
+        todayDeep: todayDeep(s, base.yongsin.yong.i),
         areas: lifeAreas(s),
+        life: lifeDeep(s, { gender: nb.gender }),
+        yongsin: base.yongsin,
+        strength: base.strength,
+        ilju: base.ilju,
         serverDay: todayKST(),
       });
     } catch (e) { return bad(e.message || '계산 실패'); }
@@ -743,9 +751,9 @@ export default {
       });
     }
     const PAGES = {
-      '/today': { view: 'today', title: '오늘의 운세 · 스피드 운세지도', desc: '오늘 일진과 내 사주를 견줘 오늘 하루의 결을 풀어드립니다. 무료입니다.' },
+      '/today': { view: 'today', title: '오늘의 운세 · 스피드 운세지도', desc: '오늘 일진과 내 사주를 견줘 하루의 결을 봅니다. 시간대별 12시진 흐름, 오늘 맞는 띠, 이번 주 7일 흐름까지 무료입니다.' },
       '/saju': { view: 'saju', title: '사주 정밀 풀이 · 스피드 운세지도', desc: '원국 여덟 글자에 십신·지장간·십이운성·공망, 신강신약·격국·용신, 신살 20여 종, 궁과 육친, 대운 90년과 올해 12개월까지. 전부 무료입니다.' },
-      '/life': { view: 'life', title: '분야별 풀이 · 스피드 운세지도', desc: '건강·재물·일·사람. 내 원국을 네 갈래로 나눠 풀어드립니다. 무료입니다.' },
+      '/life': { view: 'life', title: '분야별 풀이 · 스피드 운세지도', desc: '건강·재물·일·애정·문서·가정·사람·이동·말년. 내 원국을 아홉 갈래로 나눠 점수와 풀이를 따로 냅니다. 무료입니다.' },
       '/about': { view: 'about', title: '어떻게 계산하나요 · 스피드 운세지도', desc: '스피드 운세지도가 쓰는 명리학 방법과 천문 계산을 그대로 공개합니다.' },
       '/tojeong': { view: 'tojeong', title: '토정비결 · 스피드 운세지도', desc: '올해 나의 토정비결을 무료로 봅니다. 144괘 작괘는 전통 그대로, 여기에 재물·직장·애정·건강·문서·이동·사람·구설 여덟 갈래와 12개월 월운까지 더했습니다.' },
       '/my': { view: 'profile', title: '내 사주 · 스피드 운세지도', desc: '생년월일을 한 번만 넣으면 오늘의 운세·사주팔자·분야별 풀이가 바로 열립니다.' },

@@ -3,6 +3,7 @@ import {
   STEMS, STEMS_HAN, BRANCHES, BRANCHES_HAN, ELEMENTS, ELEMENT_HAN, ZODIAC,
   SIPSIN, sipsin, branchRelation, stemElem, branchElem, CHEONEUL,
   GAN_HAP, GAN_CHUNG, gen, ctl, computeSaju,
+  STEM_YANG, HIDDEN, sipsinTally, YUKHAP, SAMHAP, CHUNG, HAE,
 } from './saju.js';
 
 /** 오늘(한국 기준) 날짜 */
@@ -184,5 +185,144 @@ export function lifeAreas(s) {
   return {
     areas,
     balance: { strong: strongest, weak: weakest, dist: d, strength: strong >= 45 ? '신강' : strong <= 30 ? '신약' : '중화' },
+  };
+}
+
+/* ══════════════════════════════════════════════
+   오늘의 운세 — 심화
+   일진 상세 · 12시진 · 7일 흐름 · 띠 궁합 · 길방
+   ══════════════════════════════════════════════ */
+
+
+const UNSEONG_N = ['장생', '목욕', '관대', '건록', '제왕', '쇠', '병', '사', '묘', '절', '태', '양'];
+const JANGSAENG_B = [11, 6, 2, 9, 2, 9, 5, 0, 8, 3];
+const UNSEONG_W = [6, 1, 5, 8, 8, 2, -1, 0, -1, -6, 1, 4];
+function unseong(stem, branch) {
+  const base = JANGSAENG_B[stem];
+  return STEM_YANG[stem] ? ((branch - base + 12) % 12) : ((base - branch + 12) % 12);
+}
+function samGroup(b) { for (let i = 0; i < SAMHAP.length; i++) if (SAMHAP[i].includes(b)) return i; return -1; }
+const SIPSIN_W = [4, -6, 10, 2, 6, 9, -7, 6, 0, 11];
+
+/* 12시진 */
+const SIJIN = [
+  ['자시', '子時', '23:30~01:30'], ['축시', '丑時', '01:30~03:30'], ['인시', '寅時', '03:30~05:30'],
+  ['묘시', '卯時', '05:30~07:30'], ['진시', '辰時', '07:30~09:30'], ['사시', '巳時', '09:30~11:30'],
+  ['오시', '午時', '11:30~13:30'], ['미시', '未時', '13:30~15:30'], ['신시', '申時', '15:30~17:30'],
+  ['유시', '酉時', '17:30~19:30'], ['술시', '戌時', '19:30~21:30'], ['해시', '亥時', '21:30~23:30'],
+];
+const SIJIN_TIP = [
+  '내 뜻대로 밀어붙이기 좋은 시간입니다.',
+  '지출과 약속을 한 번 더 확인할 시간입니다.',
+  '사람을 만나고 이야기를 꺼내기 좋은 시간입니다.',
+  '아이디어를 내고 말로 푸는 데 좋은 시간입니다.',
+  '움직이고 벌이기 좋은 시간입니다.',
+  '계산하고 정산하기 좋은 시간입니다.',
+  '부딪히기 쉬운 시간입니다. 중요한 대화는 피하세요.',
+  '보고·서류·공식 자리에 좋은 시간입니다.',
+  '혼자 정리하고 공부하기 좋은 시간입니다.',
+  '부탁하고 도움을 청하기 좋은 시간입니다.',
+];
+
+/* 오행 색·방향 */
+const EC = ['초록·청록', '빨강·주황', '노랑·베이지', '흰색·은색', '검정·남색'];
+const ED = ['동쪽', '남쪽', '중앙', '서쪽', '북쪽'];
+const EN = ['3·8', '2·7', '5·10', '4·9', '1·6'];
+
+function dayScore(me, myBranch, st, br, cheoneul) {
+  const sinIdx = sipsin(me, st);
+  let sc = 52 + SIPSIN_W[sinIdx] + UNSEONG_W[unseong(me, br)] * 0.7;
+  const tags = [];
+  if (GAN_HAP[me] === st) { sc += 8; tags.push('천간합'); }
+  if (GAN_CHUNG[me] === st) { sc -= 7; tags.push('천간충'); }
+  if (CHUNG[myBranch] === br) { sc -= 9; tags.push('일지충'); }
+  if (YUKHAP[myBranch] === br) { sc += 7; tags.push('육합'); }
+  if (samGroup(myBranch) >= 0 && samGroup(myBranch) === samGroup(br)) { sc += 5; tags.push('삼합'); }
+  if (HAE[myBranch] === br) { sc -= 4; tags.push('해'); }
+  if (cheoneul.includes(br)) { sc += 9; tags.push('천을귀인'); }
+  return { score: Math.max(12, Math.min(97, Math.round(sc))), sipsin: SIPSIN[sinIdx], sinIdx, tags };
+}
+
+/**
+ * 오늘의 운세 심화
+ * @param {object} s 내 사주
+ * @param {number} yongElem 용신 오행 (없으면 가장 얇은 오행)
+ */
+export function todayDeep(s, yongElem, ts) {
+  const t = todayKST(ts);
+  const me = s.dayStem, myB = s.dayBranch;
+  const cheoneul = CHEONEUL[me] || [];
+  const day = computeSaju({ y: t.y, m: t.m, d: t.d, unknownTime: true });
+  const st = day.pillars.day.stem, br = day.pillars.day.branch;
+  const base = dayScore(me, myB, st, br, cheoneul);
+  const un = unseong(me, br);
+
+  /* 지지 십신 (지장간 본기) */
+  const brSin = SIPSIN[sipsin(me, HIDDEN[br][0][0])];
+
+  /* 12시진 — 오자둔으로 오늘의 시간(時干)을 뽑는다 */
+  const hours = SIJIN.map((h, i) => {
+    const hs = ((st % 5) * 2 + i) % 10;
+    const sinIdx = sipsin(me, hs);
+    let sc = 50 + SIPSIN_W[sinIdx] + UNSEONG_W[unseong(me, i)] * 0.5;
+    if (CHUNG[myB] === i) sc -= 8;
+    if (YUKHAP[myB] === i) sc += 6;
+    if (cheoneul.includes(i)) sc += 8;
+    return {
+      i, name: h[0], han: h[1], time: h[2],
+      gz: STEMS_HAN[hs] + BRANCHES_HAN[i],
+      sipsin: SIPSIN[sinIdx],
+      score: Math.max(15, Math.min(96, Math.round(sc))),
+      tip: SIJIN_TIP[sinIdx],
+    };
+  });
+  const bestHour = hours.slice().sort((a, b) => b.score - a.score)[0];
+  const worstHour = hours.slice().sort((a, b) => a.score - b.score)[0];
+
+  /* 7일 흐름 */
+  const week = [];
+  const DOW = ['일', '월', '화', '수', '목', '금', '토'];
+  for (let k = 0; k < 7; k++) {
+    const dt = new Date(Date.UTC(t.y, t.m - 1, t.d + k));
+    const yy = dt.getUTCFullYear(), mm = dt.getUTCMonth() + 1, dd = dt.getUTCDate();
+    const dp = computeSaju({ y: yy, m: mm, d: dd, unknownTime: true }).pillars.day;
+    const r = dayScore(me, myB, dp.stem, dp.branch, cheoneul);
+    week.push({
+      y: yy, m: mm, d: dd, dow: DOW[dt.getUTCDay()],
+      gz: STEMS_HAN[dp.stem] + BRANCHES_HAN[dp.branch],
+      sipsin: r.sipsin, score: r.score, tags: r.tags, today: k === 0,
+    });
+  }
+  const bestDay = week.slice().sort((a, b) => b.score - a.score)[0];
+
+  /* 오늘 잘 맞는 띠 / 조심할 띠 */
+  const good = [], bad = [];
+  for (let b = 0; b < 12; b++) {
+    if (YUKHAP[br] === b) good.push({ b, why: '육합' });
+    else if (samGroup(br) >= 0 && samGroup(br) === samGroup(b) && b !== br) good.push({ b, why: '삼합' });
+    if (CHUNG[br] === b) bad.push({ b, why: '충' });
+    else if (HAE[br] === b) bad.push({ b, why: '해' });
+  }
+
+  const ye = (yongElem == null || yongElem < 0) ? s.dist.indexOf(Math.min(...s.dist)) : yongElem;
+
+  return {
+    date: t,
+    dayGZ: STEMS_HAN[st] + BRANCHES_HAN[br],
+    dayGZKo: STEMS[st] + BRANCHES[br],
+    stemSipsin: base.sipsin,
+    branchSipsin: brSin,
+    unseong: UNSEONG_N[un],
+    score: base.score,
+    tags: base.tags,
+    hours, bestHour, worstHour,
+    week, bestDay,
+    goodZodiac: good.map((g) => ({ zodiac: ZODIAC[g.b], han: BRANCHES_HAN[g.b], why: g.why })),
+    badZodiac: bad.map((g) => ({ zodiac: ZODIAC[g.b], han: BRANCHES_HAN[g.b], why: g.why })),
+    lucky: {
+      elem: ELEMENT_HAN[ye] + ELEMENTS[ye],
+      color: EC[ye], dir: ED[ye], num: EN[ye],
+      gwiin: cheoneul.map((b) => ZODIAC[b] + '띠').join(' · '),
+    },
   };
 }
