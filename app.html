@@ -396,6 +396,90 @@ details.adv[open] summary::before{content:'－ '}
 @keyframes sp{to{transform:rotate(360deg)}}
 footer{margin-top:56px;padding-top:22px;border-top:1px solid var(--line);color:var(--dim2);font-size:12.5px;line-height:1.75}
 @media(min-width:600px){ .wrap{padding-bottom:90px} }
+
+/* ══ 사주 정밀 풀이 ══ */
+.jump{position:sticky;top:56px;z-index:40;margin:0 -18px;padding:9px 18px;background:rgba(251,247,236,.93);
+  backdrop-filter:saturate(160%) blur(12px);-webkit-backdrop-filter:saturate(160%) blur(12px);
+  border-bottom:1px solid var(--line);display:flex;gap:6px;overflow-x:auto;scrollbar-width:none}
+.jump::-webkit-scrollbar{display:none}
+.jump a{flex:0 0 auto;padding:6px 11px;border-radius:999px;background:#fff;border:1px solid var(--line2);
+  font-size:12.5px;font-weight:600;letter-spacing:-.03em;color:var(--ink2);text-decoration:none;white-space:nowrap}
+.jump a.on{background:var(--gold-soft);border-color:rgba(193,154,46,.5);color:var(--gold2)}
+
+.wg{margin:0 -6px;overflow-x:auto;-webkit-overflow-scrolling:touch}
+table.wonguk{width:100%;min-width:320px;border-collapse:separate;border-spacing:5px;table-layout:fixed}
+table.wonguk th{font-size:11px;font-weight:700;letter-spacing:-.02em;color:var(--dim);padding:0 0 3px;text-align:center}
+table.wonguk td{padding:0;vertical-align:top}
+.wcell{border-radius:12px;padding:7px 4px;text-align:center;background:#fff;border:1px solid var(--line)}
+.wsin{font-size:10.5px;font-weight:700;letter-spacing:-.03em;color:var(--dim);padding:5px 0 3px;text-align:center}
+.wbig{border-radius:14px;padding:9px 4px 8px;text-align:center;color:#fff;position:relative}
+.wbig b{display:block;font-size:30px;font-weight:800;line-height:1.05;letter-spacing:-.02em}
+.wbig s{display:block;text-decoration:none;font-size:11px;opacity:.86;margin-top:2px;letter-spacing:-.02em}
+.whid{font-size:10.5px;line-height:1.5;color:var(--dim);padding:4px 2px 0;text-align:center;word-break:keep-all}
+.whid i{font-style:normal;color:var(--ink2);font-weight:600}
+.wun{font-size:11px;font-weight:700;color:var(--ink2);text-align:center;padding:4px 0 0}
+.wgm{display:inline-block;margin-top:3px;font-size:9.5px;font-weight:700;color:#a07c1c;
+  background:var(--gold-soft);border-radius:6px;padding:1px 5px}
+.wempty{border:1px dashed var(--line2);border-radius:14px;padding:22px 4px;text-align:center;color:var(--dim2);font-size:12px}
+
+.kv{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.kv .k{flex:1 1 92px;background:#fff;border:1px solid var(--line);border-radius:13px;padding:10px 9px;text-align:center}
+.kv .k i{display:block;font-style:normal;font-size:10.5px;color:var(--dim);letter-spacing:-.02em}
+.kv .k b{display:block;font-size:17px;font-weight:800;letter-spacing:-.04em;margin-top:3px}
+
+.dbar{margin-top:4px}
+.dbar .row{display:flex;align-items:center;gap:8px;margin-top:6px}
+.dbar .nm{flex:0 0 52px;font-size:12px;font-weight:600;letter-spacing:-.03em;color:var(--ink2)}
+.dbar .tk{flex:1;height:8px;border-radius:99px;background:rgba(60,48,16,.07);overflow:hidden}
+.dbar .tk i{display:block;height:100%;border-radius:99px}
+.dbar .vl{flex:0 0 42px;text-align:right;font-size:11.5px;color:var(--dim);font-variant-numeric:tabular-nums}
+
+.slist{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+.sitem{background:#fff;border:1px solid var(--line);border-left:3px solid var(--c,#c19a2e);border-radius:12px;padding:11px 13px}
+.sitem .h{display:flex;align-items:baseline;gap:6px;flex-wrap:wrap}
+.sitem .h b{font-size:14.5px;font-weight:700;letter-spacing:-.035em}
+.sitem .h u{text-decoration:none;font-size:11px;color:var(--dim)}
+.sitem .h em{font-style:normal;margin-left:auto;font-size:10.5px;color:var(--dim2)}
+.sitem p{margin:5px 0 0;font-size:13.2px;line-height:1.68;color:#4a4438;word-break:keep-all}
+
+.deun{display:flex;gap:7px;overflow-x:auto;margin:12px -18px 0;padding:2px 18px 8px;scrollbar-width:none}
+.deun::-webkit-scrollbar{display:none}
+.dcard{flex:0 0 108px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:10px 9px;text-align:center;position:relative}
+.dcard.now{border-color:var(--gold);box-shadow:0 0 0 2px rgba(193,154,46,.18)}
+.dcard.past{opacity:.55}
+.dcard i{display:block;font-style:normal;font-size:10.5px;color:var(--dim)}
+.dcard b{display:block;font-size:21px;font-weight:800;letter-spacing:-.02em;margin:3px 0 1px}
+.dcard s{display:block;text-decoration:none;font-size:11px;font-weight:700;letter-spacing:-.03em}
+.dcard u{display:block;text-decoration:none;font-size:10px;color:var(--dim2);margin-top:2px}
+.dcard .tag{position:absolute;top:-7px;left:50%;transform:translateX(-50%);font-size:9.5px;font-weight:800;
+  background:var(--gold);color:#fff;border-radius:99px;padding:1px 7px;white-space:nowrap}
+
+.mgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:7px;margin-top:10px}
+@media(min-width:520px){.mgrid{grid-template-columns:repeat(3,1fr)}}
+.mcell{background:#fff;border:1px solid var(--line);border-radius:12px;padding:9px 10px}
+.mcell .t{display:flex;align-items:baseline;gap:5px}
+.mcell .t b{font-size:13.5px;font-weight:800;letter-spacing:-.03em}
+.mcell .t u{text-decoration:none;font-size:10.5px;color:var(--dim)}
+.mcell .t em{font-style:normal;margin-left:auto;font-size:12px;font-weight:800;font-variant-numeric:tabular-nums}
+.mcell .tk{height:5px;border-radius:99px;background:rgba(60,48,16,.07);margin-top:6px;overflow:hidden}
+.mcell .tk i{display:block;height:100%;border-radius:99px}
+.mcell p{margin:6px 0 0;font-size:11.8px;line-height:1.6;color:#5b5446;word-break:keep-all}
+.mcell .tg{margin-top:5px;font-size:10px;color:#a07c1c;font-weight:700}
+
+.ycard{background:#fff;border:1px solid var(--line);border-radius:13px;padding:11px 13px;margin-top:8px;
+  display:flex;align-items:center;gap:11px}
+.ycard .lb{flex:0 0 66px}
+.ycard .lb b{display:block;font-size:13.5px;font-weight:700;letter-spacing:-.05em;word-break:keep-all}
+.ycard .lb i{display:block;font-style:normal;font-size:10px;color:var(--dim2);margin-top:1px}
+.ycard .bd{flex:1}
+.ycard .bd .tk{height:6px;border-radius:99px;background:rgba(60,48,16,.07);overflow:hidden}
+.ycard .bd .tk i{display:block;height:100%;border-radius:99px;background:var(--gold)}
+.ycard .bd p{margin:6px 0 0;font-size:12.5px;line-height:1.62;color:#4a4438;word-break:keep-all}
+.relgrid{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.relchip{font-size:11.5px;font-weight:700;letter-spacing:-.03em;border-radius:9px;padding:4px 9px;
+  background:#fff;border:1px solid var(--line2);color:var(--ink2)}
+.relchip.bad{background:#fdf1ec;border-color:#f0cfc0;color:#b5532e}
+.relchip.good{background:#eef8f2;border-color:#bfe3ce;color:#2f855f}
 </style>
 </head>
 <body>
@@ -614,6 +698,10 @@ function formHTML(o){
   return ''+
   '<div class="field"><label for="fName">'+esc(o.nameLabel||'이름 또는 닉네임')+'</label>'+
     '<input class="inp" id="fName" maxlength="12" autocomplete="off" value="'+esc(o.name||'')+'" placeholder="'+esc(o.namePh||'예: 김도현, 도현이')+'"></div>'+
+  '<div class="field"><label>성별</label><div class="seg" id="fSex">'+
+    '<button type="button" data-v="m" aria-pressed="'+(o.gender==='m'?'true':'false')+'">남자</button>'+
+    '<button type="button" data-v="f" aria-pressed="'+(o.gender==='f'?'true':'false')+'">여자</button></div>'+
+    '<div class="hint">대운(10년 흐름)은 남녀에 따라 방향이 반대이고, 배우자·자녀 자리도 갈립니다. 정확한 풀이에 꼭 필요합니다.</div></div>'+
   '<div class="field"><label>달력</label><div class="seg" id="fCal">'+
     '<button type="button" data-v="solar" aria-pressed="'+(lun?'false':'true')+'">양력</button>'+
     '<button type="button" data-v="lunar" aria-pressed="'+(lun?'true':'false')+'">음력</button></div></div>'+
@@ -635,6 +723,16 @@ function formHTML(o){
 }
 
 function bindForm(root,onSubmit){
+  var sexSeg=root.querySelector('#fSex'),sex=null;
+  if(sexSeg){
+    var pk=sexSeg.querySelector('button[aria-pressed="true"]');
+    if(pk)sex=pk.dataset.v;
+    sexSeg.addEventListener('click',function(e){
+      var b=e.target.closest('button[data-v]');if(!b)return;
+      sex=b.dataset.v;
+      sexSeg.querySelectorAll('button').forEach(function(x){x.setAttribute('aria-pressed',String(x===b));});
+    });
+  }
   var pre=root.querySelector('#fCal button[data-v="lunar"]');
   var cal=(pre&&pre.getAttribute('aria-pressed')==='true')?'lunar':'solar';
   var seg=root.querySelector('#fCal');
@@ -665,6 +763,7 @@ function bindForm(root,onSubmit){
     if(busy)return;
     var name=root.querySelector('#fName').value.trim();
     if(!name){err.textContent='이름 또는 닉네임을 입력해 주세요.';root.querySelector('#fName').focus();return;}
+    if(sexSeg&&!sex){err.textContent='성별을 선택해 주세요.';sexSeg.scrollIntoView({block:'center',behavior:'smooth'});return;}
     var hv=root.querySelector('#fH').value;
     var unknown=(hv==='모름');
     var birth={
@@ -672,7 +771,8 @@ function bindForm(root,onSubmit){
       hour:unknown?null:Number(hv),minute:unknown?null:30,
       unknownTime:unknown,lunar:cal==='lunar',
       leap:!!root.querySelector('#fLeap').checked,
-      trueSolar:!!root.querySelector('#fTrue').checked
+      trueSolar:!!root.querySelector('#fTrue').checked,
+      gender:sex
     };
     err.textContent='';busy=true;
     btn.innerHTML='<span class="spin"></span>';
@@ -1802,18 +1902,20 @@ var INTRO={
     d:'오늘 하루의 결을 봅니다. 오늘 날짜의 간지(일진)와 내가 태어난 날의 천간(일간)을 견줘, 오늘 어떤 기운이 들어오는지 풀어드립니다.',
     n:'매일 0시(한국 시각)에 바뀝니다. 사주는 평생 그대로지만 이건 날마다 달라집니다.',
     c:['매일 바뀜','일진 × 일간','무료']},
-  saju:{t:'사주팔자란',
-    d:'태어난 연·월·일·시를 각각 두 글자씩, 모두 <b>여덟 글자</b>로 세운 것입니다. 이 여덟 글자가 평생 바뀌지 않는 내 원국(原局)입니다.',
-    n:'절기 기준으로 년주와 월주를, 율리우스일로 일주를, 오자둔으로 시주를 뽑습니다. 오행이 어디에 몰렸는지, 힘이 센지 약한지까지 봅니다.',
-    c:['절기 기준','오행 분포','신강·신약']},
+  saju:{t:'사주 정밀 풀이란',
+    d:'태어난 연·월·일·시를 각각 두 글자씩, 모두 <b>여덟 글자</b>로 세운 것이 내 원국(原局)입니다. 여기서 십신·지장간·십이운성·공망을 뽑고, '+
+      '신강·신약을 재고, 격국과 용신을 잡은 다음, 신살과 궁·육친까지 읽어 <b>대운 90년과 올해 12개월</b>까지 풀어드립니다.',
+    n:'계산은 전통 명리 방식 그대로입니다. 절기 기준 년·월주, 율리우스일 일주, 오자둔 시주, 오호둔 월간, 양남음녀 대운. 풀이 문장만 저희가 직접 썼습니다.',
+    c:['원국 8자','십신·지장간','십이운성','격국·용신','신살 20여 종','대운·세운·월운']},
   life:{t:'분야별 풀이란',
     d:'내 사주 하나를 <b>건강 · 재물 · 일과 성취 · 사람</b> 네 갈래로 나눠 풀어드립니다.',
     n:'오행이 어디에 몰리고 어디가 얇은지를 보고, 몸에서 먼저 신호가 오는 곳과 돈이 도는 방식, 조직과 사람에서의 결을 짚습니다.',
     c:['건강','재물','일과 성취','사람']},
   tojeong:{t:'토정비결이란',
-    d:'한 해의 결을 보는 옛 방식입니다. 세는나이와 그 해의 태세, 태어난 달과 날을 써서 <b>144괘</b> 중 하나를 뽑습니다.',
-    n:'사주 명리와는 계산 체계가 다릅니다. 사주는 평생 그대로지만 토정비결은 해가 바뀌면 괘도 바뀝니다.',
-    c:['144괘','전통 작괘법','해마다 바뀜']},
+    d:'한 해의 결을 보는 옛 방식입니다. 세는나이와 그 해의 태세, 태어난 달과 날을 써서 <b>144괘</b> 중 하나를 뽑습니다. '+
+      '여기에 <b>내 원국과 그 해 세운의 관계</b>를 더해 재물·직장·애정·건강·문서·이동·사람·구설 <b>여덟 갈래</b>와 12개월 월운까지 냅니다.',
+    n:'괘를 뽑는 작괘법은 전통 그대로이고, 괘사 문장은 저희가 직접 썼습니다. 사주 명리와는 계산 체계가 다릅니다. 사주는 평생 그대로지만 토정비결은 해가 바뀌면 괘도 바뀝니다.',
+    c:['144괘','전통 작괘법','여덟 갈래','12개월 월운','해마다 바뀜']},
   map:{t:'인연지도란',
     d:'내 링크를 받은 사람이 생일을 넣으면, 그 사람이 <b>나에게 어떤 기운인지</b>를 사주로 풀어 별 하나로 찍습니다.',
     n:'별의 방향은 주고받음(누가 채워주고 누가 이끄는지), 거리는 궁합 점수입니다. 사람이 모일수록 별자리가 완성됩니다.',
@@ -1821,10 +1923,12 @@ var INTRO={
 };
 function birthPrefill(extra){
   var b=getBirth(), o=extra||{};
+  if(b&&!b.birth&&b.pending)b={name:b.name,birth:b.pending};
   if(b&&b.birth){
     o.name=b.name||''; o.y=b.birth.y; o.m=b.birth.m; o.d=b.birth.d;
     o.hour=b.birth.unknownTime?null:b.birth.hour;
     o.lunar=!!b.birth.lunar;
+    o.gender=b.birth.gender||null;
   }
   return o;
 }
@@ -1861,16 +1965,22 @@ function introBox(k){
 /* 사주 미등록 안내 — 입력은 오른쪽 위에서만 */
 function needBirthView(label){
   setDock(null);
+  var pb=getBirth(), resex=!!(pb&&pb.needSex);
   app.innerHTML='';
   app.appendChild(h(
   '<section class="fade" style="padding-top:26px">'+
     '<div class="eyebrow">'+esc(label)+'</div>'+
-    '<h1 style="font-size:29px">사주 정보를<br>먼저 넣어주세요</h1>'+
-    '<div class="uphint"><span class="ar">↑</span>'+
-      '<span class="tx">화면 <b>오른쪽 위</b>의 <b>사주 정보를 입력하세요</b>를 눌러주세요</span></div>'+
-    '<p class="lead" style="font-size:15px">생년월일은 <b>한 번만</b> 넣으면 됩니다. 그 뒤로는 오늘의 운세도, 사주팔자도, 토정비결도 다시 묻지 않습니다. '+
-      '이 기기에만 저장되고 서버에는 남기지 않습니다.</p>'+
-    '<button class="btn" id="goinp" style="margin-top:22px">사주 정보 넣으러 가기</button>'+
+    (resex
+      ? '<h1 style="font-size:29px">성별만<br>한 번 더 알려주세요</h1>'+
+        '<p class="lead" style="font-size:15px">풀이가 훨씬 깊어졌습니다. <b>대운(10년 흐름)</b>은 남녀에 따라 흐르는 방향이 반대이고, '+
+          '<b>배우자·자녀 자리</b>도 남녀가 다릅니다. 그래서 성별을 받게 되었습니다. '+
+          '생년월일은 그대로 있으니 성별만 고르시면 됩니다.</p>'
+      : '<h1 style="font-size:29px">사주 정보를<br>먼저 넣어주세요</h1>'+
+        '<div class="uphint"><span class="ar">↑</span>'+
+          '<span class="tx">화면 <b>오른쪽 위</b>의 <b>사주 정보를 입력하세요</b>를 눌러주세요</span></div>'+
+        '<p class="lead" style="font-size:15px">생년월일은 <b>한 번만</b> 넣으면 됩니다. 그 뒤로는 오늘의 운세도, 사주팔자도, 토정비결도 다시 묻지 않습니다. '+
+          '이 기기에만 저장되고 서버에는 남기지 않습니다.</p>')+
+    '<button class="btn" id="goinp" style="margin-top:22px">'+(resex?'성별 고르러 가기':'사주 정보 넣으러 가기')+'</button>'+
   '</section>'+
   '<section class="sec fade" style="margin-top:26px">'+introBox(
     label==='오늘의 운세'?'today':label==='내 사주팔자'?'saju':label==='분야별 풀이'?'life':'tojeong')+'</section>'+
@@ -1922,14 +2032,67 @@ function renderTojeong(j,b){
     '</div>'+
   '</section>'+
 
+  /* ── 올해 총운 ── */
+  '<section class="sec rv">'+
+    '<div class="gold-sec center">'+
+      '<div class="eyebrow" style="color:#c9a227">올해 총운</div>'+
+      '<div class="scorebig" style="color:'+scColor(r.totalTone)+';font-size:66px">'+r.total+'<small>점</small></div>'+
+      '<div style="margin-top:6px"><span class="band tone-'+r.totalTone+'">'+esc(r.totalTier)+'</span></div>'+
+      (r.tags&&r.tags.length?'<div class="chips" style="justify-content:center;margin-top:12px">'+
+        r.tags.map(function(t){return '<span class="chip">'+esc(t)+'</span>';}).join('')+'</div>':'')+
+      '<p class="tiny" style="margin-top:12px;text-align:left">'+esc(r.sajuNote)+'</p>'+
+    '</div>'+
+  '</section>'+
+
+  /* ── 분야별 ── */
+  '<section class="sec rv">'+
+    '<h2>여덟 갈래로 본 올해</h2>'+
+    '<p class="tiny" style="margin:-8px 0 12px">괘의 기운에 내 원국과 '+esc(r.seun.gz)+'년 세운('+esc(r.seun.sipsin)+')의 관계를 더해 갈래마다 따로 냈습니다.</p>'+
+    '<div class="mgrid">'+r.areas.map(function(a){
+      var c=scColor(a.tone);
+      return '<div class="mcell"><div class="t"><b>'+esc(a.icon)+' '+esc(a.title)+'</b>'+
+        '<em style="color:'+c+'">'+a.score+'</em></div>'+
+        '<div class="tk"><i style="width:'+a.score+'%;background:'+c+'"></i></div>'+
+        '<p>'+esc(a.text)+'</p>'+
+        '<div class="tg" style="color:'+c+'">'+esc(a.tierName)+'</div></div>';
+    }).join('')+'</div>'+
+  '</section>'+
+
+  /* ── 올해 챙길 것 ── */
+  '<section class="sec rv">'+
+    '<h2>올해 챙기면 좋은 것</h2>'+
+    '<div class="card">'+
+      '<div class="kv" style="margin-top:0">'+
+        '<div class="k"><i>색</i><b style="font-size:14px">'+esc(r.lucky.color)+'</b></div>'+
+        '<div class="k"><i>방향</i><b style="font-size:14px">'+esc(r.lucky.dir)+'</b></div>'+
+        '<div class="k"><i>숫자</i><b style="font-size:14px">'+esc(r.lucky.num)+'</b></div>'+
+      '</div>'+
+      '<div class="kv">'+
+        '<div class="k" style="flex:1 1 100%"><i>내 귀인 (천을귀인 띠)</i><b style="font-size:15px">'+esc(r.lucky.gwiin||'—')+'</b></div>'+
+      '</div>'+
+      '<p class="tiny" style="margin-top:11px">내 사주에서 가장 얇은 '+esc(r.lucky.elem)+' 기운을 채우는 쪽입니다. '+
+        '귀인 띠는 어려운 일이 있을 때 도움을 청하기 좋은 사람들입니다.</p>'+
+      '<hr class="d">'+
+      '<div class="note"><div class="ic">◈</div><div><b>가장 좋은 달</b><span>'+
+        r.bestMonths.map(function(m){return m+'월';}).join(' · ')+' — 중요한 결정과 계약, 새로 시작하는 일을 이 달에 맞추세요.</span></div></div>'+
+      '<div class="note"><div class="ic">◈</div><div><b>조심할 달</b><span>'+
+        r.worstMonths.map(function(m){return m+'월';}).join(' · ')+' — 큰 결정과 큰돈이 오가는 일은 이 달을 피하는 편이 낫습니다.</span></div></div>'+
+    '</div>'+
+  '</section>'+
+
+  /* ── 월운 ── */
   '<section class="sec rv">'+
     '<h2>달마다 어떤가</h2>'+
-    '<p class="tiny" style="margin:-8px 0 12px">그 달의 월건(月建)과 내 일간을 견줘 냈습니다.</p>'+
-    '<div class="mlist">'+r.months.map(function(m){
-      return '<div class="mrow2"><span class="mm">'+m.m+'월</span>'+
-        '<span class="mgz">'+esc(m.gz)+'</span>'+
-        '<span class="mtag" style="color:'+scColor(m.tone)+'">'+esc(m.sipsin)+'</span>'+
-        '<span class="mtx">'+esc(m.text)+'</span></div>';
+    '<p class="tiny" style="margin:-8px 0 12px">그 달의 월건(月建)과 내 일간을 견주고, 내 일지와의 충·합까지 반영했습니다. 절기 기준입니다.</p>'+
+    '<div class="mgrid">'+r.months.map(function(m){
+      var c=scColor(m.tone);
+      var best=r.bestMonths.indexOf(m.m)>=0, worst=r.worstMonths.indexOf(m.m)>=0;
+      return '<div class="mcell"'+(best?' style="border-color:rgba(193,154,46,.55);background:var(--gold-soft)"':'')+'>'+
+        '<div class="t"><b>'+m.m+'월</b><u>'+esc(m.gz)+'</u><em style="color:'+c+'">'+m.score+'</em></div>'+
+        '<div class="tk"><i style="width:'+m.score+'%;background:'+c+'"></i></div>'+
+        '<p>'+esc(m.text)+'</p>'+
+        '<div class="tg">'+esc(m.sipsin)+(m.tags.length?' · '+esc(m.tags.join(' · ')):'')+
+          (best?' · 좋은 달':'')+(worst?' · 조심':'')+'</div></div>';
     }).join('')+'</div>'+
   '</section>'+
 
@@ -2340,8 +2503,8 @@ function updateNav(){
 /* ===== 메뉴 ===== */
 var MENU=[
   {k:'today', ic:'☀', c:'#e8a33b', t:'오늘의 운세', d:'오늘 일진과 내 사주를 견줍니다', go:function(){location.href='/today'}},
-  {k:'tojeong',ic:'卦', c:'#b8746e', t:'토정비결', d:'올해 내 괘를 뽑습니다', go:function(){location.href='/tojeong'}},
-  {k:'saju',  ic:'四', c:'#9aa7b8', t:'내 사주팔자', d:'여덟 글자와 오행 분포를 봅니다', go:function(){location.href='/saju'}},
+  {k:'tojeong',ic:'卦', c:'#b8746e', t:'토정비결', d:'올해 괘 + 여덟 갈래 + 12개월', go:function(){location.href='/tojeong'}},
+  {k:'saju',  ic:'四', c:'#9aa7b8', t:'내 사주팔자', d:'격국·용신·신살·대운까지 전부', go:function(){location.href='/saju'}},
   {k:'life',  ic:'◈', c:'#4ea87a', t:'분야별 풀이', d:'건강 · 재물 · 일 · 사람', go:function(){location.href='/life'}},
   {k:'map',   ic:'✦', c:'#d9b45b', t:'내 인연지도', d:'내 사람들의 별자리', go:function(){goMyMap()}},
   {k:'wealth',ic:'財', c:'#c19a2e', t:'재물지도', d:'누가 돈그릇이 큰 사람인가', go:function(){location.href='/wealth'}},
@@ -2459,16 +2622,20 @@ function viewProfile(){
   setDock(null);
   var b=getBirth();
   app.innerHTML='';
+  var pend=b&&b.needSex?b.pending:null;
   var head='<section class="fade" style="padding-top:30px">'+
     '<div class="eyebrow">내 사주</div>'+
-    '<h1 style="font-size:30px">'+(b&&b.birth?'등록되어 있습니다':'아직 넣은<br>생년월일이 없어요')+'</h1>'+
+    '<h1 style="font-size:30px">'+(b&&b.birth?'등록되어 있습니다':pend?'성별만<br>한 번 더 골라주세요':'아직 넣은<br>생년월일이 없어요')+'</h1>'+
     '<p class="lead" style="font-size:15px">'+
       (b&&b.birth
         ? '이 생년월일로 <b>오늘의 운세 · 내 사주팔자 · 분야별 풀이</b>가 바로 열립니다. 이 기기에만 저장되고 서버에는 남기지 않습니다.'
+        : pend
+        ? '풀이가 깊어지면서 <b>대운(10년 흐름)</b>과 <b>배우자·자녀 자리</b>를 정확히 보려면 성별이 필요해졌습니다. '+
+          '<b class="gold">'+esc(pend.y+'.'+pend.m+'.'+pend.d)+'</b> 생년월일은 그대로 남아 있으니 아래에서 성별만 고르고 저장하시면 됩니다.'
         : '따로 등록할 필요 없습니다. <b class="gold">인연지도를 만들 때 넣은 생년월일</b>이 그대로 여기에 저장돼서, '+
           '그 뒤로는 오늘의 운세도 사주팔자도 다시 입력하지 않아도 됩니다.')+
     '</p>'+
-    (b&&b.birth?'':'<button class="btn" id="gomap" style="margin-top:24px">내 인연지도 만들기</button>'+
+    (b&&b.birth||pend?'':'<button class="btn" id="gomap" style="margin-top:24px">내 인연지도 만들기</button>'+
       '<p class="tiny center" style="margin-top:10px">30초면 끝나요 · 가입 없음 · 무료</p>')+
   '</section>';
   var body='';
@@ -2479,7 +2646,7 @@ function viewProfile(){
         '<a class="prow" href="/today"><span class="av" style="background:#e8a33b22;color:#e8a33b">☀</span>'+
           '<span class="nm"><b>오늘의 운세</b><i>오늘 일진과 내 사주를 견줍니다</i></span><span class="tiny">›</span></a>'+
         '<a class="prow" href="/saju"><span class="av" style="background:#9aa7b822;color:#7a8b99">四</span>'+
-          '<span class="nm"><b>내 사주팔자</b><i>여덟 글자와 오행 분포</i></span><span class="tiny">›</span></a>'+
+          '<span class="nm"><b>사주 정밀 풀이</b><i>격국·용신·신살·대운까지</i></span><span class="tiny">›</span></a>'+
         '<a class="prow" href="/life"><span class="av" style="background:#4ea87a22;color:#4ea87a">◈</span>'+
           '<span class="nm"><b>분야별 풀이</b><i>건강 · 재물 · 일 · 사람</i></span><span class="tiny">›</span></a>'+
       '</div>'+
@@ -2487,15 +2654,15 @@ function viewProfile(){
       '<button class="btn sec2" id="del" style="margin-top:9px">이 기기에서 지우기</button>'+
     '</section>';
   }
-  if(!(b&&b.birth)){
+  if(!(b&&b.birth)&&!pend){
     body+='<section class="sec fade" style="margin-top:26px">'+
       '<button class="btn sec2" id="openForm">지도 없이 생년월일만 넣기</button>'+
       '<p class="tiny center" style="margin-top:9px">오늘의 운세만 보고 싶을 때 쓰세요.</p>'+
     '</section>';
   }
-  body+='<section class="sec '+(b&&b.birth?'rv':'fade')+'" id="formSec" hidden>'+
-    '<h2>'+(b&&b.birth?'생년월일 바꾸기':'생년월일 넣기')+'</h2>'+
-    '<div class="card" id="fw">'+formHTML({cta:b&&b.birth?'바꾸기':'저장하고 오늘의 운세 보기'})+'</div>'+
+  body+='<section class="sec '+(b&&b.birth?'rv':'fade')+'" id="formSec"'+(pend?'':' hidden')+'>'+
+    '<h2>'+(b&&b.birth?'생년월일 바꾸기':pend?'성별 고르기':'생년월일 넣기')+'</h2>'+
+    '<div class="card" id="fw">'+formHTML(birthPrefill({cta:b&&b.birth?'바꾸기':pend?'저장하고 내 사주 보기':'저장하고 오늘의 운세 보기'}))+'</div>'+
   '</section>';
   app.appendChild(h(head+body+
     '<section class="sec rv">'+pageShareBox('home')+'</section>'+
@@ -2522,11 +2689,19 @@ function viewProfile(){
   bindForm(el('fw'),function(data,done){
     saveBirth(data.name,data.birth);paintBio();
     if(done)done();
-    location.href='/today';
+    location.href=pend?'/saju':'/today';
   });
   window.scrollTo(0,0);
 }
-function getBirth(){ return store('inbokdo_birth'); }
+function getBirth(){
+  var b=store('inbokdo_birth');
+  if(!b) return b;
+  // 성별이 없는 예전 기록은 미완성으로 본다 (대운·육친 계산에 반드시 필요)
+  if(b.birth&&b.birth.gender!=='m'&&b.birth.gender!=='f'){
+    return {name:b.name,charKey:b.charKey,pending:b.birth,needSex:true};
+  }
+  return b;
+}
 
 /* ===== 화면: 로그인 ===== */
 function viewLogin(next){
@@ -2623,6 +2798,380 @@ function renderToday(j,b){
   pageFoot('today')+
   '<footer>오늘의 운세는 오늘 일진(日辰)과 내 일간의 관계로 계산합니다. 재미와 참고로만 봐주세요.</footer>'));
   reveal(app);window.scrollTo(0,0);
+}
+
+/* ═════════ 사주 정밀 풀이 ═════════ */
+var SELEM=[0,0,1,1,2,2,3,3,4,4], BELEM=[4,2,0,0,2,1,1,2,3,3,2,4];
+var ECOL_D=['#3f8f66','#c95f38','#ad8931','#788da6','#3f6ea8'];
+var TONE_C={gold:'#c19a2e',green:'#3f8f66',blue:'#3f6ea8',gray:'#7a8395',amber:'#c98a2e',red:'#c05a3c'};
+
+function deepPage(){
+  var b=getBirth();
+  if(!b||!b.birth) return needBirthView('내 사주팔자');
+  app.innerHTML='<div class="skel" style="height:38px;width:58%;margin-top:34px"></div>'+
+    '<div class="skel" style="height:22px;width:80%;margin-top:14px"></div>'+
+    '<div class="skel" style="height:230px;margin-top:22px"></div>'+
+    '<div class="skel" style="height:160px;margin-top:12px"></div>';
+  api('/api/deep',{method:'POST',body:JSON.stringify({birth:b.birth})})
+    .then(function(j){
+      if(j.char&&b.charKey!==j.char.key){ b.charKey=j.char.key; store('inbokdo_birth',b); paintBio(); }
+      renderDeep(j,b);
+    })
+    .catch(function(e){
+      app.innerHTML='<section class="center" style="padding-top:60px"><h1 style="font-size:24px">'+esc(e.message)+'</h1>'+
+        '<button class="btn" style="margin-top:20px" onclick="location.href=\'/my\'">사주 정보 확인하기</button></section>';
+    });
+}
+
+function wonguk(D){
+  var C=D.chart;
+  var head='',sinT='',ganR='',jiR='',sinB='',hid='',un='';
+  for(var i=0;i<4;i++){
+    var c=C[i];
+    head+='<th>'+esc(c.label)+'</th>';
+    if(c.empty){
+      sinT+='<td></td>';
+      ganR+='<td rowspan="2"><div class="wempty">시간을<br>모릅니다</div></td>';
+      sinB+='<td></td>';hid+='<td></td>';un+='<td></td>';
+      continue;
+    }
+    var sc=ECOL_D[SELEM[c.stem]], bc=ECOL_D[BELEM[c.branch]];
+    sinT+='<td><div class="wsin">'+esc(c.stemSipsin)+'</div></td>';
+    ganR+='<td><div class="wbig" style="background:'+sc+'"><b>'+esc(c.stemHan)+'</b><s>'+esc(c.stemKo)+' '+esc(c.stemElem)+'</s></div></td>';
+    jiR+='<td><div class="wbig" style="background:'+bc+'"><b>'+esc(c.branchHan)+'</b><s>'+esc(c.branchKo)+' '+esc(c.branchElem)+'</s></div></td>';
+    sinB+='<td><div class="wsin">'+esc(c.branchSipsin)+(c.gongmang?'<span class="wgm">공망</span>':'')+'</div></td>';
+    hid+='<td><div class="whid">'+c.hidden.map(function(x){return '<i>'+esc(x.han)+'</i> '+esc(x.sipsin);}).join('<br>')+'</div></td>';
+    un+='<td><div class="wun">'+esc(c.unseong.name)+'<div class="tiny" style="font-weight:400;margin-top:1px">'+esc(c.unseong.han)+'</div></div></td>';
+  }
+  // 시주가 없으면 천간칸을 rowspan 처리했으므로 지지행에서 빼준다
+  var hourEmpty=C[3].empty;
+  if(hourEmpty){ jiR=jiR; }
+  return '<div class="wg"><table class="wonguk">'+
+    '<thead><tr>'+head+'</tr></thead><tbody>'+
+    '<tr>'+sinT+'</tr>'+
+    '<tr>'+ganR+'</tr>'+
+    '<tr>'+jiR+(hourEmpty?'':'')+'</tr>'+
+    '<tr>'+sinB+'</tr>'+
+    '<tr>'+hid+'</tr>'+
+    '<tr>'+un+'</tr>'+
+    '</tbody></table></div>';
+}
+
+function sitem(name,han,at,text,color,good){
+  var c=good>0?'#3f8f66':good<0?'#c05a3c':(color||'#c19a2e');
+  return '<div class="sitem" style="--c:'+c+'">'+
+    '<div class="h"><b>'+esc(name)+'</b>'+(han?'<u>'+esc(han)+'</u>':'')+
+      (at?'<em>'+esc(at)+'</em>':'')+'</div>'+
+    '<p>'+esc(text)+'</p></div>';
+}
+
+function renderDeep(j,b){
+  var ch=charBy(j.char.key), sa=j.saju, D=j.deep, X=j.ext;
+  var yong=D.yongsin, st=D.strength, gk=D.gyeokguk;
+  var NAV=[['won','원국'],['core','강약·격국·용신'],['sip','십신'],['sin','신살'],['gung','궁'],
+           ['yuk','육친'],['life','성격·직업·건강'],['dae','대운'],['se','올해']];
+
+  var html=
+  '<section class="fade" style="padding-top:28px">'+
+    '<div class="eyebrow">사주 정밀 풀이 · '+esc(D.ilju.gz)+' 일주</div>'+
+    '<h1 style="font-size:30px">나는 <span class="gold">'+esc(D.ilju.name)+'</span></h1>'+
+    '<p class="lead" style="font-size:15px">'+esc(D.ilju.text)+'</p>'+
+    '<div class="chips" style="margin-top:14px">'+
+      '<span class="chip">'+esc(gk.name)+'</span>'+
+      '<span class="chip">'+esc(st.level)+'</span>'+
+      '<span class="chip">용신 '+esc(yong.yong.han)+esc(yong.yong.name)+'</span>'+
+      '<span class="chip">'+esc(sa.gender==='f'?'여자':'남자')+'</span>'+
+      '<span class="chip">'+esc(ch.name)+' '+esc(ch.han)+'</span>'+
+    '</div>'+
+  '</section>'+
+  '<section class="sec fade" style="margin-top:20px"><div class="gold-sec">'+
+    '<div class="eyebrow" style="color:#c9a227">한눈에 보는 총평</div>'+
+    D.summary.map(function(t,i){
+      return '<p style="margin:'+(i?10:9)+'px 0 0;font-size:14.6px;line-height:1.78;color:#3f3930">'+esc(t)+'</p>';
+    }).join('')+
+  '</div></section>'+
+  '<div class="jump" id="jump">'+NAV.map(function(n,i){
+    return '<a href="#s-'+n[0]+'"'+(i===0?' class="on"':'')+'>'+esc(n[1])+'</a>';
+  }).join('')+'</div>'+
+
+  /* ── 원국 ── */
+  '<section class="sec" id="s-won" style="margin-top:20px">'+
+    '<h2>사주 원국</h2>'+
+    '<p class="tiny" style="margin:-2px 0 12px">태어난 순간을 여덟 글자로 세운 것입니다. 위가 천간(하늘), 아래가 지지(땅)이고, '+
+      '각 글자 옆의 이름이 내 일간에서 본 십신(十神)입니다.</p>'+
+    wonguk(D)+
+    '<div class="kv">'+
+      '<div class="k"><i>일간 (나)</i><b>'+esc(D.chart[2].stemHan)+esc(D.chart[2].stemKo)+'</b></div>'+
+      '<div class="k"><i>공망</i><b>'+esc(D.gongmang)+'</b></div>'+
+      '<div class="k"><i>띠</i><b>'+esc(sa.zodiac)+'</b></div>'+
+    '</div>'+
+    (X.rel.length?'<div class="relgrid">'+X.rel.map(function(r){
+      return '<span class="relchip '+(r.good>0?'good':'bad')+'" title="'+esc(r.at)+'">'+esc(r.a+r.b)+' '+esc(r.label)+'</span>';
+    }).join('')+'</div>'+
+    '<div class="slist">'+dedupeRel(X.rel).map(function(r){
+      return sitem(r.label+' — '+r.a+r.b, r.at, '', r.text, null, r.good);
+    }).join('')+'</div>':'')+
+    '<p class="tiny" style="margin-top:10px">지장간(支藏干)은 지지 안에 숨어 있는 천간입니다. 겉으로 안 보여도 실제로 작용합니다. '+
+      '십이운성(十二運星)은 그 자리에서 내 기운이 어느 단계에 있는지를 나타냅니다.</p>'+
+  '</section>'+
+
+  /* ── 강약 · 격국 · 용신 ── */
+  '<div class="rule"></div>'+
+  '<section class="sec rv" id="s-core">'+
+    '<h2>기운의 세기</h2>'+
+    '<div class="gold-sec">'+
+      '<div class="eyebrow" style="color:#c9a227">신강 · 신약</div>'+
+      '<b style="display:block;font-size:24px;font-weight:800;letter-spacing:-.04em;margin-top:6px">'+esc(st.level)+'</b>'+
+      '<p style="margin:8px 0 0;font-size:14.5px;color:#4a4438;line-height:1.68">'+esc(st.text)+'</p>'+
+      '<div class="chips"><span class="chip">'+(st.deukryeong?'득령 ○':'실령 ×')+'</span>'+
+        '<span class="chip">'+(st.deukji?'득지 ○':'실지 ×')+'</span>'+
+        '<span class="chip">신강 지수 '+st.score+'</span></div>'+
+      '<p class="tiny" style="margin-top:10px">'+esc(st.detail)+'</p>'+
+    '</div>'+
+
+    '<h2 style="margin-top:26px">격국 — 내가 일하는 방식</h2>'+
+    '<div class="typecard" style="--c:#c19a2e;background:#fff">'+
+      '<div class="lbl" style="color:#a07c1c">'+esc(gk.han)+'</div>'+
+      '<h3 style="font-size:21px;margin-top:6px">'+esc(gk.name)+' · '+esc(gk.lead)+'</h3>'+
+      '<p>'+esc(gk.text)+'</p>'+
+      '<p style="margin-top:9px"><b style="color:#a07c1c">이렇게 쓰세요 —</b> '+esc(gk.tip)+'</p>'+
+      '<p class="tiny" style="margin-top:10px">'+esc(gk.from)+'</p>'+
+    '</div>'+
+
+    '<h2 style="margin-top:26px">용신 — 나를 살리는 기운</h2>'+
+    '<div class="card">'+
+      '<div class="kv" style="margin-top:0">'+
+        '<div class="k" style="border-color:rgba(193,154,46,.5);background:var(--gold-soft)"><i>용신 (약)</i>'+
+          '<b style="color:'+ECOL_D[yong.yong.i]+'">'+esc(yong.yong.han)+' '+esc(yong.yong.name)+'</b></div>'+
+        '<div class="k"><i>희신 (도움)</i><b style="color:'+ECOL_D[yong.hui.i]+'">'+esc(yong.hui.han)+' '+esc(yong.hui.name)+'</b></div>'+
+        '<div class="k"><i>기신 (피할 것)</i><b style="color:'+ECOL_D[yong.gi.i]+'">'+esc(yong.gi.han)+' '+esc(yong.gi.name)+'</b></div>'+
+      '</div>'+
+      '<p style="margin:14px 0 0;font-size:14px;color:#4a4438;line-height:1.7">'+esc(yong.why)+'</p>'+
+      '<div class="kv">'+
+        '<div class="k"><i>색</i><b style="font-size:14px">'+esc(yong.color)+'</b></div>'+
+        '<div class="k"><i>방향</i><b style="font-size:14px">'+esc(yong.dir)+'</b></div>'+
+        '<div class="k"><i>숫자</i><b style="font-size:14px">'+esc(yong.num)+'</b></div>'+
+      '</div>'+
+      '<p style="margin:12px 0 0;font-size:13.5px;color:#4a4438;line-height:1.7">'+esc(yong.tip)+'</p>'+
+    '</div>'+
+  '</section>'+
+
+  /* ── 십신 ── */
+  '<div class="rule"></div>'+
+  '<section class="sec rv" id="s-sip">'+
+    '<h2>십신 — 내 안의 열 가지 기운</h2>'+
+    '<p class="tiny" style="margin:-2px 0 12px">일간(나)을 기준으로 나머지 일곱 글자와 지장간까지 가중해 센 비중입니다. 합이 100%가 됩니다.</p>'+
+    '<div class="card"><div class="dbar">'+
+      D.tally.map(function(t){
+        return '<div class="row"><span class="nm">'+esc(t.name)+'</span>'+
+          '<span class="tk"><i style="width:'+Math.min(100,t.pct*3.2)+'%;background:'+t.color+'"></i></span>'+
+          '<span class="vl">'+t.pct.toFixed(1)+'%</span></div>';
+      }).join('')+
+    '</div>'+
+    '<div class="kv" style="margin-top:14px">'+
+      Object.keys(D.groups).map(function(k){
+        return '<div class="k"><i>'+esc(k)+'</i><b style="font-size:15px">'+D.groups[k].toFixed(1)+'%</b></div>';
+      }).join('')+
+    '</div></div>'+
+    '<div class="slist">'+
+      D.topSipsin.map(function(t){
+        return sitem(t.name+' '+t.pct+'%', t.han, t.one, t.text, t.color, 0);
+      }).join('')+
+      (D.missing.length?sitem('없거나 아주 얇은 기운','','',
+        D.missing.map(function(m){return m.name+'('+m.han+') — '+m.text;}).join(' '),'#9aa3b8',0):'')+
+    '</div>'+
+  '</section>'+
+
+  /* ── 신살 ── */
+  '<div class="rule"></div>'+
+  '<section class="sec rv" id="s-sin">'+
+    '<h2>신살 — 타고난 별</h2>'+
+    '<p class="tiny" style="margin:-2px 0 12px">신살은 사주에서 특정 글자 조합이 만드는 성향의 이름입니다. '+
+      '좋고 나쁨을 가르기보다 <b>어떤 힘이 붙어 있는가</b>로 보시는 편이 정확합니다.</p>'+
+    (D.sinsal.length?'<h3 style="font-size:15px;margin:0 0 2px;letter-spacing:-.035em">주요 신살</h3>'+
+      '<div class="slist">'+D.sinsal.map(function(x){
+        return sitem(x.name,x.han+' · '+x.pos,x.at,x.text,null,x.good);
+      }).join('')+'</div>':'')+
+    (X.extra.length?'<h3 style="font-size:15px;margin:20px 0 2px;letter-spacing:-.035em">그 밖의 신살</h3>'+
+      '<div class="slist">'+X.extra.map(function(x){
+        return sitem(x.name,x.han+' · '+x.pos,x.at,x.text,null,x.good);
+      }).join('')+'</div>':'')+
+    (X.sin12.length?'<h3 style="font-size:15px;margin:20px 0 2px;letter-spacing:-.035em">12신살 배치</h3>'+
+      '<p class="tiny" style="margin:2px 0 8px">년지 '+esc(BR_H[sa.pillars.year[1]])+'을 기준으로 네 자리에 어떤 신살이 앉았는지 본 것입니다.</p>'+
+      '<div class="slist">'+X.sin12.map(function(x){
+        return sitem(x.at+' — '+x.name,x.han+' · '+x.pos,x.lead,x.text,null,x.good);
+      }).join('')+'</div>':'')+
+    (X.samjae?'<div class="card" style="margin-top:14px"><div class="eyebrow" style="color:#c9a227">삼재</div>'+
+      '<p style="margin:8px 0 0;font-size:13.8px;color:#4a4438;line-height:1.7">'+esc(X.samjae.text)+'</p>'+
+      (X.samjae.next&&X.samjae.next.length?'<div class="chips">'+X.samjae.next.map(function(n){
+        return '<span class="chip">'+n.year+'년 '+esc(n.kind)+'</span>';}).join('')+'</div>':'')+
+      '</div>':'')+
+  '</section>'+
+
+  /* ── 궁 ── */
+  '<div class="rule"></div>'+
+  '<section class="sec rv" id="s-gung">'+
+    '<h2>궁 — 인생을 네 토막으로</h2>'+
+    '<p class="tiny" style="margin:-2px 0 12px">년·월·일·시 네 기둥은 각각 인생의 한 시기와 한 사람을 맡습니다.</p>'+
+    D.gung.map(function(g,i){
+      return '<div class="typecard'+(i?' rv':'')+'" style="--c:#c19a2e;background:#fff;margin-top:'+(i?10:0)+'px">'+
+        '<div class="lbl" style="color:#a07c1c">'+esc(g.title)+(g.gz?' · '+esc(g.gz):'')+'</div>'+
+        '<h3 style="font-size:18px;margin-top:6px">'+esc(g.age)+'</h3>'+
+        '<p style="margin-top:6px">'+esc(g.b)+'</p>'+
+        '<p style="margin-top:8px">'+esc(g.text)+'</p>'+
+        (g.chips&&g.chips.length?'<div class="chips">'+g.chips.map(function(c){return '<span class="chip">'+esc(c)+'</span>';}).join('')+'</div>':'')+
+      '</div>';
+    }).join('')+
+  '</section>'+
+
+  /* ── 육친 ── */
+  '<div class="rule"></div>'+
+  '<section class="sec rv" id="s-yuk">'+
+    '<h2>육친 — 나와 가족</h2>'+
+    '<p class="tiny" style="margin:-2px 0 10px">명리에서는 십신으로 가족 인연의 두께를 봅니다. 사이가 좋고 나쁨이 아니라 <b>인연의 굵기</b>입니다.</p>'+
+    X.yukchin.rows.map(function(r){
+      return '<div class="ycard"><div class="lb"><b>'+esc(r.title)+'</b><i>'+esc(r.sub.replace('으로 봅니다','').replace('로 봅니다',''))+'</i></div>'+
+        '<div class="bd"><div class="tk"><i style="width:'+Math.min(100,r.pct*3.2)+'%"></i></div>'+
+        '<p>'+esc(r.text)+'</p></div></div>';
+    }).join('')+
+  '</section>'+
+
+  /* ── 성격 · 직업 · 건강 ── */
+  '<div class="rule"></div>'+
+  '<section class="sec rv" id="s-life">'+
+    '<h2>성격</h2>'+
+    '<div class="typecard" style="--c:#7ec9a2;background:#fff">'+
+      '<div class="lbl" style="color:#2f855f">일주 '+esc(D.ilju.gz)+' — '+esc(D.ilju.name)+'</div>'+
+      '<p style="margin-top:8px">'+esc(D.ilju.text)+'</p>'+
+      '<p class="tiny" style="margin-top:9px">일주(日柱)는 나 자신을 나타내는 두 글자입니다. 60갑자 중 하나이고, 사주에서 성격을 볼 때 가장 먼저 보는 자리입니다.</p>'+
+    '</div>'+
+    '<div class="typecard rv" style="--c:#7ec9a2;background:#fff;margin-top:10px">'+
+      '<div class="lbl" style="color:#2f855f">일간 '+esc(X.personality.lead)+'</div>'+
+      '<p style="margin-top:8px">'+esc(X.personality.text)+'</p>'+
+      '<p style="margin-top:8px">'+esc(X.personality.add)+'</p>'+
+    '</div>'+
+    '<h2 style="margin-top:26px">직업 적성</h2>'+
+    '<div class="typecard" style="--c:#4f86c6;background:#fff">'+
+      '<div class="lbl" style="color:#3c6ca6">'+esc(gk.name)+' × 용신 '+esc(yong.yong.han)+'</div>'+
+      '<h3 style="font-size:18px;margin-top:6px">'+esc(X.job.main)+'</h3>'+
+      '<p style="margin-top:8px"><b>용신 쪽 분야 —</b> '+esc(X.job.elem)+'</p>'+
+      '<p style="margin-top:8px">'+esc(X.job.text)+'</p>'+
+    '</div>'+
+    '<h2 style="margin-top:26px">건강</h2>'+
+    '<div class="typecard" style="--c:#c05a3c;background:#fff">'+
+      '<div class="lbl" style="color:#b5532e">'+esc(X.health.lead)+'</div>'+
+      '<h3 style="font-size:18px;margin-top:6px">'+esc(X.health.weak.organ)+' · '+esc(X.health.weak.part)+'</h3>'+
+      '<p style="margin-top:8px">'+esc(X.health.text)+'</p>'+
+      '<p class="tiny" style="margin-top:10px">'+esc(X.health.note)+'</p>'+
+    '</div>'+
+  '</section>'+
+
+  /* ── 대운 ── */
+  '<div class="rule"></div>'+
+  '<section class="sec rv" id="s-dae">'+
+    '<h2>대운 — 10년마다 바뀌는 판</h2>'+
+    (D.daeun.need
+      ? '<div class="card"><p style="margin:0;font-size:14px;color:#4a4438;line-height:1.7">'+esc(D.daeun.note)+'</p>'+
+        '<button class="btn sec2" style="margin-top:12px" onclick="location.href=\'/my\'">성별 넣고 대운 보기</button></div>'
+      : '<p class="tiny" style="margin:-2px 0 4px">'+esc(D.daeun.note)+'</p>'+
+        '<div class="deun">'+D.daeun.list.map(function(d,i){
+          return '<div class="dcard'+(i===D.daeun.current?' now':(i<D.daeun.current?' past':''))+'">'+
+            (i===D.daeun.current?'<span class="tag">지금</span>':'')+
+            '<i>'+d.age+'~'+d.ageTo+'세</i><b style="color:'+ECOL_D[SELEM[d.stem]]+'">'+esc(d.gz)+'</b>'+
+            '<s style="color:'+d.color+'">'+esc(d.sipsin)+'</s><u>'+d.year+'년~</u></div>';
+        }).join('')+'</div>'+
+        '<p class="tiny" style="margin-top:2px">'+esc(D.daeun.before)+'</p>'+
+        '<div class="slist" style="margin-top:14px">'+D.daeun.list.map(function(d,i){
+          var now=(i===D.daeun.current);
+          return '<div class="sitem" style="--c:'+d.color+(now?';background:var(--gold-soft);border-color:rgba(193,154,46,.45)':'')+'">'+
+            '<div class="h"><b>'+d.age+'~'+d.ageTo+'세 '+esc(d.gz)+'</b><u>'+esc(d.sipsin)+' · '+esc(d.unseong)+'</u>'+
+            '<em>'+(now?'지금 이 대운':d.year+'~'+d.yearTo+'년')+'</em></div>'+
+            '<p><b>'+esc(d.head)+'</b> — '+esc(d.text)+'</p></div>';
+        }).join('')+'</div>')+
+  '</section>'+
+
+  /* ── 세운 · 월운 ── */
+  '<div class="rule"></div>'+
+  '<section class="sec rv" id="s-se">'+
+    '<h2>'+D.seun.year+'년 — 올해의 흐름</h2>'+
+    '<div class="gold-sec center">'+
+      '<div class="eyebrow" style="color:#c9a227">세운 '+esc(D.seun.gz)+' '+esc(D.seun.gzKo)+'</div>'+
+      '<div class="scorebig" style="color:'+TONE_C.gold+';font-size:64px">'+D.seun.score+'<small>점</small></div>'+
+      '<div style="margin-top:6px"><span class="band tone-gold">'+esc(D.seun.sipsin)+' · '+esc(D.seun.unseong)+'</span></div>'+
+      '<p style="margin:12px 0 0;font-size:14.5px;color:#4a4438;line-height:1.7;text-align:left">'+
+        '<b>'+esc(D.seun.head)+'</b> — '+esc(D.seun.text)+'</p>'+
+      (D.seun.daeunGZ?'<p class="tiny" style="margin-top:10px;text-align:left">지금 대운 '+esc(D.seun.daeunGZ)+'('+esc(D.seun.daeunSipsin)+') 안에서 맞는 해입니다. 대운이 판을 정하고 세운이 그 해의 사건을 정합니다.</p>':'')+
+    '</div>'+
+    (D.seun.notes.length?'<div class="slist">'+D.seun.notes.map(function(n){
+      return sitem(n.t,'','',n.d,null,0);
+    }).join('')+'</div>':'')+
+    '<h2 style="margin-top:26px">'+X.wolun.year+'년 달별 흐름</h2>'+
+    '<p class="tiny" style="margin:-2px 0 4px">'+esc(X.wolun.note)+'</p>'+
+    '<div class="mgrid">'+X.wolun.list.map(function(m){
+      return '<div class="mcell"><div class="t"><b>'+esc(m.solar)+'</b><u>'+esc(m.gz)+'</u><em style="color:'+m.color+'">'+m.score+'</em></div>'+
+        '<div class="tk"><i style="width:'+m.score+'%;background:'+m.color+'"></i></div>'+
+        '<p>'+esc(m.text)+'</p>'+
+        (m.tags.length?'<div class="tg">'+esc(m.tags.join(' · '))+'</div>':'')+
+      '</div>';
+    }).join('')+'</div>'+
+  '</section>'+
+
+  '<div class="rule"></div>'+
+  '<section class="sec rv">'+introBox('saju')+'</section>'+
+  '<section class="sec rv">'+adBox()+'</section>'+
+  '<section class="sec rv">'+pageShareBox('saju')+'</section>'+
+  pageFoot('saju')+
+  '<footer>절기 기준으로 년·월주를, 율리우스일 기준으로 일주를, 오자둔으로 시주를 세웠습니다. '+
+    '십신·십이운성·격국·용신·신살·대운은 모두 전통 명리 방식 그대로 계산했고, 풀이 문장은 직접 썼습니다. '+
+    '자세한 방법은 <a href="/about" style="color:#7a7365;text-decoration:underline">계산 방법</a>에서 볼 수 있습니다. '+
+    '재미와 참고로 봐주세요.</footer>';
+
+  app.innerHTML='';
+  app.appendChild(h(html));
+  bindJump();
+  var now=app.querySelector('.dcard.now');
+  if(now&&now.parentNode){
+    var sc=now.parentNode;
+    sc.scrollLeft=Math.max(0,now.offsetLeft-sc.clientWidth/2+now.offsetWidth/2);
+  }
+  reveal(app);window.scrollTo(0,0);
+}
+
+function dedupeRel(rel){
+  var seen={},out=[];
+  rel.forEach(function(r){ if(seen[r.k])return; seen[r.k]=1; out.push(r); });
+  return out;
+}
+
+function bindJump(){
+  var nav=el('jump');if(!nav)return;
+  var links=[].slice.call(nav.querySelectorAll('a'));
+  nav.addEventListener('click',function(e){
+    var a=e.target.closest('a');if(!a)return;
+    e.preventDefault();tap();
+    var t=document.querySelector(a.getAttribute('href'));if(!t)return;
+    var y=t.getBoundingClientRect().top+window.pageYOffset-108;
+    window.scrollTo({top:y,behavior:'smooth'});
+  });
+  var ticking=false;
+  function onScroll(){
+    if(ticking)return;ticking=true;
+    requestAnimationFrame(function(){
+      ticking=false;
+      var best=null,bd=1e9;
+      links.forEach(function(a){
+        var t=document.querySelector(a.getAttribute('href'));if(!t)return;
+        var d=Math.abs(t.getBoundingClientRect().top-130);
+        if(d<bd){bd=d;best=a;}
+      });
+      links.forEach(function(a){a.classList.toggle('on',a===best);});
+      if(best){
+        var l=best.offsetLeft-nav.clientWidth/2+best.offsetWidth/2;
+        nav.scrollTo({left:Math.max(0,l),behavior:'smooth'});
+      }
+    });
+  }
+  window.addEventListener('scroll',onScroll,{passive:true});
 }
 
 /* ===== 화면: 내 사주팔자 ===== */
@@ -2748,11 +3297,23 @@ function viewAbout(){
       ['월별 운세','전통 월괘사 대신, 그 달의 월건(月建)과 내 일간의 십신 관계로 냅니다. 사람마다 열두 달이 다르게 나옵니다.']
     ],'토정비결은 조선 후기부터 널리 읽힌 방식입니다. 사주 명리와는 계산 체계가 다릅니다.')+
 
-    blk('7','연애·일운 지도에서 성별을 안 묻는 이유',[
-      ['전통은 남녀를 나눕니다','명리에서 남자의 처는 재성, 여자의 남편은 관성으로 봅니다. 원래는 성별에 따라 보는 자리가 다릅니다.'],
-      ['그래도 안 묻습니다','성별을 입력받는 순간 참여 문턱이 올라가고, 저희가 들고 있어야 할 개인정보도 늘어납니다. 그래서 <b>재성과 관성을 합쳐 배우자성</b>으로 보는 성별 중립 방식을 씁니다.'],
-      ['대신 이런 걸 봅니다','배우자궁인 일지(日支)의 상태, 도화살과 홍염살, 지지의 합과 충, 표현력(식상)을 함께 봅니다.']
-    ],'성별을 나눠 보는 전통 방식보다 정밀도가 조금 떨어집니다. 이 점을 감추지 않겠습니다.')+
+    blk('7','사주 정밀 풀이는 이렇게 냅니다',[
+      ['십신 배치','천간 넷과 지지 넷, 그리고 지지 안에 숨은 지장간(支藏干)까지 전부 일간 기준 십신으로 환산합니다. 자리마다 가중치를 달리 줍니다(월지가 가장 무겁습니다).'],
+      ['십이운성(十二運星)','일간이 각 지지에서 어느 단계에 있는지 봅니다. 양간은 장생지에서 순행, 음간은 역행합니다. 갑木은 亥에서, 경金은 巳에서 장생합니다.'],
+      ['공망(空亡)','일주의 순중(旬中)에서 빠진 두 지지를 냅니다. 그 자리의 일은 손에 잡힐 듯 안 잡히는 결로 봅니다.'],
+      ['신강·신약','비겁과 인성의 비중에 <b>득령(월지)</b>과 <b>득지(일지)</b>를 더해 지수로 냅니다. 극신강·신강·중화·신약·극신약 다섯 단계입니다.'],
+      ['격국(格局)','월지 지장간 중 천간에 투출한 글자로 격을 잡습니다. 월지 본기가 비견이면 건록격, 겁재면 양인격으로 봅니다.'],
+      ['용신(用神)','억부(抑扶)를 먼저 봅니다. 신강이면 빼거나 누르는 오행, 신약이면 살려주는 오행입니다. 중화면 조후(調候) — 겨울생은 火, 여름생은 水를 우선합니다.'],
+      ['신살 20여 종','천을·천덕·월덕·문창·학당·암록·금여·천의성, 도화·홍염·양인·괴강·백호, 12신살 전체, 원진·귀문·고신·과숙, 공망과 삼재까지 냅니다.'],
+      ['대운(大運)','<b>양남음녀는 순행, 음남양녀는 역행</b>합니다. 태어난 시각에서 다음(또는 이전) 절입(節入)까지의 일수를 3으로 나눠 대운수를 냅니다. 그래서 성별이 반드시 필요합니다.'],
+      ['세운·월운','그 해 간지와 내 일간·일지의 관계(십신·충·합·귀인·공망)로 냅니다. 월운은 절기 기준이라 인월(寅月)은 입춘부터입니다.']
+    ],'계산은 전통 명리 방식 그대로이고, 풀이 문장은 전부 저희가 직접 썼습니다.')+
+
+    blk('8','성별을 받는 이유',[
+      ['대운의 방향','대운은 남녀에 따라 흐르는 방향이 정반대입니다(양남음녀 순행 · 음남양녀 역행). 성별 없이는 10년 흐름을 아예 세울 수 없습니다.'],
+      ['배우자와 자녀 자리','남자는 재성이 처, 관성이 자녀입니다. 여자는 관성이 남편, 식상이 자녀입니다. 성별에 따라 보는 자리가 반대로 바뀝니다.'],
+      ['어디에 저장되나','성별과 생년월일은 <b>이용자 브라우저에만</b> 저장됩니다. 지도나 방에 참여할 때를 빼면 서버로 보내지 않고, 다른 참여자에게도 공개하지 않습니다.']
+    ],'처음에는 문턱을 낮추려고 성별을 받지 않았지만, 그러면 대운을 낼 수 없어 정확도를 택했습니다.')+
 
     '<div class="gold-sec rv" style="margin-top:16px">'+
       '<div class="eyebrow" style="color:#c9a227">솔직하게</div>'+
@@ -2816,7 +3377,8 @@ Promise.all([loadMeta(),loadMe()]).then(function(){
   else if(BOOT.view==='tojeong')viewTojeong();
   else if(BOOT.view==='roomNew')viewRoomNew(BOOT.topic||'wealth');
   else if(BOOT.view==='room')viewRoom(BOOT.code);
-  else if(BOOT.view==='today'||BOOT.view==='saju'||BOOT.view==='life')fortunePage(BOOT.view);
+  else if(BOOT.view==='saju')deepPage();
+  else if(BOOT.view==='today'||BOOT.view==='life')fortunePage(BOOT.view);
   else if(BOOT.view==='map')viewMap(BOOT.code);
   else if(BOOT.view==='notfound'){
     app.innerHTML='<section class="fade center" style="padding-top:70px">'+

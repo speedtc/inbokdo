@@ -14,12 +14,12 @@ export const ZODIAC = ['쥐', '소', '호랑이', '토끼', '용', '뱀', '말',
 export const ELEMENTS = ['목', '화', '토', '금', '수'];
 export const ELEMENT_HAN = ['木', '火', '土', '金', '水'];
 const STEM_ELEM = [0, 0, 1, 1, 2, 2, 3, 3, 4, 4];
-const STEM_YANG = [1, 0, 1, 0, 1, 0, 1, 0, 1, 0];
+export const STEM_YANG = [1, 0, 1, 0, 1, 0, 1, 0, 1, 0];
 const BRANCH_ELEM = [4, 2, 0, 0, 2, 1, 1, 2, 3, 3, 2, 4]; // 자수 축토 인목 묘목 진토 사화 오화 미토 신금 유금 술토 해수
-const BRANCH_YANG = [1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0];
+export const BRANCH_YANG = [1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0];
 
 // 지장간 (본기 위주 가중치)
-const HIDDEN = [
+export const HIDDEN = [
   [[9, 1.0]],                          // 자 - 계
   [[5, 0.6], [9, 0.2], [7, 0.2]],      // 축 - 기,계,신
   [[0, 0.6], [2, 0.2], [4, 0.2]],      // 인 - 갑,병,무
@@ -161,6 +161,8 @@ export function computeSaju(p) {
     .concat(pillars.hour ? [pillars.hour.stem] : []);
 
   return {
+    jdUT, monthOff,
+    gender: p.gender === 'm' || p.gender === 'f' ? p.gender : null,
     solar: { y, m, d, hour: p.unknownTime ? null : hour, minute: p.unknownTime ? null : minute },
     lunar: lunarInfo,
     unknownTime: !!p.unknownTime,

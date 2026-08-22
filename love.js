@@ -3,9 +3,8 @@
 // 배우자궁(일지)의 상태, 도화·홍염 같은 인연 신살, 지지의 합과 충,
 // 그리고 배우자성(재성·관성)의 두께를 본다.
 //
-// ⚠️ 성별을 묻지 않는다. 전통 명리는 남자의 처를 재성, 여자의 남편을 관성으로 보지만
-//    성별을 입력받는 순간 참여 문턱이 올라간다. 그래서 재성·관성을 합쳐
-//    '배우자성'으로 보는 성별 중립 방식을 쓴다. 이 점은 계산 방법 페이지에 밝혀두었다.
+// 배우자성: 전통 명리대로 남자는 재성(財=처), 여자는 관성(官=남편)을 본다.
+// 성별을 받지 못한 경우에만 재성+관성을 합친 성별 중립 방식으로 되돌린다.
 
 import {
   BRANCHES_HAN, SAMHAP, YUKHAP, CHUNG,
@@ -95,7 +94,10 @@ export function score(s) {
   const jae = d[ctl(me)];
   const gwan = d[(me + 3) % 5];
   const iny = d[(me + 4) % 5];
-  const spouse = jae + gwan;           // 배우자성 (성별 중립)
+  const g = s.gender;
+  const spouse = g === 'm' ? jae * 1.7 + gwan * 0.3
+    : g === 'f' ? gwan * 1.7 + jae * 0.3
+      : jae + gwan;                    // 성별 미상이면 중립
   const body = bi + iny;
 
   let v = 44;
@@ -118,7 +120,7 @@ export function score(s) {
   const ilji = s.dayBranch;
   const ie = branchElem(ilji);
   if (gen(ie) === me) { v += 9; notes.push({ t: '배우자궁이 나를 살립니다', w: 6, d: `일지 ${BRANCHES_HAN[ilji]}가 내 일간을 생해줍니다. 곁에 둔 사람 덕을 보는 자리입니다.` }); }
-  else if (ie === ctl(me) || ie === (me + 3) % 5) { v += 6; notes.push({ t: '배우자궁에 배우자성', w: 5, d: `일지 ${BRANCHES_HAN[ilji]}가 그대로 배우자 자리입니다. 인연이 제자리에 앉아 있는 배치입니다.` }); }
+  else if (ie === (g === 'm' ? ctl(me) : g === 'f' ? (me + 3) % 5 : ctl(me)) || ie === (me + 3) % 5) { v += 6; notes.push({ t: '배우자궁에 배우자성', w: 5, d: `일지 ${BRANCHES_HAN[ilji]}가 그대로 배우자 자리입니다. 인연이 제자리에 앉아 있는 배치입니다.` }); }
   else if (ctl(ie) === me) { v -= 6; notes.push({ t: '배우자궁이 나를 누릅니다', w: 4, d: `일지 ${BRANCHES_HAN[ilji]}가 내 기운을 눌러, 가까운 사람에게서 오히려 힘이 빠질 수 있습니다.` }); }
 
   // 3) 일지 충 — 배우자 자리가 흔들린다
@@ -143,8 +145,8 @@ export function score(s) {
   }
 
   // 5) 도화살 — 이성에게 끌리는 힘
-  const g = samhapGroup(ilji) >= 0 ? samhapGroup(ilji) : samhapGroup(s.pillars.year.branch);
-  const dohwaB = g >= 0 ? DOHWA_OF[g] : -1;
+  const sg = samhapGroup(ilji) >= 0 ? samhapGroup(ilji) : samhapGroup(s.pillars.year.branch);
+  const dohwaB = sg >= 0 ? DOHWA_OF[sg] : -1;
   const dohwa = dohwaB >= 0 ? s.branches.filter((b) => b === dohwaB).length : 0;
   if (dohwa) {
     v += Math.min(9, dohwa * 5.5);

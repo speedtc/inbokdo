@@ -15,7 +15,11 @@
 //   중괘 = (월건수 + 월대소) mod 6 → 0이면 6
 //   하괘 = (일진수 + 음력 생일) mod 3 → 0이면 3
 
-import { computeSaju, STEMS_HAN, BRANCHES_HAN, sipsin, SIPSIN } from './saju.js';
+import {
+  computeSaju, STEMS_HAN, BRANCHES_HAN, sipsin, SIPSIN, sipsinTally,
+  stemElem, branchElem, gen, ctl, CHEONEUL, CHUNG, YUKHAP, SAMHAP,
+  ELEMENTS, ELEMENT_HAN, ZODIAC, BRANCHES,
+} from './saju.js';
 import { solarToLunar, lunarMonthLength } from './astro.js';
 
 /* ── 상괘: 팔괘의 물상 ── */
@@ -108,6 +112,139 @@ const MONTH_SIPSIN = [
   { k: '정인', tone: 'green', s: '도움이 들어옵니다. 부탁할 일이 있으면 이 달에 꺼내세요.' },
 ];
 
+
+/* ══════════════ 분야별 한 해 운 ══════════════ */
+
+/* 상괘 8 · 중괘 6 · 하괘 3 의 기본 점수 */
+const SANG_SC = [0, 14, 8, 9, 2, 5, -8, -3, 7];
+const JUNG_SC = [0, -2, 6, 4, 5, -1, -4];
+const HA_SC = [0, 11, -1, -12];
+
+const TIER = (v) => (v >= 74 ? 3 : v >= 60 ? 2 : v >= 46 ? 1 : 0);
+const TIER_NAME = ['조심해야 하는 해', '무난한 해', '괜찮은 해', '아주 좋은 해'];
+const TIER_TONE = ['gray', 'blue', 'green', 'gold'];
+
+/* 분야별 4단계 문장 (0 나쁨 → 3 좋음) */
+const AREA_DEF = [
+  { key: 'money', icon: '財', title: '재물운',
+    t: [
+      '들어오는 것보다 나가는 것이 많은 해입니다. 새로 벌이기보다 새는 곳을 막는 데 힘을 쓰세요. 보증·대여·즉흥적인 투자는 올해 특히 손실로 돌아옵니다.',
+      '크게 늘지도 크게 줄지도 않는 해입니다. 한 방을 노리면 오히려 깎입니다. 들어오는 주기를 하나 더 만들어 두는 정도가 딱 맞습니다.',
+      '벌이가 살아나는 해입니다. 미뤄뒀던 계약이나 정산이 풀립니다. 다만 규모를 두 배로 키우기보다 한 단계씩 올리는 쪽이 남습니다.',
+      '재물이 크게 붙는 해입니다. 미뤄둔 결정을 올해 하세요. 다만 들어온 만큼 관리할 사람이 없으면 그대로 새니, 버는 일과 지키는 일을 나누어 두세요.',
+    ] },
+  { key: 'work', icon: '職', title: '사업 · 직장운',
+    t: [
+      '자리가 흔들리는 해입니다. 옮기고 싶은 마음이 커지지만, 급하게 결정하면 다음 자리도 오래 못 갑니다. 한 계절은 두고 보세요.',
+      '큰 변화 없이 굴러가는 해입니다. 눈에 띄는 성과는 적어도 쌓이는 것은 있습니다. 지금 자리에서 한 가지를 깊게 파세요.',
+      '일이 풀리는 해입니다. 맡은 일이 커지고 인정이 따라옵니다. 승진·이직·확장 이야기가 나오면 받아도 좋습니다.',
+      '크게 쓰이는 해입니다. 자리와 이름이 같이 올라갑니다. 미뤄둔 도전을 올해 시작하면 그대로 밀고 나갈 힘이 붙습니다.',
+    ] },
+  { key: 'love', icon: '愛', title: '애정 · 가정운',
+    t: [
+      '가까운 사람과 부딪히기 쉬운 해입니다. 사소한 말이 오래 갑니다. 말로 이기려 하지 말고 시간을 두면 저절로 가라앉습니다.',
+      '큰 변화 없이 지나가는 해입니다. 새 인연을 기다리기보다 지금 곁에 있는 사람에게 시간을 쓰는 쪽이 남습니다.',
+      '사람이 잘 붙는 해입니다. 소개나 모임에서 인연이 생깁니다. 이미 만나는 사람이 있다면 한 단계 나아갈 이야기가 오갑니다.',
+      '인연이 크게 들어오는 해입니다. 혼담이나 중요한 약속이 오갈 수 있습니다. 가정에도 좋은 일이 겹칩니다.',
+    ] },
+  { key: 'health', icon: '健', title: '건강운',
+    t: [
+      '몸이 먼저 신호를 보내는 해입니다. 미루던 검진을 올해 받으세요. 과로와 술자리가 겹치면 한 번에 무너집니다.',
+      '큰 병은 없지만 잔병이 붙는 해입니다. 수면과 식사 시간을 고정하는 것만으로 절반은 잡힙니다.',
+      '몸이 가벼운 해입니다. 미뤄둔 운동을 시작하기 좋고, 시작하면 오래 갑니다.',
+      '체력이 살아나는 해입니다. 무리해도 회복이 빠릅니다. 다만 그 믿음으로 과하게 밀어붙이는 것만 조심하세요.',
+    ] },
+  { key: 'study', icon: '文', title: '문서 · 시험운',
+    t: [
+      '문서가 어긋나는 해입니다. 계약서는 두 번 읽고, 도장은 하루 미뤘다 찍으세요. 시험은 준비 기간을 더 잡아야 합니다.',
+      '준비한 만큼 나오는 해입니다. 요행은 없지만 손해도 없습니다. 자격증 하나를 목표로 잡기 좋습니다.',
+      '문서 운이 좋은 해입니다. 계약·합격·등기처럼 종이로 남는 일이 잘 풀립니다.',
+      '문서와 배움에서 크게 얻는 해입니다. 시험·합격·계약을 올해 안에 매듭짓는 것이 유리합니다.',
+    ] },
+  { key: 'move', icon: '移', title: '이동 · 이사운',
+    t: [
+      '움직임이 손해로 이어지기 쉬운 해입니다. 꼭 옮겨야 한다면 시기를 미루고, 계약 조건을 평소보다 깐깐하게 보세요.',
+      '움직여도 좋고 머물러도 좋은 해입니다. 급할 것 없으니 조건이 맞을 때만 움직이세요.',
+      '움직이면 풀리는 해입니다. 이사·출장·이직이 좋게 작용합니다.',
+      '크게 자리를 옮기기 좋은 해입니다. 새 터에서 시작한 일이 오래 갑니다. 해외나 먼 곳과도 인연이 있습니다.',
+    ] },
+  { key: 'people', icon: '人', title: '사람 · 귀인운',
+    t: [
+      '사람 때문에 마음 쓰이는 해입니다. 부탁을 다 받아주면 내가 빕니다. 거절하는 연습이 필요합니다.',
+      '오는 사람 가는 사람이 반반인 해입니다. 넓히기보다 있는 관계를 정리하는 쪽이 남습니다.',
+      '도와주는 사람이 나타나는 해입니다. 어려운 부탁이 있으면 올해 꺼내세요.',
+      '귀인이 크게 붙는 해입니다. 결정적인 순간에 사람이 나타나 길을 열어줍니다. 사람에게 쓰는 시간이 가장 남는 해입니다.',
+    ] },
+  { key: 'trouble', icon: '訟', title: '구설 · 관재',
+    t: [
+      '말과 문서로 걸리기 쉬운 해입니다. 남의 일에 편들지 말고, 보증과 즉답을 피하세요. 운전과 서명은 특히 조심하세요.',
+      '자잘한 구설이 스치는 해입니다. 크게 번지지는 않으니 대응하지 않는 것이 가장 좋은 대응입니다.',
+      '큰 시비 없이 지나가는 해입니다. 다만 술자리에서의 한마디만 조심하면 됩니다.',
+      '깨끗하게 지나가는 해입니다. 묵은 시비가 있었다면 올해 정리됩니다.',
+    ] },
+];
+
+function areaScores(s, year, sang, jung, ha) {
+  const base = 52 + SANG_SC[sang] + JUNG_SC[jung] + HA_SC[ha];
+  const me = s.dayStem, meE = stemElem(me);
+  const t = sipsinTally(s);
+  const bi = t[0] + t[1], sik = t[2] + t[3], jae = t[4] + t[5], gwan = t[6] + t[7], iny = t[8] + t[9];
+  const body = bi + iny;
+
+  const yStem = ((year - 4) % 10 + 10) % 10;
+  const yBranch = ((year - 4) % 12 + 12) % 12;
+  const ySin = sipsin(me, yStem);
+  const yE = branchElem(yBranch);
+
+  const chung = CHUNG[s.dayBranch] === yBranch;
+  const hap = YUKHAP[s.dayBranch] === yBranch;
+  let samhap = false;
+  for (const g of SAMHAP) if (g.includes(s.dayBranch) && g.includes(yBranch)) samhap = true;
+  const gwiin = (CHEONEUL[me] || []).includes(yBranch);
+  const yeokma = [2, 5, 8, 11].includes(yBranch);
+  const weakE = s.dist.indexOf(Math.min(...s.dist));
+
+  const cl = (v) => Math.max(8, Math.min(97, Math.round(v)));
+  const add = {};
+  add.money = (jae >= 22 ? 7 : jae < 6 ? -6 : 0) + ([4, 5].includes(ySin) ? 9 : ySin === 1 ? -8 : 0) + (body < 28 && jae > 30 ? -6 : 0);
+  add.work = (gwan >= 18 ? 6 : gwan < 6 ? -4 : 0) + ([6, 7].includes(ySin) ? 8 : ySin === 3 ? -5 : 0) + (chung ? -6 : 0);
+  add.love = (hap ? 9 : 0) + (samhap ? 6 : 0) + (chung ? -10 : 0) + (jae + gwan >= 40 ? 5 : jae + gwan < 12 ? -6 : 0);
+  add.health = (chung ? -8 : 0) + (yE === weakE ? 8 : 0) + (body < 26 ? -5 : 0) + ([6].includes(ySin) ? -6 : 0) + (sik >= 22 ? 4 : 0);
+  add.study = (iny >= 20 ? 8 : iny < 5 ? -5 : 0) + ([8, 9].includes(ySin) ? 9 : 0) + (gwiin ? 5 : 0);
+  add.move = (yeokma ? 8 : 0) + (chung ? 6 : 0) + (hap ? -3 : 0);
+  add.people = (gwiin ? 12 : 0) + (hap ? 6 : 0) + (samhap ? 5 : 0) + (bi > 40 ? -5 : 0);
+  add.trouble = (chung ? -9 : 0) + (t[3] >= 18 ? -6 : 0) + (t[6] >= 18 ? -5 : 0) + (gwiin ? 7 : 0) + (hap ? 4 : 0);
+
+  const tags = [];
+  if (chung) tags.push('일지충');
+  if (hap) tags.push('일지 육합');
+  if (samhap) tags.push('일지 삼합');
+  if (gwiin) tags.push('천을귀인');
+  if (yeokma) tags.push('역마');
+
+  const areas = AREA_DEF.map((a) => {
+    const sc = cl(base + (add[a.key] || 0));
+    const tier = TIER(sc);
+    return {
+      key: a.key, icon: a.icon, title: a.title, score: sc,
+      tier, tierName: TIER_NAME[tier], tone: TIER_TONE[tier], text: a.t[tier],
+    };
+  });
+
+  return {
+    areas, tags,
+    seun: { gz: STEMS_HAN[yStem] + BRANCHES_HAN[yBranch], sipsin: SIPSIN[ySin] },
+    total: cl(areas.reduce((x, a) => x + a.score, 0) / areas.length),
+    lucky: {
+      elem: ELEMENT_HAN[weakE] + ELEMENTS[weakE],
+      color: ['초록·청록', '빨강·주황', '노랑·베이지', '흰색·은색', '검정·남색'][weakE],
+      dir: ['동쪽', '남쪽', '중앙', '서쪽', '북쪽'][weakE],
+      num: ['3·8', '2·7', '5·10', '4·9', '1·6'][weakE],
+      gwiin: (CHEONEUL[me] || []).map((b) => ZODIAC[b] + '띠').join(' · '),
+    },
+  };
+}
+
 /**
  * 토정비결
  * @param {object} birth 사용자가 입력한 생년월일 (normBirth 결과)
@@ -152,19 +289,34 @@ export function tojeong(birth, year) {
   ];
 
   // 월운 12개월 — 그 해 각 달의 월주와 내 일간
+  const MSC = [4, -6, 9, 2, 6, 9, -7, 6, 0, 10];
   const months = [];
   for (let m = 1; m <= 12; m++) {
     const mp = computeSaju({ y: year, m, d: 16, unknownTime: true }).pillars.month;
     const sin = sipsin(s.dayStem, mp.stem);
     const info = MONTH_SIPSIN[sin];
+    let sc = 54 + MSC[sin];
+    const tags = [];
+    if (CHUNG[s.dayBranch] === mp.branch) { sc -= 9; tags.push('일지충'); }
+    if (YUKHAP[s.dayBranch] === mp.branch) { sc += 7; tags.push('육합'); }
+    for (const g of SAMHAP) if (g.includes(s.dayBranch) && g.includes(mp.branch)) { sc += 5; tags.push('삼합'); break; }
+    if ((CHEONEUL[s.dayStem] || []).includes(mp.branch)) { sc += 9; tags.push('천을귀인'); }
+    sc = Math.max(15, Math.min(96, Math.round(sc)));
     months.push({
       m,
       gz: STEMS_HAN[mp.stem] + BRANCHES_HAN[mp.branch],
       sipsin: SIPSIN[sin],
       tone: info.tone,
       text: info.s,
+      score: sc,
+      tags,
     });
   }
+  const ranked = months.slice().sort((a, b) => b.score - a.score);
+  const bestMonths = ranked.slice(0, 3).map((x) => x.m).sort((a, b) => a - b);
+  const worstMonths = ranked.slice(-2).map((x) => x.m).sort((a, b) => a - b);
+
+  const AR = areaScores(s, year, sang, jung, ha);
 
   return {
     year,
@@ -181,5 +333,20 @@ export function tojeong(birth, year) {
     cross,
     taese: STEMS_HAN[taese.stem] + BRANCHES_HAN[taese.branch],
     months,
+    bestMonths, worstMonths,
+    areas: AR.areas,
+    total: AR.total,
+    totalTier: TIER_NAME[TIER(AR.total)],
+    totalTone: TIER_TONE[TIER(AR.total)],
+    seun: AR.seun,
+    tags: AR.tags,
+    lucky: AR.lucky,
+    guide: {
+      keep: H.adv,
+      when: J.when,
+      best: bestMonths,
+      worst: worstMonths,
+    },
+    sajuNote: `이 풀이는 토정비결 144괘(${sang}·${jung}·${ha})에 더해, ${STEMS_HAN[s.dayStem]}${BRANCHES_HAN[s.dayBranch]}일주인 당신의 원국과 ${AR.seun.gz}년 세운의 관계까지 함께 본 것입니다.`,
   };
 }

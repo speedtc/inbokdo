@@ -3,6 +3,7 @@ import { computeSaju } from './saju.js';
 import { analyze, TYPES, CHARACTERS, scoreBand, AXES, AXIS_ORDER } from './compat.js';
 import { TOPICS, isTopic, topicsPayload } from './topics.js';
 import { tojeong } from './tojeong.js';
+import { deepSaju, extendDeep } from './deep.js';
 import { leapMonthOf, lunarMonthLength } from './astro.js';
 import APP_HTML from './app.html';
 import OG_PNG from './og.png';
@@ -42,6 +43,7 @@ function validBirth(b) {
   if (!b.unknownTime) {
     if (!Number.isInteger(b.hour) || b.hour < 0 || b.hour > 23) return '시간을 확인해 주세요.';
   }
+  if (b.gender !== 'm' && b.gender !== 'f') return '성별을 선택해 주세요.';
   return null;
 }
 
@@ -54,6 +56,7 @@ function normBirth(b) {
     lunar: !!b.lunar,
     leap: !!b.leap,
     trueSolar: !!b.trueSolar,
+    gender: b.gender === 'm' || b.gender === 'f' ? b.gender : null,
   };
 }
 
@@ -81,6 +84,7 @@ function sajuPayload(s) {
     solar: s.solar,
     lunar: s.lunar,
     unknownTime: s.unknownTime,
+    gender: s.gender || null,
   };
 }
 
@@ -436,6 +440,29 @@ async function handleApi(request, env, url) {
     } catch (e) { return bad(e.message || '계산 실패'); }
   }
 
+  // 사주 심화 풀이
+  if (path === '/api/deep' && request.method === 'POST') {
+    const body = await request.json().catch(() => null);
+    if (!body) return bad('요청을 읽을 수 없습니다.');
+    const err = validBirth(body.birth);
+    if (err) return bad(err);
+    const nowY = todayKST().y;
+    let year = parseInt(body.year, 10);
+    if (!Number.isFinite(year) || year < 1950 || year > nowY + 5) year = nowY;
+    try {
+      const nb = normBirth(body.birth);
+      const s = computeSaju(nb);
+      const opt = { gender: nb.gender, year };
+      const base = deepSaju(s, opt);
+      const ext = extendDeep(s, base, opt);
+      return json({
+        char: charPayload(s.dayStem), saju: sajuPayload(s),
+        deep: base, ext, today: todayFortune(s), areas: lifeAreas(s),
+        thisYear: nowY, serverDay: todayKST(),
+      });
+    } catch (e) { return bad(e.message || '계산 실패'); }
+  }
+
   // 토정비결
   if (path === '/api/tojeong' && request.method === 'POST') {
     const body = await request.json().catch(() => null);
@@ -717,10 +744,10 @@ export default {
     }
     const PAGES = {
       '/today': { view: 'today', title: '오늘의 운세 · 스피드 운세지도', desc: '오늘 일진과 내 사주를 견줘 오늘 하루의 결을 풀어드립니다. 무료입니다.' },
-      '/saju': { view: 'saju', title: '내 사주팔자 · 스피드 운세지도', desc: '생년월일시를 여덟 글자로 세우고 오행 분포까지 보여드립니다. 무료입니다.' },
+      '/saju': { view: 'saju', title: '사주 정밀 풀이 · 스피드 운세지도', desc: '원국 여덟 글자에 십신·지장간·십이운성·공망, 신강신약·격국·용신, 신살 20여 종, 궁과 육친, 대운 90년과 올해 12개월까지. 전부 무료입니다.' },
       '/life': { view: 'life', title: '분야별 풀이 · 스피드 운세지도', desc: '건강·재물·일·사람. 내 원국을 네 갈래로 나눠 풀어드립니다. 무료입니다.' },
       '/about': { view: 'about', title: '어떻게 계산하나요 · 스피드 운세지도', desc: '스피드 운세지도가 쓰는 명리학 방법과 천문 계산을 그대로 공개합니다.' },
-      '/tojeong': { view: 'tojeong', title: '토정비결 · 스피드 운세지도', desc: '올해 나의 토정비결을 무료로 봅니다. 괘는 전통 작괘법 그대로 뽑고, 풀이는 우리가 직접 썼습니다.' },
+      '/tojeong': { view: 'tojeong', title: '토정비결 · 스피드 운세지도', desc: '올해 나의 토정비결을 무료로 봅니다. 144괘 작괘는 전통 그대로, 여기에 재물·직장·애정·건강·문서·이동·사람·구설 여덟 갈래와 12개월 월운까지 더했습니다.' },
       '/my': { view: 'profile', title: '내 사주 · 스피드 운세지도', desc: '생년월일을 한 번만 넣으면 오늘의 운세·사주팔자·분야별 풀이가 바로 열립니다.' },
       '/wealth': { view: 'roomNew', topic: 'wealth', title: '재물지도 · 스피드 운세지도', desc: '단톡방 사람들의 재물 사주를 한 장의 지도에 모읍니다. 가운데가 財, 안쪽에 있을수록 재물 그릇이 큰 사람입니다. 무료입니다.' },
       '/love': { view: 'roomNew', topic: 'love', title: '연애지도 · 스피드 운세지도', desc: '단톡방에서 누구에게 인연이 먼저 오는지 사주로 봅니다. 애인 유무는 묻지 않습니다. 무료입니다.' },
