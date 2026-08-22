@@ -417,6 +417,24 @@ async function handleApi(request, env, url) {
     } catch (e) { return bad(e.message || '계산 실패'); }
   }
 
+  // 오늘의 운세 · 사주팔자 · 분야별 풀이
+  if (path === '/api/fortune' && request.method === 'POST') {
+    const body = await request.json().catch(() => null);
+    if (!body) return bad('요청을 읽을 수 없습니다.');
+    const err = validBirth(body.birth);
+    if (err) return bad(err);
+    try {
+      const s = computeSaju(normBirth(body.birth));
+      return json({
+        char: charPayload(s.dayStem),
+        saju: sajuPayload(s),
+        today: todayFortune(s),
+        areas: lifeAreas(s),
+        serverDay: todayKST(),
+      });
+    } catch (e) { return bad(e.message || '계산 실패'); }
+  }
+
   /* ══════════ 재물지도 (분야별 방) ══════════ */
 
   function roomEntryRow(r) {
