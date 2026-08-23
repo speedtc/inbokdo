@@ -211,7 +211,7 @@ async function ensureSchema(db) {
   ]) { try { await db.prepare(sql).run(); } catch (e) { /* 이미 존재 */ } }
 }
 
-// 정원 제한 없음. 한 지도가 받을 수 있는 절대 상한만 둔다.
+// 정원 제한 없음. (재배포 트리거: 관리자 통계 v1)
 const HARD_CAP = 0;         // 0 = 인원 제한 없음 (entry_limit 컬럼 호환용으로만 남김)
 
 /* 메뉴별 페이지뷰. 실패해도 서비스에 영향 없음 */
