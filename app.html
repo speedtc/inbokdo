@@ -1383,8 +1383,13 @@ function viewHome(){
     '<p class="lead"><b class="gold">내 생년월일을 먼저 넣으세요.</b> 그러면 나만의 링크가 만들어집니다. '+
       '그 링크를 친구에게 보내고 친구가 자기 생일을 넣으면, 두 사람 사이에 오가는 기운을 사주 명리로 풀어 '+
       '<b class="gold">별자리처럼</b> 그려드립니다.</p>'+
-    '<button class="btn" id="go" style="margin-top:26px">내 인연지도 만들기</button>'+
-    '<p class="tiny center" style="margin-top:11px">30초면 끝나요 · 가입 없음 · 무료</p>'+
+    (myMapCode()
+      ? '<button class="btn" id="open" style="margin-top:26px">내 인연지도 열기</button>'+
+        '<button class="btn sec2" id="go" style="margin-top:9px">지도 새로 만들기</button>'+
+        '<p class="tiny center" style="margin-top:11px">새로 만들면 <b style="color:#4a4438">링크가 새로 생깁니다.</b> '+
+          '이미 뿌린 링크에 모인 별은 <b style="color:#4a4438">원래 지도</b>에 그대로 있어요.</p>'
+      : '<button class="btn" id="go" style="margin-top:26px">내 인연지도 만들기</button>'+
+        '<p class="tiny center" style="margin-top:11px">30초면 끝나요 · 가입 없음 · 무료</p>')+
   '</section>'+
 
   '<section class="sec rv">'+
@@ -1508,7 +1513,10 @@ function viewHome(){
       return '<div class="statbox"><b>'+Number(x[0]||0).toLocaleString('ko-KR')+'</b><i>'+x[1]+'</i></div>';
     }).join('');
   }).catch(function(){});
-  setDock('<button class="btn">내 인연지도 만들기</button>',function(){viewCreate();},'#go');
+  var mine0=myMapCode();
+  var ob=el('open'); if(ob)ob.onclick=function(){tap();location.href='/m/'+mine0;};
+  setDock('<button class="btn">'+(mine0?'내 인연지도 열기':'내 인연지도 만들기')+'</button>',
+    function(){ if(mine0)location.href='/m/'+mine0; else viewCreate(); }, mine0?'#open':'#go');
   reveal(app);
 
   // 데모 지도
@@ -3229,6 +3237,15 @@ function bindHandoff(){
       })
       .catch(function(e){ go.disabled=false; go.textContent='가져오기'; er.textContent=e.message||'가져오지 못했어요.'; });
   };
+}
+
+/* 이 기기에 이미 만든 인연지도가 있으면 가장 최근 것의 코드 */
+function myMapCode(){
+  var m=store('inbokdo_mine')||{};
+  var ks=Object.keys(m);
+  if(!ks.length)return null;
+  ks.sort(function(a,b){ return (m[b]&&m[b].at||0)-(m[a]&&m[a].at||0); });
+  return ks[0];
 }
 
 function getBirth(){
