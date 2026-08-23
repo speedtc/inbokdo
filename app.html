@@ -742,16 +742,33 @@ function reveal(root){
     if(n.getBoundingClientRect().top > vh*0.92){ n.classList.add('armed'); RV.observe(n); }
   });
 }
+/* 숫자 카운트업.
+   ⚠️ requestAnimationFrame 은 탭이 뒤로 가 있으면 아예 안 돈다.
+   그대로 두면 점수가 0점으로 굳어버린다(실제로 겪음).
+   그래서 (1) 숨은 탭·모션 최소화 설정이면 바로 최종값을 쓰고
+        (2) 애니메이션을 돌리더라도 타이머로 반드시 최종값에 도달시킨다. */
 function countUp(node,to,ms){
-  var t0=null,from=0;
+  var dur=ms||900, fin=String(to);
+  function done(){ try{ node.firstChild.nodeValue=fin; }catch(e){} }
+  var reduce=false;
+  try{ reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches; }catch(e){}
+  if(document.hidden||reduce||typeof requestAnimationFrame!=='function'){ done(); return; }
+  var t0=null,from=0,ended=false;
   function step(t){
+    if(ended)return;
     if(!t0)t0=t;
-    var k=Math.min(1,(t-t0)/(ms||900));
+    var k=Math.min(1,(t-t0)/dur);
     var e=1-Math.pow(1-k,3);
     node.firstChild.nodeValue=String(Math.round(from+(to-from)*e));
-    if(k<1)requestAnimationFrame(step);
+    if(k<1)requestAnimationFrame(step); else ended=true;
   }
-  node.firstChild.nodeValue='0';requestAnimationFrame(step);
+  node.firstChild.nodeValue='0';
+  requestAnimationFrame(step);
+  // 안전망: 어떤 이유로든 프레임이 안 돌면 최종값으로 맞춘다
+  setTimeout(function(){ if(!ended){ ended=true; done(); } }, dur+400);
+  document.addEventListener('visibilitychange',function h(){
+    if(!document.hidden&&!ended){ ended=true; done(); document.removeEventListener('visibilitychange',h); }
+  });
 }
 var dockEl=document.getElementById('dock');
 var dockIO=null;
@@ -2018,6 +2035,7 @@ function renderVisitor(j){
       var jd=store('inbokdo_joined')||{};
       jd[j.code]={id:r.entryId,token:r.token,name:data.name};
       store('inbokdo_joined',jd);
+      if(r.already)toast('이미 남긴 별을 불러왔어요');
       renderResult(r,j.code);
     }).catch(function(e){
       if(done)done(e.message); else toast(e.message);
@@ -2722,6 +2740,7 @@ function renderRoom(j,mine){
         var mr=store('inbokdo_myroom')||{};
         mr[j.code]={id:r.entryId,token:r.entryToken,name:data.name};
         store('inbokdo_myroom',mr);
+        if(r.already)toast('이미 찍은 별을 불러왔어요');
         renderRoomResult(r,j.code);
       }).catch(function(e){ if(done)done(e.message); else toast(e.message); });
     }
