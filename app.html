@@ -1141,6 +1141,14 @@ function adPing(kind,id,topic){
     else fetch('/api/ad',{method:'POST',headers:{'content-type':'application/json'},body:b,keepalive:true}).catch(function(){});
   }catch(e){}
 }
+/* 공유 집계. 무엇을 · 어떤 방법으로(카카오/기기공유/복사) 공유했는지 */
+function sharePing(kind,via){
+  try{
+    var b=JSON.stringify({kind:kind,via:via});
+    if(navigator.sendBeacon)navigator.sendBeacon('/api/share',new Blob([b],{type:'application/json'}));
+    else fetch('/api/share',{method:'POST',headers:{'content-type':'application/json'},body:b,keepalive:true}).catch(function(){});
+  }catch(e){}
+}
 function adBox(note,topic){
   var a=pickAd(topic);if(!a)return '';
   var n=note||a.note||'';
@@ -1218,10 +1226,12 @@ function doPageShare(k){
         content:{title:c.t,description:c.d,imageUrl:location.origin+'/'+(c.img||'og-home.png'),
           imageWidth:1200,imageHeight:630,link:{mobileWebUrl:url,webUrl:url}},
         buttons:[{title:c.cta,link:{mobileWebUrl:url,webUrl:url}}]});
+      sharePing('page:'+k,'kakao');
       return;
     }catch(e){}
   }
-  if(navigator.share){navigator.share({title:c.t,text:c.d,url:url}).catch(function(){});return;}
+  if(navigator.share){sharePing('page:'+k,'webshare');navigator.share({title:c.t,text:c.d,url:url}).catch(function(){});return;}
+  sharePing('page:'+k,'copy');
   copyText(url,'주소를 복사했어요');
 }
 function copyText(t,msg){
@@ -1743,10 +1753,12 @@ function shareSite(){
           imageWidth:1200,imageHeight:630,link:{mobileWebUrl:url,webUrl:url}},
         buttons:[{title:'내 인연지도 만들기',link:{mobileWebUrl:url,webUrl:url}}]
       });
+      sharePing('site','kakao');
       return;
     }catch(e){}
   }
-  if(navigator.share){navigator.share({title:title,text:txt,url:url}).catch(function(){});return;}
+  if(navigator.share){sharePing('site','webshare');navigator.share({title:title,text:txt,url:url}).catch(function(){});return;}
+  sharePing('site','copy');
   var i=document.createElement('input');i.value=url;document.body.appendChild(i);
   i.select();try{document.execCommand('copy');toast('인연지도 주소를 복사했어요')}catch(e){}
   i.remove();
@@ -1765,14 +1777,16 @@ function doShare(code,ownerName,group){
           imageWidth:1200,imageHeight:630,link:{mobileWebUrl:url,webUrl:url}},
         buttons:[{title:group?'나도 해보기':'내 별 남기기',link:{mobileWebUrl:url,webUrl:url}}]
       });
+      sharePing(group?'map_group':'map','kakao');
       return;
     }catch(e){}
   }
-  if(navigator.share){navigator.share({title:title,text:txt,url:url}).catch(function(){});return;}
+  if(navigator.share){sharePing(group?'map_group':'map','webshare');navigator.share({title:title,text:txt,url:url}).catch(function(){});return;}
+  sharePing(group?'map_group':'map','copy');
   copyLink(code);
 }
 function bindShare(code,ownerName){
-  var c=el('cpy');if(c)c.onclick=function(){tap();copyLink(code);};
+  var c=el('cpy');if(c)c.onclick=function(){tap();sharePing('copy_map','copy');copyLink(code);};
   var s=el('shr');if(s)s.onclick=function(){tap();doShare(code,ownerName);};
   var g=el('grp');if(g)g.onclick=function(){tap();doShare(code,ownerName,true);};
   var t=el('sit');if(t)t.onclick=function(){tap();shareSite();};
@@ -1818,8 +1832,8 @@ function renderOwner(j){
     var t=(j.entries[0]||{}).name;
     var url=location.origin+'/m/'+j.code;
     var msg=t+'님이 제 1번 인연이래요. 인연지도에서 나온 결과예요.';
-    if(navigator.share)navigator.share({title:'인연지도',text:msg,url:url}).catch(function(){});
-    else copyLink(j.code);
+    if(navigator.share){sharePing('brag','webshare');navigator.share({title:'인연지도',text:msg,url:url}).catch(function(){});}
+    else {sharePing('brag','copy');copyLink(j.code);}
   };
   setDock('<button class="btn">내 별자리 공유하기</button>',function(){
     doShare(j.code,j.ownerName);
@@ -2691,14 +2705,16 @@ function doRoomShare(code,title,topic){
         content:{title:t+' · '+T.label,description:T.shareTxt,imageUrl:location.origin+'/og-'+topic+'.png',
           imageWidth:1200,imageHeight:630,link:{mobileWebUrl:url,webUrl:url}},
         buttons:[{title:'내 별 찍기',link:{mobileWebUrl:url,webUrl:url}}]});
+      sharePing('room:'+topic,'kakao');
       return;
     }catch(e){}
   }
-  if(navigator.share){navigator.share({title:t,text:T.shareTxt,url:url}).catch(function(){});return;}
+  if(navigator.share){sharePing('room:'+topic,'webshare');navigator.share({title:t,text:T.shareTxt,url:url}).catch(function(){});return;}
+  sharePing('room:'+topic,'copy');
   copyText(url,'링크를 복사했어요');
 }
 function bindRoomShare(code,title,topic){
-  var c=el('rcpy');if(c)c.onclick=function(){tap();copyText(location.origin+'/w/'+code,'링크를 복사했어요');};
+  var c=el('rcpy');if(c)c.onclick=function(){tap();sharePing('copy_room:'+topic,'copy');copyText(location.origin+'/w/'+code,'링크를 복사했어요');};
   var sh=el('rshr');if(sh)sh.onclick=function(){tap();doRoomShare(code,title,topic);};
 }
 function renderRoom(j,mine){
@@ -3986,6 +4002,16 @@ var ADM_SRC={
   today:'오늘의 운세', life:'분야별 풀이', profile:'내 사주',
   deep:'사주 정밀 풀이', tojeong:'토정비결', topic:'분야 점수 보기'
 };
+var ADM_SHARE={
+  map:'인연지도 (친구에게)', map_group:'인연지도 (단톡방에)', site:'운세지도 소개',
+  brag:'1번 인연에게 알려주기', copy_map:'인연지도 링크 복사',
+  'room:wealth':'재물지도 방', 'room:love':'연애지도 방', 'room:work':'일운지도 방',
+  'copy_room:wealth':'재물지도 링크 복사', 'copy_room:love':'연애지도 링크 복사', 'copy_room:work':'일운지도 링크 복사',
+  'page:today':'오늘의 운세', 'page:saju':'사주 정밀 풀이', 'page:life':'분야별 풀이',
+  'page:tojeong':'토정비결', 'page:wealth':'재물지도 소개', 'page:love':'연애지도 소개',
+  'page:work':'일운지도 소개', 'page:about':'계산 방법', 'page:home':'운세지도 홈'
+};
+var ADM_VIA={ kakao:'카카오톡 공유창', webshare:'기기 공유 메뉴', copy:'링크 복사' };
 function admN(n){ return Number(n||0).toLocaleString('ko-KR'); }
 function admEsc(v){ return esc(String(v==null?'':v)); }
 function admDate(ts){ var d=new Date(Number(ts)||0);
@@ -4070,9 +4096,10 @@ function loadAdmin(silent){
 function renderAdmin(j){
   var S=j.summary;
   var body=el('admBody');
+  var SH=j.share||{kinds:[],vias:[],daily:[],total:0};
   var cards=[
     ['누적 방문',S.visitsTotal],['오늘 방문',S.visitsToday],
-    ['사주 입력 총합',S.sajuTotal],
+    ['사주 입력 총합',S.sajuTotal],['공유한 횟수',SH.total],
     ['인연지도',S.maps],['인연지도 별',S.entries],
     ['분야 방',S.rooms],['방 참여',S.roomEntries]
   ];
@@ -4097,6 +4124,17 @@ function renderAdmin(j){
 
   '<div class="card" style="margin-top:12px"><h3 class="admh">사주 정보를 어디서 넣었나 <i>실제 입력 건수</i></h3>'+
     admBars(j.sajuSrc,{label:function(r){return ADM_SRC[r.src]||r.src;}})+'</div>'+
+
+  '<div class="card" style="margin-top:12px"><h3 class="admh">공유한 횟수 <i>무엇을 공유했나</i></h3>'+
+    admBars(SH.kinds,{label:function(r){return ADM_SHARE[r.k]||r.k;}})+
+    '<div class="admsub" style="margin-top:16px">어떤 방법으로 나갔나</div>'+
+    admBars(SH.vias,{label:function(r){return ADM_VIA[r.k]||r.k;}})+
+    '<div class="admsub" style="margin-top:16px">일자별 공유</div>'+
+    admDaily(SH.daily,'#7a6ec6')+
+    '<p class="tiny" style="margin:10px 0 0;line-height:1.7;color:var(--dim)">'+
+      '<b style="color:#4a4438">카카오톡 공유창</b>이 떴다는 건 카카오 연동이 정상이라는 뜻입니다. '+
+      '<b style="color:#4a4438">링크 복사</b>만 계속 늘어나면 카카오 설정을 다시 봐야 합니다.</p>'+
+  '</div>'+
 
   '<div class="card" style="margin-top:12px"><h3 class="admh">참여자 분포 <i>이름·생일은 보지 않고 집계만</i></h3>'+
     '<div class="admsub">성별</div>'+

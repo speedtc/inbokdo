@@ -187,6 +187,11 @@ async function ensureSchema(db) {
       day TEXT NOT NULL, src TEXT NOT NULL, n INTEGER NOT NULL DEFAULT 0,
       PRIMARY KEY (day, src)
     )`),
+    // 공유 집계 (무엇을 · 어떤 방법으로 공유했는지)
+    db.prepare(`CREATE TABLE IF NOT EXISTS share_stats (
+      day TEXT NOT NULL, kind TEXT NOT NULL, via TEXT NOT NULL, n INTEGER NOT NULL DEFAULT 0,
+      PRIMARY KEY (day, kind, via)
+    )`),
     // 관리자 로그인 시도 (무차별 대입 방지)
     db.prepare(`CREATE TABLE IF NOT EXISTS admin_tries (
       ip TEXT NOT NULL, win INTEGER NOT NULL, n INTEGER NOT NULL DEFAULT 0,
@@ -619,6 +624,7 @@ async function handleApi(request, env, url, ctx) {
       const [
         sumRow, todayRow, mapsRow, entriesRow, roomsRow, rEntRow,
         daily, pages, sajuSrc, ads, topMaps, topRooms, genders, ages, elems, joinDaily,
+        shareKind, shareVia, shareDaily,
       ] = await Promise.all([
         q1(`SELECT SUM(hits) AS n FROM stats`),
         q1(`SELECT hits AS n FROM stats WHERE day = ?`, today),
@@ -648,6 +654,9 @@ async function handleApi(request, env, url, ctx) {
              SELECT day_stem FROM entries UNION ALL SELECT day_stem FROM room_entries
            ) GROUP BY k ORDER BY k`),
         q(`SELECT day, SUM(n) AS n FROM saju_stats WHERE day >= ? GROUP BY day ORDER BY day`, since),
+        q(`SELECT kind AS k, SUM(n) AS n FROM share_stats WHERE day >= ? GROUP BY kind ORDER BY n DESC`, since),
+        q(`SELECT via AS k, SUM(n) AS n FROM share_stats WHERE day >= ? GROUP BY via ORDER BY n DESC`, since),
+        q(`SELECT day, SUM(n) AS n FROM share_stats WHERE day >= ? GROUP BY day ORDER BY day`, since),
       ]);
 
       return json({
@@ -663,6 +672,8 @@ async function handleApi(request, env, url, ctx) {
             + ((mapsRow && mapsRow.n) || 0) + ((roomsRow && roomsRow.n) || 0),
         },
         daily, joinDaily, pages, sajuSrc, ads, topMaps, topRooms,
+        share: { kinds: shareKind, vias: shareVia, daily: shareDaily,
+                 total: shareKind.reduce((a, r) => a + (Number(r.n) || 0), 0) },
         people: { genders, ages, elems },
       });
     }
@@ -684,6 +695,19 @@ async function handleApi(request, env, url, ctx) {
     }
 
     return bad('없는 경로입니다.', 404);
+  }
+
+  // 공유 집계 (실패해도 화면에 영향 없음)
+  if (path === '/api/share' && request.method === 'POST') {
+    const body = await request.json().catch(() => null);
+    const kind = String(body?.kind || '').slice(0, 40);
+    const via = String(body?.via || '').slice(0, 12);
+    if (!/^[a-z0-9_:-]+$/i.test(kind)) return json({ ok: false });
+    if (!['kakao', 'webshare', 'copy'].includes(via)) return json({ ok: false });
+    const sql = `INSERT INTO share_stats (day, kind, via, n) VALUES (?, ?, ?, 1)
+                 ON CONFLICT(day, kind, via) DO UPDATE SET n = n + 1`;
+    try { await db.prepare(sql).bind(kstDay(), kind, via).run(); } catch (e) { /* 무시 */ }
+    return json({ ok: true });
   }
 
   // 광고 노출·클릭 집계
