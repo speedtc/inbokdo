@@ -1,5 +1,5 @@
 // index.js — 인연지도 Cloudflare Worker
-import { computeSaju } from './saju.js';
+import { computeSaju, STEMS_HAN, BRANCHES_HAN } from './saju.js';
 import { analyze, relDeep, TYPES, CHARACTERS, scoreBand, AXES, AXIS_ORDER } from './compat.js';
 import { TOPICS, isTopic, topicsPayload, topicYear, topicActions } from './topics.js';
 import { tojeong } from './tojeong.js';
@@ -695,6 +695,86 @@ async function handleApi(request, env, url, ctx) {
     }
 
     return bad('없는 경로입니다.', 404);
+  }
+
+  // ===================== 카카오톡 챗봇 스킬 =====================
+  // 사용자가 채널 채팅창에 생년월일을 보내면 오늘의 운세를 자동으로 답한다.
+  // 카카오가 이 주소로 POST 한다. 저장하는 것은 없고 계산만 한다.
+  if (path === '/api/kakao/skill' && request.method === 'POST') {
+    const SITE = 'https://unsejido.koneup.workers.dev';
+    const kt = (text, quick) => {
+      const out = { version: '2.0', template: { outputs: [{ simpleText: { text } }] } };
+      if (quick) out.template.quickReplies = quick;
+      return new Response(JSON.stringify(out), {
+        headers: { 'content-type': 'application/json; charset=utf-8', 'cache-control': 'no-store' },
+      });
+    };
+    const QUICK = [
+      { label: '사주 정밀 풀이', action: 'message', messageText: '사주' },
+      { label: '토정비결', action: 'message', messageText: '토정비결' },
+      { label: '사이트 열기', action: 'message', messageText: '사이트' },
+    ];
+    const HELP = '생년월일을 보내주시면 오늘의 운세를 바로 알려드려요.\n\n'
+      + '이렇게 보내주세요\n· 1976.1.7\n· 19760107\n· 1976.1.7 음력\n· 1976.1.7 23시\n\n'
+      + '나머지 메뉴는 여기서 전부 무료로 보실 수 있어요.\n' + SITE;
+
+    let body = null;
+    try { body = await request.json(); } catch (e) { /* 무시 */ }
+    const utter = String(body?.userRequest?.utterance || '').trim();
+
+    if (!utter) return kt(HELP, QUICK);
+    if (/^(사이트|홈|주소|링크)/.test(utter)) {
+      return kt('스피드 운세지도입니다. 모든 메뉴가 무료예요.\n' + SITE, QUICK);
+    }
+    if (/사주|정밀/.test(utter) && !/\d/.test(utter)) {
+      return kt('사주 정밀 풀이는 여기서 보실 수 있어요. 무료입니다.\n' + SITE + '/saju', QUICK);
+    }
+    if (/토정/.test(utter)) {
+      return kt('올해 토정비결은 여기서 보세요. 무료입니다.\n' + SITE + '/tojeong', QUICK);
+    }
+    if (/지도|재물|연애|일운|인연/.test(utter) && !/\d/.test(utter)) {
+      return kt('단톡방에 링크를 던지면 다 같이 겨루는 지도가 그려져요.\n'
+        + '· 인연지도 ' + SITE + '\n· 재물지도 ' + SITE + '/wealth\n'
+        + '· 연애지도 ' + SITE + '/love\n· 일운지도 ' + SITE + '/work', QUICK);
+    }
+
+    // 생년월일 뽑기
+    const digits = utter.replace(/[^0-9]/g, '');
+    let y = 0, mo = 0, d = 0;
+    let m1 = utter.match(/(\d{4})\s*[.\-/년]\s*(\d{1,2})\s*[.\-/월]\s*(\d{1,2})/);
+    if (m1) { y = +m1[1]; mo = +m1[2]; d = +m1[3]; }
+    else if (digits.length >= 8) { y = +digits.slice(0, 4); mo = +digits.slice(4, 6); d = +digits.slice(6, 8); }
+    if (!y || !mo || !d || y < 1900 || y > 2035 || mo < 1 || mo > 12 || d < 1 || d > 31) {
+      return kt(HELP, QUICK);
+    }
+    const lunar = /음력/.test(utter);
+    const hm = utter.match(/(\d{1,2})\s*시/);
+    const hour = hm ? Math.min(23, Math.max(0, +hm[1])) : null;
+
+    try {
+      const s2 = computeSaju(normBirth({
+        y, m: mo, d, hour, minute: hour == null ? null : 30,
+        unknownTime: hour == null, lunar, gender: 'm',
+      }));
+      const t = todayFortune(s2);
+      const day = todayKST();
+      const P = s2.pillars;
+      const ilju = STEMS_HAN[P.day.stem] + BRANCHES_HAN[P.day.branch];
+      const txt = day.y + '년 ' + day.m + '월 ' + day.d + '일\n'
+        + '내 일주 ' + ilju + ' · ' + (lunar ? '음력 ' : '') + y + '.' + mo + '.' + d
+        + (hour == null ? ' (시간 모름)' : ' ' + hour + '시') + '\n\n'
+        + '오늘 일진 ' + t.dayGZText + ' (' + t.sipsin + ')\n\n'
+        + '오늘의 기운 ' + t.score + '점\n'
+        + t.headline + '\n' + t.body + '\n\n'
+        + (t.notes && t.notes.length
+            ? t.notes.slice(0, 2).map((n) => '· ' + n.t + ' — ' + n.d).join('\n') + '\n\n' : '')
+        + '행운 색 ' + t.lucky.color + ' · 방향 ' + t.lucky.dir + '\n\n'
+        + '시간대별 흐름, 사주 정밀 풀이, 토정비결까지 전부 무료예요.\n' + SITE + '/today';
+      ctx.waitUntil(bumpSaju(env, 'chatbot'));
+      return kt(txt.slice(0, 950), QUICK);
+    } catch (e) {
+      return kt('그 날짜는 계산하지 못했어요.\n\n' + HELP, QUICK);
+    }
   }
 
   // 공유 집계 (실패해도 화면에 영향 없음)
