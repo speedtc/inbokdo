@@ -177,6 +177,21 @@ async function ensureSchema(db) {
       created_at INTEGER NOT NULL
     )`),
     db.prepare(`CREATE INDEX IF NOT EXISTS idx_room_entries ON room_entries(code, score DESC)`),
+    // 메뉴별 페이지뷰 (어느 메뉴가 인기 있는지)
+    db.prepare(`CREATE TABLE IF NOT EXISTS page_stats (
+      day TEXT NOT NULL, path TEXT NOT NULL, hits INTEGER NOT NULL DEFAULT 0,
+      PRIMARY KEY (day, path)
+    )`),
+    // 사주 정보를 실제로 넣은 건수 (어느 메뉴에서 넣었는지)
+    db.prepare(`CREATE TABLE IF NOT EXISTS saju_stats (
+      day TEXT NOT NULL, src TEXT NOT NULL, n INTEGER NOT NULL DEFAULT 0,
+      PRIMARY KEY (day, src)
+    )`),
+    // 관리자 로그인 시도 (무차별 대입 방지)
+    db.prepare(`CREATE TABLE IF NOT EXISTS admin_tries (
+      ip TEXT NOT NULL, win INTEGER NOT NULL, n INTEGER NOT NULL DEFAULT 0,
+      PRIMARY KEY (ip, win)
+    )`),
     // 기기 이동용 1회용 코드 (휴대폰 → PC). 15분 뒤 만료, 한 번 읽으면 삭제.
     db.prepare(`CREATE TABLE IF NOT EXISTS handoff (
       code TEXT PRIMARY KEY,
@@ -198,6 +213,26 @@ async function ensureSchema(db) {
 
 // 정원 제한 없음. 한 지도가 받을 수 있는 절대 상한만 둔다.
 const HARD_CAP = 0;         // 0 = 인원 제한 없음 (entry_limit 컬럼 호환용으로만 남김)
+
+/* 메뉴별 페이지뷰. 실패해도 서비스에 영향 없음 */
+async function bumpPage(env, path) {
+  if (!env.DB) return;
+  const sql = `INSERT INTO page_stats (day, path, hits) VALUES (?, ?, 1)
+               ON CONFLICT(day, path) DO UPDATE SET hits = hits + 1`;
+  try { await env.DB.prepare(sql).bind(kstDay(), path).run(); } catch (e) { /* 무시 */ }
+}
+/* 사주 정보를 넣은 건수. src 예: map_new, map_join, room_new:wealth, today, deep ... */
+async function bumpSaju(env, src) {
+  if (!env.DB || !src) return;
+  const sql = `INSERT INTO saju_stats (day, src, n) VALUES (?, ?, 1)
+               ON CONFLICT(day, src) DO UPDATE SET n = n + 1`;
+  try { await env.DB.prepare(sql).bind(kstDay(), String(src).slice(0, 40)).run(); } catch (e) { /* 무시 */ }
+}
+/* 클라이언트가 보낸 출처 문자열을 화이트리스트로 거른다 */
+const SAJU_SRC = new Set(['today', 'deep', 'life', 'profile', 'tojeong', 'topic']);
+function safeSrc(v, fallback) {
+  return SAJU_SRC.has(v) ? v : fallback;
+}
 
 /** 한국 날짜 문자열 (YYYY-MM-DD) */
 function kstDay(ts) {
@@ -252,7 +287,7 @@ async function bumpStats(env) {
   }
 }
 
-async function handleApi(request, env, url) {
+async function handleApi(request, env, url, ctx) {
   const db = env.DB;
   const path = url.pathname;
   const me = await currentUser(request, env);
@@ -323,6 +358,7 @@ async function handleApi(request, env, url) {
       }
     }
 
+    ctx.waitUntil(bumpSaju(env, 'map_new'));
     return json({
       code, token, refRewarded, saved: !!me,
       owner: { name, char: charPayload(saju.dayStem), saju: sajuPayload(saju) },
@@ -413,6 +449,7 @@ async function handleApi(request, env, url) {
     ).bind(code, res.score, res.score, id).first();
     const tot = await db.prepare(`SELECT COUNT(*) AS n FROM entries WHERE code = ?`).bind(code).first();
     const total = tot.n;
+    ctx.waitUntil(bumpSaju(env, 'map_join'));
 
     return json({
       entryId: id, token,
@@ -476,6 +513,7 @@ async function handleApi(request, env, url) {
 
   // 오늘의 운세 · 사주팔자 · 분야별 풀이
   if (path === '/api/fortune' && request.method === 'POST') {
+    // 어느 메뉴에서 넣었는지는 클라이언트가 알려준다 (화이트리스트로 거름)
     const body = await request.json().catch(() => null);
     if (!body) return bad('요청을 읽을 수 없습니다.');
     const err = validBirth(body.birth);
@@ -484,6 +522,7 @@ async function handleApi(request, env, url) {
       const nb = normBirth(body.birth);
       const s = computeSaju(nb);
       const base = deepSaju(s, { gender: nb.gender, year: todayKST().y });
+      ctx.waitUntil(bumpSaju(env, safeSrc(body.src, 'today')));
       return json({
         char: charPayload(s.dayStem),
         saju: sajuPayload(s),
@@ -497,6 +536,154 @@ async function handleApi(request, env, url) {
         serverDay: todayKST(),
       });
     } catch (e) { return bad(e.message || '계산 실패'); }
+  }
+
+  // ===================== 관리자 =====================
+  // 비밀번호는 코드가 아니라 Cloudflare 시크릿(ADMIN_PW)에만 둔다.
+  // 저장소가 공개라서 평문·해시 어느 쪽도 코드에 넣지 않는다.
+  if (path.startsWith('/api/admin/')) {
+    const PW = env.ADMIN_PW || '';
+    if (!PW) return json({ error: '관리자 비밀번호가 설정되지 않았습니다.', reason: 'NO_PW' }, 503);
+
+    const admToken = async () => {
+      const buf = await crypto.subtle.digest('SHA-256',
+        new TextEncoder().encode(PW + '|unsejido-admin-v1|' + PW.length));
+      return [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, '0')).join('');
+    };
+    const cookieOf = (nm) => {
+      const c = request.headers.get('cookie') || '';
+      const m = c.match(new RegExp('(?:^|;\\s*)' + nm + '=([^;]+)'));
+      return m ? m[1] : '';
+    };
+    const isAdmin = async () => {
+      const want = await admToken();
+      const got = cookieOf('adm');
+      if (got.length !== want.length) return false;
+      let diff = 0;                                   // 길이가 같을 때만 상수시간 비교
+      for (let i = 0; i < want.length; i++) diff |= want.charCodeAt(i) ^ got.charCodeAt(i);
+      return diff === 0;
+    };
+
+    // 로그인
+    if (path === '/api/admin/login' && request.method === 'POST') {
+      const ip = request.headers.get('cf-connecting-ip') || 'unknown';
+      const win = Math.floor(Date.now() / 900000);    // 15분 창
+      let tries = 0;
+      try {
+        const r = await db.prepare(`SELECT n FROM admin_tries WHERE ip = ? AND win = ?`).bind(ip, win).first();
+        tries = (r && r.n) || 0;
+      } catch (e) { /* 무시 */ }
+      if (tries >= 8) return json({ error: '시도가 너무 많습니다. 15분 뒤에 다시 해주세요.' }, 429);
+
+      const body = await request.json().catch(() => null);
+      const pw = String(body?.pw || '');
+      if (pw !== PW) {
+        try {
+          await db.prepare(`INSERT INTO admin_tries (ip, win, n) VALUES (?, ?, 1)
+                            ON CONFLICT(ip, win) DO UPDATE SET n = n + 1`).bind(ip, win).run();
+          await db.prepare(`DELETE FROM admin_tries WHERE win < ?`).bind(win - 4).run();
+        } catch (e) { /* 무시 */ }
+        return json({ error: '비밀번호가 맞지 않습니다.', left: Math.max(0, 7 - tries) }, 401);
+      }
+      const tok = await admToken();
+      return new Response(JSON.stringify({ ok: true }), {
+        headers: {
+          'content-type': 'application/json; charset=utf-8',
+          'cache-control': 'no-store',
+          'set-cookie': `adm=${tok}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=43200`,
+        },
+      });
+    }
+
+    if (path === '/api/admin/logout' && request.method === 'POST') {
+      return new Response(JSON.stringify({ ok: true }), {
+        headers: {
+          'content-type': 'application/json; charset=utf-8',
+          'set-cookie': 'adm=; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=0',
+        },
+      });
+    }
+
+    if (!(await isAdmin())) return json({ error: '로그인이 필요합니다.', reason: 'AUTH' }, 401);
+
+    // 통계
+    if (path === '/api/admin/stats' && request.method === 'GET') {
+      let days = parseInt(url.searchParams.get('days') || '30', 10);
+      if (!Number.isFinite(days) || days < 1) days = 30;
+      if (days > 365) days = 365;
+      const since = kstDay(Date.now() - (days - 1) * 86400000);
+      const today = kstDay();
+      const q = (sql, ...b) => db.prepare(sql).bind(...b).all().then((r) => r.results || []).catch(() => []);
+      const q1 = (sql, ...b) => db.prepare(sql).bind(...b).first().catch(() => null);
+
+      const [
+        sumRow, todayRow, mapsRow, entriesRow, roomsRow, rEntRow,
+        daily, pages, sajuSrc, ads, topMaps, topRooms, genders, ages, elems, joinDaily,
+      ] = await Promise.all([
+        q1(`SELECT SUM(hits) AS n FROM stats`),
+        q1(`SELECT hits AS n FROM stats WHERE day = ?`, today),
+        q1(`SELECT COUNT(*) AS n FROM maps`),
+        q1(`SELECT COUNT(*) AS n FROM entries`),
+        q1(`SELECT COUNT(*) AS n FROM rooms`),
+        q1(`SELECT COUNT(*) AS n FROM room_entries`),
+        q(`SELECT day, hits AS n FROM stats WHERE day >= ? ORDER BY day`, since),
+        q(`SELECT path, SUM(hits) AS n FROM page_stats WHERE day >= ? GROUP BY path ORDER BY n DESC`, since),
+        q(`SELECT src, SUM(n) AS n FROM saju_stats WHERE day >= ? GROUP BY src ORDER BY n DESC`, since),
+        q(`SELECT ad, SUM(views) AS v, SUM(clicks) AS c FROM ad_stats WHERE day >= ? GROUP BY ad ORDER BY v DESC`, since),
+        q(`SELECT m.code, m.owner_name, m.created_at,
+                  (SELECT COUNT(*) FROM entries e WHERE e.code = m.code) AS n
+             FROM maps m ORDER BY n DESC, m.created_at DESC LIMIT 20`),
+        q(`SELECT r.code, r.topic, r.title, r.created_at,
+                  (SELECT COUNT(*) FROM room_entries x WHERE x.code = r.code) AS n
+             FROM rooms r ORDER BY n DESC, r.created_at DESC LIMIT 20`),
+        q(`SELECT g AS k, COUNT(*) AS n FROM (
+             SELECT json_extract(birth_json,'$.gender') AS g FROM entries
+             UNION ALL
+             SELECT json_extract(birth_json,'$.gender') AS g FROM room_entries
+           ) GROUP BY g`),
+        q(`SELECT (CAST(json_extract(birth_json,'$.y') AS INTEGER)/10)*10 AS k, COUNT(*) AS n FROM (
+             SELECT birth_json FROM entries UNION ALL SELECT birth_json FROM room_entries
+           ) GROUP BY k ORDER BY k`),
+        q(`SELECT day_stem AS k, COUNT(*) AS n FROM (
+             SELECT day_stem FROM entries UNION ALL SELECT day_stem FROM room_entries
+           ) GROUP BY k ORDER BY k`),
+        q(`SELECT day, SUM(n) AS n FROM saju_stats WHERE day >= ? GROUP BY day ORDER BY day`, since),
+      ]);
+
+      return json({
+        days, since, today,
+        summary: {
+          visitsTotal: (sumRow && sumRow.n) || 0,
+          visitsToday: (todayRow && todayRow.n) || 0,
+          maps: (mapsRow && mapsRow.n) || 0,
+          entries: (entriesRow && entriesRow.n) || 0,
+          rooms: (roomsRow && roomsRow.n) || 0,
+          roomEntries: (rEntRow && rEntRow.n) || 0,
+          sajuTotal: ((entriesRow && entriesRow.n) || 0) + ((rEntRow && rEntRow.n) || 0)
+            + ((mapsRow && mapsRow.n) || 0) + ((roomsRow && roomsRow.n) || 0),
+        },
+        daily, joinDaily, pages, sajuSrc, ads, topMaps, topRooms,
+        people: { genders, ages, elems },
+      });
+    }
+
+    // 지도/방 지우기 (관리자)
+    const mAdmDel = path.match(/^\/api\/admin\/(map|room)\/([0-9a-z]{4,12})$/);
+    if (mAdmDel && request.method === 'DELETE') {
+      const [, kind, code] = mAdmDel;
+      try {
+        if (kind === 'map') {
+          await db.prepare(`DELETE FROM entries WHERE code = ?`).bind(code).run();
+          await db.prepare(`DELETE FROM maps WHERE code = ?`).bind(code).run();
+        } else {
+          await db.prepare(`DELETE FROM room_entries WHERE code = ?`).bind(code).run();
+          await db.prepare(`DELETE FROM rooms WHERE code = ?`).bind(code).run();
+        }
+        return json({ ok: true });
+      } catch (e) { return bad('삭제하지 못했습니다.'); }
+    }
+
+    return bad('없는 경로입니다.', 404);
   }
 
   // 광고 노출·클릭 집계
@@ -565,6 +752,7 @@ async function handleApi(request, env, url) {
   }
 
   if (path === '/api/deep' && request.method === 'POST') {
+    // 사주 정밀 풀이
     const body = await request.json().catch(() => null);
     if (!body) return bad('요청을 읽을 수 없습니다.');
     const err = validBirth(body.birth);
@@ -578,6 +766,7 @@ async function handleApi(request, env, url) {
       const opt = { gender: nb.gender, year };
       const base = deepSaju(s, opt);
       const ext = extendDeep(s, base, opt);
+      ctx.waitUntil(bumpSaju(env, 'deep'));
       return json({
         char: charPayload(s.dayStem), saju: sajuPayload(s),
         deep: base, ext, today: todayFortune(s), areas: lifeAreas(s),
@@ -597,6 +786,7 @@ async function handleApi(request, env, url) {
     if (!Number.isFinite(year) || year < 1950 || year > nowY + 1) year = nowY;
     try {
       const s2 = computeSaju(normBirth(body.birth));
+      ctx.waitUntil(bumpSaju(env, 'tojeong'));
       return json({ char: charPayload(s2.dayStem), saju: sajuPayload(s2), result: tojeong(normBirth(body.birth), year), thisYear: nowY });
     } catch (e) { return bad(e.message || '계산 실패'); }
   }
@@ -650,6 +840,7 @@ async function handleApi(request, env, url) {
     ).bind(code, name, JSON.stringify(normBirth(body.birth)), JSON.stringify(saju),
       JSON.stringify(res), res.score, saju.dayStem, entryToken, now).run();
 
+    ctx.waitUntil(bumpSaju(env, 'room_new:' + topic));
     return json({
       code, token, title, topic,
       entryId: ins.meta.last_row_id, entryToken,
@@ -737,6 +928,7 @@ async function handleApi(request, env, url) {
       `SELECT COUNT(*) + 1 AS r FROM room_entries WHERE code = ? AND (score > ? OR (score = ? AND id < ?))`
     ).bind(code, res.score, res.score, id).first();
     const rtot = await db.prepare(`SELECT COUNT(*) AS n FROM room_entries WHERE code = ?`).bind(code).first();
+    ctx.waitUntil(bumpSaju(env, 'room_join:' + topic));
 
     return json({
       code, title: row.title, topic,
@@ -882,7 +1074,7 @@ export default {
     if (url.pathname.startsWith('/api/')) {
       try {
         if (env.DB) { await ensureSchema(env.DB); await ensureAuthSchema(env.DB); }
-        return await handleApi(request, env, url);
+        return await handleApi(request, env, url, ctx);
       } catch (e) {
         return json({ error: '서버 오류가 발생했습니다.', detail: String(e && e.message || e) }, 500);
       }
@@ -927,10 +1119,19 @@ export default {
     };
     if (PAGES[url.pathname]) {
       const pg = PAGES[url.pathname];
-      if (env.DB) ctx.waitUntil(bumpStats(env));
+      if (env.DB) { ctx.waitUntil(bumpStats(env)); ctx.waitUntil(bumpPage(env, url.pathname)); }
       return new Response(renderPage({
         title: pg.title, desc: pg.desc, url: origin + url.pathname, origin, img: pg.img,
         boot: { view: pg.view, topic: pg.topic, providers: enabledProviders(env), kakaoKey: env.KAKAO_JS_KEY || '' },
+      }), { headers: { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'no-store' } });
+    }
+
+    // 관리자 화면 (검색 노출 안 함)
+    if (url.pathname === '/admin' || url.pathname === '/admin/') {
+      return new Response(renderPage({
+        title: '관리자 · 스피드 운세지도', desc: '관리자 전용', url: origin + '/admin', origin,
+        img: 'og-home.png', noindex: true,
+        boot: { view: 'admin', kakaoKey: '', providers: [] },
       }), { headers: { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'no-store' } });
     }
 
@@ -951,7 +1152,7 @@ export default {
         'WhatsApp', 'SkypeUriPreview', 'Line', 'Applebot',
       ];
       const body = previewBots.map((b) => `User-agent: ${b}\nAllow: /\n`).join('\n')
-        + `\nUser-agent: *\nDisallow: /me\nDisallow: /auth/\nDisallow: /api/\n`;
+        + `\nUser-agent: *\nDisallow: /me\nDisallow: /admin\nDisallow: /auth/\nDisallow: /api/\n`;
       return new Response(body, { headers: { 'content-type': 'text/plain; charset=utf-8' } });
     }
 
@@ -971,7 +1172,7 @@ export default {
       const desc = ownerName
         ? `생일만 넣으면 ${ownerName}님과 나 사이에 오가는 기운을 사주로 풀어드립니다. 가입도 결제도 없이 30초면 끝납니다.`
         : '내 사람 별자리를 그려보세요.';
-      if (env.DB) ctx.waitUntil(bumpStats(env));
+      if (env.DB) { ctx.waitUntil(bumpStats(env)); ctx.waitUntil(bumpPage(env, '/m')); }
       return new Response(renderPage({ title, desc, url: `${origin}/m/${code}`, origin, img: 'og-map.png', boot: { view: 'map', code, ownerName, kakaoKey: env.KAKAO_JS_KEY || '', providers }, noindex: true }), {
         headers: { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'no-store' },
       });
@@ -994,7 +1195,7 @@ export default {
       const desc = title2
         ? `생일만 넣으면 내 사주가 이 지도에 찍힙니다. ${TOPICS[topic2].lead} 무료입니다.`
         : `단톡방 사람들의 사주를 한 장의 지도에 모읍니다. ${TL}, 전부 무료입니다.`;
-      if (env.DB) ctx.waitUntil(bumpStats(env));
+      if (env.DB) { ctx.waitUntil(bumpStats(env)); ctx.waitUntil(bumpPage(env, '/w:' + topic2)); }
       return new Response(renderPage({
         title, desc, url: `${origin}/w/${code}`, origin, img: 'og-' + topic2 + '.png',
         boot: { view: 'room', code, roomTitle: title2, topic: topic2, kakaoKey: env.KAKAO_JS_KEY || '', providers },
@@ -1003,7 +1204,7 @@ export default {
     }
 
     if (url.pathname === '/' || url.pathname === '') {
-      if (env.DB) ctx.waitUntil(bumpStats(env));
+      if (env.DB) { ctx.waitUntil(bumpStats(env)); ctx.waitUntil(bumpPage(env, '/')); }
       return new Response(renderPage({
         title: '스피드 운세지도 · 사주 전부 무료',
         desc: '사주팔자·오늘의 운세·인연지도·재물지도, 모든 메뉴가 무료입니다. 생일만 넣으면 두 사람 사이에 오가는 기운을 별자리처럼 그려드립니다. 가입도 결제도 없이 30초면 끝납니다.',

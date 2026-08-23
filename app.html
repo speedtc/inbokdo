@@ -329,6 +329,32 @@ details.adv[open] summary::before{content:'－ '}
   color:#8a7c5c;border:1px solid rgba(217,180,91,.28);border-radius:999px;padding:2px 8px}
 .adwrap{margin-top:26px}
 .adwrap .tiny{margin-top:8px;text-align:center}
+.admbar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:20px}
+.admdays{display:flex;gap:6px}
+.admdays .chip{cursor:pointer;border:1px solid var(--line2);background:#fff;font-size:12.5px;padding:5px 10px;border-radius:999px;color:var(--dim)}
+.admdays .chip.on{background:#a07c1c;border-color:#a07c1c;color:#fff;font-weight:700}
+.admgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(104px,1fr));gap:9px;margin-top:13px}
+.admcard{background:#fff;border:1px solid var(--line);border-radius:13px;padding:13px 12px;text-align:center}
+.admcard b{display:block;font-size:22px;font-weight:800;letter-spacing:-.04em;color:#231f18;font-variant-numeric:tabular-nums}
+.admcard i{display:block;font-style:normal;font-size:11.5px;color:var(--dim);margin-top:3px}
+.admh{font-size:15.5px;font-weight:700;letter-spacing:-.03em;margin:0 0 12px}
+.admh i{font-style:normal;font-weight:500;font-size:12px;color:var(--dim2);margin-left:6px}
+.admsub{font-size:12.5px;color:var(--dim);margin:14px 0 6px;font-weight:600}
+.admsub:first-of-type{margin-top:0}
+.abars{display:flex;flex-direction:column;gap:9px}
+.abt{display:flex;justify-content:space-between;align-items:baseline;font-size:13px;gap:8px}
+.abt span{color:#4a4438;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.abt b{font-variant-numeric:tabular-nums;white-space:nowrap}
+.abt i{font-style:normal;color:var(--dim2);font-weight:500;font-size:11.5px;margin-left:5px}
+.abg{height:7px;border-radius:99px;background:rgba(60,48,16,.09);margin-top:4px;overflow:hidden}
+.abg span{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#d9b45b,#a07c1c)}
+.adchart{width:100%;height:90px;display:block}
+.adx{display:flex;justify-content:space-between;font-size:11px;color:var(--dim2);margin-top:5px}
+.admtb{width:100%;border-collapse:collapse;font-size:12.5px}
+.admtb th{text-align:left;color:var(--dim);font-weight:600;padding:6px 8px;border-bottom:1px solid var(--line)}
+.admtb td{padding:7px 8px;border-bottom:1px solid rgba(60,48,16,.07);white-space:nowrap}
+.admtb a{color:#a07c1c;text-decoration:underline}
+.admdel{border:1px solid var(--line2);background:#fff;color:#b4453a;font-size:11.5px;padding:3px 9px;border-radius:8px;cursor:pointer}
 .hocode{margin-top:14px;padding:16px;border-radius:13px;background:rgba(240,232,210,.55);border:1px solid rgba(217,180,91,.4);text-align:center}
 .hocode .hoc{font-size:34px;font-weight:800;letter-spacing:.22em;color:#a07c1c;font-variant-numeric:tabular-nums}
 .consent{margin-top:18px;padding:14px 15px;border:1px solid rgba(60,48,16,.15);border-radius:13px;background:rgba(240,232,210,.42)}
@@ -3156,7 +3182,7 @@ function viewProfile(){
   bindHandoff();
 
   if(b&&b.birth){
-    api('/api/fortune',{method:'POST',body:JSON.stringify({birth:b.birth})}).then(function(j){
+    api('/api/fortune',{method:'POST',body:JSON.stringify({birth:b.birth,src:'profile'})}).then(function(j){
       var c=charBy(j.char.key);
       if(!b.charKey){ var nb=getBirth()||{}; nb.charKey=j.char.key; store('inbokdo_birth',nb); paintBio(); }
       var wrap=el('pcard');if(!wrap)return;
@@ -3287,7 +3313,7 @@ function fortunePage(view){
   if(!b||!b.birth) return needBirthView(view==='today'?'오늘의 운세':view==='saju'?'내 사주팔자':'분야별 풀이');
   app.innerHTML='<div class="skel" style="height:40px;width:55%;margin-top:34px"></div>'+
     '<div class="skel" style="height:240px;margin-top:20px"></div>';
-  api('/api/fortune',{method:'POST',body:JSON.stringify({birth:b.birth})})
+  api('/api/fortune',{method:'POST',body:JSON.stringify({birth:b.birth,src:view==='today'?'today':'life'})})
     .then(function(j){
       if(j.char&&b.charKey!==j.char.key){ b.charKey=j.char.key; store('inbokdo_birth',b); paintBio(); }
       if(view==='today')renderToday(j,b);
@@ -3943,6 +3969,193 @@ function renderLife(j,b){
 }
 
 /* ===== 화면: 계산 방법 ===== */
+/* ===================== 관리자 화면 ===================== */
+var ADM_LABEL={
+  '/':'홈', '/today':'오늘의 운세', '/saju':'사주 정밀 풀이', '/life':'분야별 풀이',
+  '/tojeong':'토정비결', '/wealth':'재물지도 만들기', '/love':'연애지도 만들기',
+  '/work':'일운지도 만들기', '/about':'계산 방법', '/my':'내 사주',
+  '/m':'인연지도 (공유 링크)', '/w:wealth':'재물지도 방', '/w:love':'연애지도 방', '/w:work':'일운지도 방'
+};
+var ADM_SRC={
+  map_new:'인연지도 만들기', map_join:'인연지도에 별 남기기',
+  'room_new:wealth':'재물지도 만들기', 'room_join:wealth':'재물지도 참여',
+  'room_new:love':'연애지도 만들기', 'room_join:love':'연애지도 참여',
+  'room_new:work':'일운지도 만들기', 'room_join:work':'일운지도 참여',
+  today:'오늘의 운세', life:'분야별 풀이', profile:'내 사주',
+  deep:'사주 정밀 풀이', tojeong:'토정비결', topic:'분야 점수 보기'
+};
+function admN(n){ return Number(n||0).toLocaleString('ko-KR'); }
+function admEsc(v){ return esc(String(v==null?'':v)); }
+function admDate(ts){ var d=new Date(Number(ts)||0);
+  return d.getFullYear()+'.'+(d.getMonth()+1)+'.'+d.getDate(); }
+
+/* 가로 막대 목록 */
+function admBars(rows,opt){
+  opt=opt||{};
+  var list=(rows||[]).map(function(r){ return {k:opt.label?opt.label(r):r.k, n:Number(opt.val?opt.val(r):r.n)||0, raw:r}; });
+  if(!list.length) return '<p class="tiny" style="margin:6px 0 0">아직 기록이 없습니다.</p>';
+  var max=Math.max.apply(null,list.map(function(x){return x.n})) || 1;
+  var tot=list.reduce(function(a,x){return a+x.n},0) || 1;
+  return '<div class="abars">'+list.map(function(x){
+    return '<div class="abar">'+
+      '<div class="abt"><span>'+admEsc(x.k)+'</span><b>'+admN(x.n)+'<i>'+Math.round(x.n/tot*100)+'%</i></b></div>'+
+      '<div class="abg"><span style="width:'+Math.max(2,Math.round(x.n/max*100))+'%"></span></div>'+
+    '</div>';
+  }).join('')+'</div>';
+}
+/* 일자별 세로 막대 (SVG) */
+function admDaily(rows,color){
+  var d=(rows||[]).slice(-60);
+  if(!d.length) return '<p class="tiny" style="margin:6px 0 0">아직 기록이 없습니다.</p>';
+  var W=340,H=90,gap=2;
+  var val=function(r){ return Number(r.n!=null?r.n:r.hits)||0; };   // stats 는 hits, saju_stats 는 n
+  var max=Math.max.apply(null,d.map(val)) || 1;
+  var bw=Math.max(2,(W-(d.length-1)*gap)/d.length);
+  var bars=d.map(function(r,i){
+    var v=val(r), h=Math.max(1,v/max*(H-16));
+    return '<rect x="'+(i*(bw+gap)).toFixed(1)+'" y="'+(H-h).toFixed(1)+'" width="'+bw.toFixed(1)+'" height="'+h.toFixed(1)+
+      '" rx="1.5" fill="'+(color||'#c19a2e')+'"><title>'+admEsc(r.day)+' · '+admN(v)+'</title></rect>';
+  }).join('');
+  return '<svg class="adchart" viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="none" role="img">'+bars+'</svg>'+
+    '<div class="adx"><span>'+admEsc(d[0].day)+'</span><span>최고 '+admN(max)+'</span><span>'+admEsc(d[d.length-1].day)+'</span></div>';
+}
+function viewAdmin(){
+  setDock(null);
+  app.innerHTML='';
+  app.appendChild(h(
+    '<section class="fade" style="padding-top:34px">'+
+      '<div class="eyebrow">ADMIN</div>'+
+      '<h1 style="font-size:28px">관리자 통계</h1>'+
+      '<p class="lead" style="font-size:14.5px">방문·사주 입력·메뉴 인기·광고 성과를 한 화면에서 봅니다.</p>'+
+      '<div class="card" style="margin-top:22px" id="admLogin">'+
+        '<div class="field" style="margin-top:0"><label for="admPw">관리자 비밀번호</label>'+
+          '<input class="inp" id="admPw" type="password" autocomplete="current-password" placeholder="비밀번호"></div>'+
+        '<div class="err" id="admErr"></div>'+
+        '<button class="btn" id="admGo" style="margin-top:14px">들어가기</button>'+
+        '<p class="tiny" style="margin-top:10px;line-height:1.65">이 주소는 검색에 노출되지 않습니다. '+
+          '비밀번호는 서버에만 있고 화면 코드에는 들어 있지 않습니다.</p>'+
+      '</div>'+
+    '</section>'+
+    '<section class="sec" id="admBody"></section>'));
+  var go=el('admGo'), pw=el('admPw'), er=el('admErr');
+  function login(){
+    var v=(pw.value||'').trim();
+    if(!v){ er.textContent='비밀번호를 넣어주세요.'; return; }
+    er.textContent=''; go.innerHTML='<span class="spin"></span>'; go.disabled=true;
+    api('/api/admin/login',{method:'POST',body:JSON.stringify({pw:v})})
+      .then(function(){ pw.value=''; loadAdmin(); })
+      .catch(function(e){ go.disabled=false; go.textContent='들어가기'; er.textContent=e.message; });
+  }
+  go.onclick=function(){tap();login();};
+  pw.addEventListener('keydown',function(e){ if(e.key==='Enter')login(); });
+  // 이미 로그인돼 있으면 바로 연다
+  loadAdmin(true);
+  window.scrollTo(0,0);
+}
+function loadAdmin(silent){
+  var days=(window.__admDays||30);
+  var body=el('admBody'); if(!body)return;
+  if(!silent) body.innerHTML='<div class="skel" style="height:240px;margin-top:20px"></div>';
+  api('/api/admin/stats?days='+days)
+    .then(function(j){ var lg=el('admLogin'); if(lg)lg.hidden=true; renderAdmin(j); })
+    .catch(function(e){
+      if(silent) return;
+      var lg=el('admLogin'); if(lg)lg.hidden=false;
+      body.innerHTML='<div class="card"><b>'+admEsc(e.message)+'</b></div>';
+      var g=el('admGo'); if(g){g.disabled=false;g.textContent='들어가기';}
+    });
+}
+function renderAdmin(j){
+  var S=j.summary;
+  var body=el('admBody');
+  var cards=[
+    ['누적 방문',S.visitsTotal],['오늘 방문',S.visitsToday],
+    ['사주 입력 총합',S.sajuTotal],
+    ['인연지도',S.maps],['인연지도 별',S.entries],
+    ['분야 방',S.rooms],['방 참여',S.roomEntries]
+  ];
+  var genderMap={m:'남자',f:'여자'};
+  var html=
+  '<div class="admbar">'+
+    '<span class="tiny">최근 <b>'+j.days+'일</b> ('+admEsc(j.since)+' ~ '+admEsc(j.today)+')</span>'+
+    '<span class="admdays">'+[7,30,90,365].map(function(d){
+      return '<button class="chip'+(d===j.days?' on':'')+'" data-days="'+d+'">'+(d===365?'1년':d+'일')+'</button>';
+    }).join('')+'</span>'+
+  '</div>'+
+
+  '<div class="admgrid">'+cards.map(function(c){
+    return '<div class="admcard"><b>'+admN(c[1])+'</b><i>'+c[0]+'</i></div>';
+  }).join('')+'</div>'+
+
+  '<div class="card" style="margin-top:18px"><h3 class="admh">일자별 방문</h3>'+admDaily(j.daily,'#c19a2e')+'</div>'+
+  '<div class="card" style="margin-top:12px"><h3 class="admh">일자별 사주 입력</h3>'+admDaily(j.joinDaily,'#4ea87a')+'</div>'+
+
+  '<div class="card" style="margin-top:12px"><h3 class="admh">어느 메뉴가 인기 있나 <i>페이지 열람</i></h3>'+
+    admBars(j.pages,{label:function(r){return ADM_LABEL[r.path]||r.path;}})+'</div>'+
+
+  '<div class="card" style="margin-top:12px"><h3 class="admh">사주 정보를 어디서 넣었나 <i>실제 입력 건수</i></h3>'+
+    admBars(j.sajuSrc,{label:function(r){return ADM_SRC[r.src]||r.src;}})+'</div>'+
+
+  '<div class="card" style="margin-top:12px"><h3 class="admh">참여자 분포 <i>이름·생일은 보지 않고 집계만</i></h3>'+
+    '<div class="admsub">성별</div>'+
+    admBars(j.people.genders,{label:function(r){return genderMap[r.k]||'미상';}})+
+    '<div class="admsub">태어난 연대</div>'+
+    admBars(j.people.ages,{label:function(r){return r.k?(r.k+'년대'):'미상';}})+
+    '<div class="admsub">일간(日干)</div>'+
+    admBars(j.people.elems,{label:function(r){return (STEM_H[r.k]||'?')+' '+(STEM[r.k]||'')+'';}})+
+  '</div>'+
+
+  '<div class="card" style="margin-top:12px"><h3 class="admh">광고 성과</h3>'+
+    (j.ads&&j.ads.length
+      ? '<table class="admtb"><thead><tr><th>광고</th><th>노출</th><th>클릭</th><th>CTR</th></tr></thead><tbody>'+
+        j.ads.map(function(a){
+          var v=Number(a.v)||0,c=Number(a.c)||0;
+          return '<tr><td>'+admEsc(a.ad)+'</td><td>'+admN(v)+'</td><td>'+admN(c)+'</td><td>'+(v?((c/v*100).toFixed(1)+'%'):'-')+'</td></tr>';
+        }).join('')+'</tbody></table>'
+      : '<p class="tiny" style="margin:6px 0 0">아직 광고 기록이 없습니다.</p>')+
+  '</div>'+
+
+  '<div class="card" style="margin-top:12px"><h3 class="admh">인연지도 <i>참여 많은 순</i></h3>'+
+    admTable(j.topMaps,'map')+'</div>'+
+  '<div class="card" style="margin-top:12px"><h3 class="admh">분야 방 <i>참여 많은 순</i></h3>'+
+    admTable(j.topRooms,'room')+'</div>'+
+
+  '<button class="btn sec2" id="admOut" style="margin-top:18px">로그아웃</button>'+
+  '<p class="tiny center" style="margin-top:10px">12시간 뒤 자동으로 로그아웃됩니다.</p>';
+
+  body.innerHTML=html;
+  body.querySelectorAll('[data-days]').forEach(function(b){
+    b.onclick=function(){ window.__admDays=Number(b.dataset.days); loadAdmin(); };
+  });
+  var out=el('admOut'); if(out)out.onclick=function(){
+    api('/api/admin/logout',{method:'POST',body:'{}'}).then(function(){ location.href='/admin'; });
+  };
+  body.querySelectorAll('[data-del]').forEach(function(b){
+    b.onclick=function(){
+      if(b.dataset.armed!=='1'){ b.dataset.armed='1'; b.textContent='정말 삭제?'; 
+        setTimeout(function(){ if(b.dataset.armed==='1'){b.dataset.armed='0';b.textContent='삭제';} },4000); return; }
+      b.disabled=true; b.textContent='...';
+      api('/api/admin/'+b.dataset.kind+'/'+b.dataset.del,{method:'DELETE'})
+        .then(function(){ loadAdmin(); })
+        .catch(function(e){ b.disabled=false; b.textContent='삭제'; toast(e.message); });
+    };
+  });
+}
+function admTable(rows,kind){
+  if(!rows||!rows.length) return '<p class="tiny" style="margin:6px 0 0">아직 없습니다.</p>';
+  var TN={wealth:'재물',love:'연애',work:'일운'};
+  return '<div class="hscroll"><table class="admtb"><thead><tr>'+
+    '<th>'+(kind==='map'?'주인':'방 이름')+'</th><th>코드</th><th>인원</th><th>만든 날</th><th></th></tr></thead><tbody>'+
+    rows.map(function(r){
+      var nm = kind==='map' ? (r.owner_name||'-') : ((TN[r.topic]||r.topic)+' · '+(r.title||'-'));
+      var href = kind==='map' ? ('/m/'+r.code) : ('/w/'+r.code);
+      return '<tr><td>'+admEsc(nm)+'</td>'+
+        '<td><a href="'+href+'" target="_blank" rel="noopener">'+admEsc(r.code)+'</a></td>'+
+        '<td>'+admN(r.n)+'</td><td>'+admDate(r.created_at)+'</td>'+
+        '<td><button class="admdel" data-del="'+admEsc(r.code)+'" data-kind="'+kind+'">삭제</button></td></tr>';
+    }).join('')+'</tbody></table></div>';
+}
+
 function viewAbout(){
   setDock(null);
   app.innerHTML='';
@@ -4119,7 +4332,8 @@ window.addEventListener('hashchange',function(){ scrollToArea(); });
 buildNav();paintStat();bindPageShare();
 Promise.all([loadMeta(),loadMe()]).then(function(){
   paintBio();
-  if(BOOT.view==='login')viewLogin();
+  if(BOOT.view==='admin')viewAdmin();
+  else if(BOOT.view==='login')viewLogin();
   else if(BOOT.view==='mine')viewMine();
   else if(BOOT.view==='about')viewAbout();
   else if(BOOT.view==='profile')viewProfile();
