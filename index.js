@@ -378,6 +378,28 @@ async function handleApi(request, env, url) {
     const A = JSON.parse(row.saju_json);
     const res = analyze(A, B);
 
+    // 같은 이름 + 같은 생년월일이면 새로 넣지 않고 원래 것을 돌려준다.
+    // (오류로 두 번 누르거나 뒤로가기 후 다시 제출해도 별이 두 개 찍히지 않게)
+    const dup = await db.prepare(
+      `SELECT id, token FROM entries WHERE code = ? AND name = ? AND birth_json = ? ORDER BY id ASC LIMIT 1`
+    ).bind(code, name, JSON.stringify(birth)).first();
+    if (dup) {
+      const dRank = await db.prepare(
+        `SELECT COUNT(*) + 1 AS r FROM entries WHERE code = ? AND (score > ? OR (score = ? AND id < ?))`
+      ).bind(code, res.score, res.score, dup.id).first();
+      const dTot = await db.prepare(`SELECT COUNT(*) AS n FROM entries WHERE code = ?`).bind(code).first();
+      return json({
+        entryId: dup.id, token: dup.token,
+        ownerName: row.owner_name,
+        ownerChar: charPayload(row.day_stem),
+        me: { name, char: charPayload(B.dayStem), saju: sajuPayload(B) },
+        result: res,
+        deep: relDeep(A, B, res),
+        rank: dRank.r, total: dTot.n,
+        already: true,
+      });
+    }
+
     const token = randToken();
     const ins = await db.prepare(
       `INSERT INTO entries (code, name, birth_json, saju_json, result_json, score, day_stem, token, created_at)
@@ -389,7 +411,8 @@ async function handleApi(request, env, url) {
     const rank = await db.prepare(
       `SELECT COUNT(*) + 1 AS r FROM entries WHERE code = ? AND (score > ? OR (score = ? AND id < ?))`
     ).bind(code, res.score, res.score, id).first();
-    const total = cnt.n + 1;
+    const tot = await db.prepare(`SELECT COUNT(*) AS n FROM entries WHERE code = ?`).bind(code).first();
+    const total = tot.n;
 
     return json({
       entryId: id, token,
@@ -683,6 +706,25 @@ async function handleApi(request, env, url) {
     try { saju = computeSaju(birth); } catch (e) { return bad(e.message || '사주를 계산할 수 없습니다.'); }
     const res = TOPICS[topic].score(saju);
 
+    const rdup = await db.prepare(
+      `SELECT id, token FROM room_entries WHERE code = ? AND name = ? AND birth_json = ? ORDER BY id ASC LIMIT 1`
+    ).bind(code, name, JSON.stringify(birth)).first();
+    if (rdup) {
+      const dRank = await db.prepare(
+        `SELECT COUNT(*) + 1 AS r FROM room_entries WHERE code = ? AND (score > ? OR (score = ? AND id < ?))`
+      ).bind(code, res.score, res.score, rdup.id).first();
+      const dTot = await db.prepare(`SELECT COUNT(*) AS n FROM room_entries WHERE code = ?`).bind(code).first();
+      return json({
+        code, title: row.title, topic,
+        entryId: rdup.id, entryToken: rdup.token,
+        me: { name, char: charPayload(saju.dayStem), saju: sajuPayload(saju) },
+        result: res, rank: dRank.r, total: dTot.n,
+        year: topicYear(saju, topic, todayKST().y),
+        actions: topicActions(topic, res.band),
+        already: true,
+      });
+    }
+
     const token = randToken();
     const ins = await db.prepare(
       `INSERT INTO room_entries (code, name, birth_json, saju_json, result_json, score, day_stem, token, created_at)
@@ -694,12 +736,13 @@ async function handleApi(request, env, url) {
     const rank = await db.prepare(
       `SELECT COUNT(*) + 1 AS r FROM room_entries WHERE code = ? AND (score > ? OR (score = ? AND id < ?))`
     ).bind(code, res.score, res.score, id).first();
+    const rtot = await db.prepare(`SELECT COUNT(*) AS n FROM room_entries WHERE code = ?`).bind(code).first();
 
     return json({
       code, title: row.title, topic,
       entryId: id, entryToken: token,
       me: { name, char: charPayload(saju.dayStem), saju: sajuPayload(saju) },
-      result: res, rank: rank.r, total: cnt.n + 1,
+      result: res, rank: rank.r, total: rtot.n,
       year: topicYear(saju, topic, todayKST().y),
       actions: topicActions(topic, res.band),
     });
