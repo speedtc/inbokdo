@@ -715,7 +715,8 @@ async function handleApi(request, env, url, ctx) {
       { label: '사이트 열기', action: 'message', messageText: '사이트' },
     ];
     const HELP = '생년월일을 보내주시면 오늘의 운세를 바로 알려드려요.\n\n'
-      + '이렇게 보내주세요\n· 1976.1.7\n· 19760107\n· 1976.1.7 음력\n· 1976.1.7 23시\n\n'
+      + '이렇게 보내주세요\n· 1976.1.7\n· 19760107\n· 1976년 1월 7일\n'
+      + '· 1976.1.7 음력\n· 1976년 음력 1월 7일 0시 15분\n· 1976.1.7 23시 (시간 모르면 안 쓰셔도 돼요)\n\n'
       + '나머지 메뉴는 여기서 전부 무료로 보실 수 있어요.\n' + SITE;
 
     let body = null;
@@ -738,22 +739,50 @@ async function handleApi(request, env, url, ctx) {
         + '· 연애지도 ' + SITE + '/love\n· 일운지도 ' + SITE + '/work', QUICK);
     }
 
-    // 생년월일 뽑기
-    const digits = utter.replace(/[^0-9]/g, '');
+    // 생년월일 · 시간 뽑기 (한글 표기도 받음)
+    const lunar = /음력|음\s*력/.test(utter);
+    let s = utter.replace(/음력|양력/g, ' ');
+
+    // 1) 시간 먼저 도려내고 문자열에서 제거 (날짜 숫자와 섞이지 않게)
+    let hour = null, minute = null, timeUnknown = false;
+    if (/시\s*모름|시간\s*모름|모름|몰라|무시/.test(s)) timeUnknown = true;
+    let ap = 0;
+    if (/오전|새벽|아침/.test(s)) ap = 1;
+    if (/오후|저녁|밤|낮/.test(s)) ap = 2;
+    let tm = s.match(/(\d{1,2})\s*시(?:\s*(\d{1,2})\s*분)?/);
+    if (!tm) tm = s.match(/(\d{1,2})\s*:\s*(\d{2})/);
+    if (tm && !timeUnknown) {
+      let hh = +tm[1];
+      const mm = tm[2] != null ? +tm[2] : 30;
+      if (ap === 2 && hh < 12) hh += 12;
+      if (ap === 1 && hh === 12) hh = 0;
+      if (hh >= 0 && hh <= 23 && mm >= 0 && mm <= 59) { hour = hh; minute = mm; }
+      s = s.slice(0, tm.index) + ' ' + s.slice(tm.index + tm[0].length);
+    }
+
+    // 2) 날짜
     let y = 0, mo = 0, d = 0;
-    let m1 = utter.match(/(\d{4})\s*[.\-/년]\s*(\d{1,2})\s*[.\-/월]\s*(\d{1,2})/);
-    if (m1) { y = +m1[1]; mo = +m1[2]; d = +m1[3]; }
-    else if (digits.length >= 8) { y = +digits.slice(0, 4); mo = +digits.slice(4, 6); d = +digits.slice(6, 8); }
+    let m1 = s.match(/(\d{4})\s*(?:년|[.\-/])\s*(\d{1,2})\s*(?:월|[.\-/])\s*(\d{1,2})/);
+    if (!m1) m1 = s.match(/(\d{2})\s*(?:년|[.\-/])\s*(\d{1,2})\s*(?:월|[.\-/])\s*(\d{1,2})/);
+    if (m1) {
+      y = +m1[1]; mo = +m1[2]; d = +m1[3];
+      if (m1[1].length === 2) y = y > 35 ? 1900 + y : 2000 + y;
+    } else {
+      const dg = s.replace(/[^0-9]/g, '');
+      if (dg.length === 8) { y = +dg.slice(0, 4); mo = +dg.slice(4, 6); d = +dg.slice(6, 8); }
+      else if (dg.length === 6) {
+        const yy = +dg.slice(0, 2);
+        y = yy > 35 ? 1900 + yy : 2000 + yy; mo = +dg.slice(2, 4); d = +dg.slice(4, 6);
+      }
+    }
     if (!y || !mo || !d || y < 1900 || y > 2035 || mo < 1 || mo > 12 || d < 1 || d > 31) {
       return kt(HELP, QUICK);
     }
-    const lunar = /음력/.test(utter);
-    const hm = utter.match(/(\d{1,2})\s*시/);
-    const hour = hm ? Math.min(23, Math.max(0, +hm[1])) : null;
+    if (timeUnknown) { hour = null; minute = null; }
 
     try {
       const s2 = computeSaju(normBirth({
-        y, m: mo, d, hour, minute: hour == null ? null : 30,
+        y, m: mo, d, hour, minute: hour == null ? null : minute,
         unknownTime: hour == null, lunar, gender: 'm',
       }));
       const t = todayFortune(s2);
